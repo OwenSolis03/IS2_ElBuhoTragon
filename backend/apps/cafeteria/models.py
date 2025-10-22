@@ -47,10 +47,13 @@ class Usuarios(models.Model):
     id_usuarios = models.AutoField(primary_key=True)
     nombre_usuario = models.CharField(max_length=255)
     contrasena = models.CharField(max_length=255)
+    email = models.EmailField(unique=True) 
     es_admin = models.IntegerField(blank=True, null=True)
     fecha_registro = models.DateTimeField(blank=True, null=True)
 
     class Meta:
+
+        managed = False 
         db_table = 'Usuarios'
 
     @property

@@ -133,9 +133,9 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": os.getenv("DB_NAME", "mydatabase"),
-        "USER": os.getenv("DB_USER", "mydatabaseuser"),
-        "PASSWORD": os.getenv("DB_PASSWORD", "mypassword"),
+        "NAME": os.getenv("DB_NAME", "el_buho_tragon"),
+        "USER": os.getenv("DB_USER", "root"),
+        "PASSWORD": os.getenv("DB_PASSWORD", "Potaxio12345"),
         "HOST": os.getenv("DB_HOST", "127.0.0.1"),
         "PORT": os.getenv("DB_PORT", "3306"),  # Cambia 5432 por 3306
     }
