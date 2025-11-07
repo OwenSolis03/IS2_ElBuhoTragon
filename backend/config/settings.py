@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'apps.cafeteria',
+    'django_filters',
 ]
 REST_FRAMEWORK = {
 

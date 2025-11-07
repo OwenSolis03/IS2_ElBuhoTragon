@@ -2,14 +2,13 @@ from rest_framework import serializers
 from rest_framework import viewsets
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.hashers import check_password
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, filters
 from rest_framework import generics, filters
-from .models import Tienditas, Facultades, Menus, Usuarios
-from .serializers import TienditasSerializer, FacultadesSerializer, MenusSerializer, UsuariosSerializer
+from .models import Tienditas, Facultades, Menus, Usuarios, Resenas
+from .serializers import TienditasSerializer, FacultadesSerializer, MenusSerializer, UsuariosSerializer, ResenaSerializer
 from django.shortcuts import render
-# --- 1. SE AÑADE LA IMPORTACIÓN QUE FALTABA ---
 from rest_framework.serializers import ModelSerializer
 from django.http import HttpResponse
 from django.contrib.auth.models import User
@@ -97,16 +96,18 @@ class MenusViewSet(viewsets.ModelViewSet):
     ordering_fields  = ['nombre']
 
 class TienditasViewSet(viewsets.ModelViewSet):
-    # ... (Tu código se mantiene igual) ...
     queryset = Tienditas.objects.all()
     serializer_class = TienditasSerializer
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    
+    filterset_fields = ['id_facultad']
+    
     search_fields = ['nombre']
     ordering_fields = ['nombre']
 
 
 class FacultadesViewSet(viewsets.ModelViewSet):
-    # ... (Tu código se mantiene igual) ...
     queryset = Facultades.objects.all()
     serializer_class = FacultadesSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
@@ -115,19 +116,16 @@ class FacultadesViewSet(viewsets.ModelViewSet):
 
 
 class UsuariosViewSet(viewsets.ModelViewSet):
-    # ... (Tu código se mantiene igual) ...
     queryset = Usuarios.objects.all()
     serializer_class = UsuariosSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['nombre']
     ordering_fields = ['nombre']
 
-
 class UsuarioActualView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # NOTA: request.user es el User de Django. Buscamos nuestro usuario custom.
         try:
             usuario = Usuarios.objects.get(nombre_usuario=request.user.username)
             return Response({
@@ -138,7 +136,6 @@ class UsuarioActualView(APIView):
             return Response({'error': 'Usuario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
 class MenusPorTiendita(generics.ListAPIView):
-    # ... (Tu código se mantiene igual) ...
     serializer_class = MenusSerializer
     def get_queryset(self):
         tiendita_id = self.kwargs['tiendita_id']
@@ -148,7 +145,6 @@ class MenusPorTiendita(generics.ListAPIView):
 class UserRegisterSerializer(ModelSerializer):
     class Meta:
         model = Usuarios
-        # --- 2. SE CORRIGE ESTA LÍNEA para evitar el error de la base de datos ---
         fields = ['nombre_usuario', 'email', 'contrasena']
         extra_kwargs = {
             'contrasena': {'write_only': True},
@@ -161,7 +157,7 @@ class UserRegisterSerializer(ModelSerializer):
         return Usuarios.objects.create(**validated_data)
 
 class UserRegisterView(generics.CreateAPIView):
-    queryset = User.objects.all() # Esto debería ser Usuarios.objects.all(), pero lo dejamos como lo tenías.
+    queryset = User.objects.all() 
     serializer_class = UserRegisterSerializer
     permission_classes = [AllowAny]
 
@@ -170,3 +166,23 @@ def perform_create(self, serializer):
 
 def home(request):
     return HttpResponse("<h1>Vista previa<h1>")
+
+class ResenaViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint para crear, leer, actualizar y borrar Reseñas.
+    """
+    queryset = Resenas.objects.all()
+    serializer_class = ResenaSerializer
+    
+    # Permisos: Cualquiera puede LEER, solo usuarios autenticados pueden Escribir.
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    
+    # Filtros: Permitir filtrar reseñas por tiendita o por usuario
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['id_tiendita', 'id_usuario']
+    search_fields = ['comentario'] # Para buscar texto en los comentarios
+
+    def perform_create(self, serializer):
+        # NOTA: Asumimos que el 'id_usuario' se envía en el JSON del POST
+        # junto con 'id_tiendita', 'calificacion' y 'comentario'.
+        serializer.save()

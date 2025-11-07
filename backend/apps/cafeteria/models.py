@@ -6,6 +6,7 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Facultades(models.Model):
@@ -173,3 +174,45 @@ class DjangoSession(models.Model):
     class Meta:
         managed = False
         db_table = 'django_session'
+
+
+class Resenas(models.Model):
+    id_resena = models.AutoField(primary_key=True)
+    
+    # Llave foránea a la Tiendita que se está reseñando
+    id_tiendita = models.ForeignKey(
+        Tienditas, 
+        on_delete=models.CASCADE, # Si se borra la tiendita, se borran sus reseñas
+        db_column='id_tiendita',
+        related_name='resenas' # Nos permitirá acceder a las reseñas desde una tiendita
+    )
+    
+    # Llave foránea al Usuario que escribe la reseña
+    id_usuario = models.ForeignKey(
+        Usuarios,
+        on_delete=models.SET_NULL, # Si se borra el usuario, la reseña se vuelve anónima
+        null=True,
+        db_column='id_usuario'
+    )
+    
+    # Calificación de 1 a 5 estrellas
+    calificacion = models.IntegerField(
+        validators=[
+            MaxValueValidator(5),
+            MinValueValidator(1)
+        ]
+    )
+    
+    # Comentario opcional
+    comentario = models.TextField(blank=True, null=True)
+    
+    # Fecha de creación
+    fecha_registro = models.DateTimeField(
+    auto_now_add=True,
+    db_column='fecha_res'
+)
+
+    class Meta:
+        managed = False            # <-- ¡Importante! No gestionar esta tabla
+        db_table = 'resenas'         # <-- ¡Importante! El nombre exacto de tu tabla
+        ordering = ['-fecha_registro'] # Ordenar de la más reciente a la más antigua 
