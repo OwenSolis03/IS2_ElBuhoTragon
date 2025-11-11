@@ -7,12 +7,13 @@ const Registro = () => {
   const [mostrarContrasena, setMostrarContrasena] = useState(false);
   const [nombreUsuario, setNombreUsuario] = useState("");
   const [contrasena, setContrasena] = useState("");
+  const [email, setEmail] = useState("");
   const [mensaje, setMensaje] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!nombreUsuario || !contrasena) {
+    if (!nombreUsuario || !contrasena || !email) {
       setMensaje("Todos los campos son obligatorios.");
       return;
     }
@@ -24,8 +25,9 @@ const Registro = () => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          nombre_usuario: nombreUsuario,
-          contrasena: contrasena
+          nombre_usuario: nombreUsuario, // Corregido: De vuelta al nombre original
+          contrasena: contrasena,       // Corregido: De vuelta al nombre original
+          email: email
         })
       });
 
@@ -34,9 +36,18 @@ const Registro = () => {
         setMensaje("Registro exitoso. Ya puedes iniciar sesión.");
         setNombreUsuario("");
         setContrasena("");
+        setEmail("");
       } else {
         const errorData = await respuesta.json();
-        setMensaje(errorData.mensaje || "Error al registrar.");
+        // Intenta mostrar un mensaje de error más específico si el backend lo envía
+        let errorMessage = "Error al registrar.";
+        if (errorData.username) errorMessage = `Usuario: ${errorData.username[0]}`;
+        else if (errorData.nombre_usuario) errorMessage = `Usuario: ${errorData.nombre_usuario[0]}`;
+        else if (errorData.email) errorMessage = `Email: ${errorData.email[0]}`;
+        else if (errorData.password) errorMessage = `Contraseña: ${errorData.password[0]}`;
+        else if (errorData.contrasena) errorMessage = `Contraseña: ${errorData.contrasena[0]}`;
+
+        setMensaje(errorMessage);
       }
     } catch (error) {
       console.error("Error al enviar datos:", error);
@@ -100,6 +111,19 @@ const Registro = () => {
               value={nombreUsuario}
               onChange={(e) => setNombreUsuario(e.target.value)}
               style={inputStyle}
+              required
+            />
+
+            <label style={{ display: "block", margin: "1rem 0 0.5rem", fontWeight: "bold" }}>
+              Correo Electrónico
+            </label>
+            <input
+              type="email"
+              placeholder="correo@ejemplo.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={inputStyle}
+              required
             />
 
             <label style={{ display: "block", margin: "1rem 0 0.5rem", fontWeight: "bold" }}>
@@ -111,6 +135,7 @@ const Registro = () => {
               value={contrasena}
               onChange={(e) => setContrasena(e.target.value)}
               style={inputStyle}
+              required
             />
 
             <div style={{ marginTop: "0.5rem", textAlign: "left" }}>
