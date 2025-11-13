@@ -15,54 +15,107 @@ import IngenieriaQuimica from "/IngQuimica1Card.jpeg";
 import Geologia from "/Cafeteria-Geologia1Card.jpeg";
 import Matematicas from "/Matematicas1Card.png";
 import Artes from "/Artes1Card.png";
-// Importamos FiChevronDown junto con los otros iconos
-import { FiSearch, FiMessageSquare, FiChevronDown } from 'react-icons/fi';
+import { FiSearch, FiMessageSquare, FiChevronDown, FiX } from 'react-icons/fi';
 
+// --- DATOS DE PRUEBA (MOCKUP) ---
 const cafeterias = [
- { name: "Cafetería Derecho", image: Derecho1, path: "/cafeterias/cafeteria-derecho" },
- { name: "Cafetería Trabajo Social", image: TrabajoSocial, path: "/cafeterias/cafeteria-de-trabajo-social" },
- { name: "Cafetería Educación", image: Educacion, path: "/cafeterias/cafeteria-educacion" },
- { name: "Cafetería Historia/Sociologia", image: Historia, path: "/cafeterias/cafeteria-historia/sociologia" },
- { name: "Cafetería Medicina", image: Medicina1, path: "/cafeterias/cafetería-medicina" },
- { name: "Cafetería Medicina 2", image: Medicina2, path: "/cafeterias/cafetería-medicina-2" },
- { name: "Cafetería Civil-Minas", image: CivilMinas, path: "/cafeterias/cafeteria-departemento-de-ingenieria-industrial/civil" },
- { name: "Cafetería Ingeniería Química", image: IngenieriaQuimica, path: "/cafeterias/cafeteria-departemento-de-ingenieria-quimica" },
- { name: "Cafetería Matematicas", image: Matematicas, path: "/cafeterias/cafetería-matemáticas"},
- { name: "Cafeteria Geologia", image: Geologia, path: "/cafeterias/cafetería-geología"},
- { name: "Cafeteria Artes", image: Artes, path: "/cafeterias/cafetería-artes"},
+  { name: "Cafetería Derecho", image: Derecho1, path: "/cafeterias/cafeteria-derecho", tags: ["Desayunos", "Comida"], price: "$" },
+  { name: "Cafetería Trabajo Social", image: TrabajoSocial, path: "/cafeterias/cafeteria-de-trabajo-social", tags: ["Snacks", "Postres"], price: "$$" },
+  { name: "Cafetería Educación", image: Educacion, path: "/cafeterias/cafeteria-educacion", tags: ["Comida Corrida"], price: "$" },
+  { name: "Cafetería Historia/Sociologia", image: Historia, path: "/cafeterias/cafeteria-historia/sociologia", tags: ["Variado"], price: "$$" },
+  { name: "Cafetería Medicina", image: Medicina1, path: "/cafeterias/cafetería-medicina", tags: ["Saludable"], price: "$$$" },
+  { name: "Cafetería Medicina 2", image: Medicina2, path: "/cafeterias/cafetería-medicina-2", tags: ["Café", "Paninis"], price: "$$" },
+  { name: "Cafetería Civil-Minas", image: CivilMinas, path: "/cafeterias/cafeteria-departemento-de-ingenieria-industrial/civil", tags: ["Burritos"], price: "$" },
+  { name: "Cafetería Ingeniería Química", image: IngenieriaQuimica, path: "/cafeterias/cafeteria-departemento-de-ingenieria-quimica", tags: ["Tortas"], price: "$" },
+  { name: "Cafetería Matematicas", image: Matematicas, path: "/cafeterias/cafetería-matemáticas", tags: ["Snacks"], price: "$"},
+  { name: "Cafeteria Geologia", image: Geologia, path: "/cafeterias/cafetería-geología", tags: ["Café"], price: "$$"},
+  { name: "Cafeteria Artes", image: Artes, path: "/cafeterias/cafetería-artes", tags: ["Vegetariano"], price: "$$$"},
 ];
 
-const Home = () => {
-  // --- Estados y useEffects (sin cambios) ---
-  const [cafeteriaDestacada, setCafeteriaDestacada] = useState(cafeterias[0]);
-  const [hover, setHover] = useState(false);
-  const [autoplay, setAutoplay] = useState(true);
+// Opciones para los filtros
+const filterOptions = {
+  facultad: ["Ingeniería", "Sociales", "Medicina", "Humanidades", "Económicas"],
+  comida: ["Desayunos", "Comida Corrida", "Snacks", "Café", "Saludable"],
+  precio: ["$ (Económico)", "$$ (Medio)", "$$$ (Premium)"]
+};
 
-  const siguienteCafeteria = () => {
-     const index = cafeterias.indexOf(cafeteriaDestacada);
-     setCafeteriaDestacada(cafeterias[(index + 1) % cafeterias.length]);
-     setAutoplay(false);
+// --- COMPONENTE REUTILIZABLE PARA EL DROPDOWN ---
+const FilterDropdown = ({ label, options, active, onToggle, selectedValue, onSelect }) => {
+  return (
+    <div className="relative">
+      <button
+        onClick={onToggle}
+        className={`
+          flex items-center justify-between border w-48 px-4 py-2 text-sm transition duration-150 shadow-sm
+          ${active || selectedValue ? '!bg-gray-100 border-gray-400' : '!bg-white border-gray-300'}
+          !text-gray-700 !rounded-none hover:!bg-gray-50
+        `}
+      >
+        <span className="truncate">{selectedValue || label}</span>
+        {selectedValue ? (
+          <FiX 
+            className="ml-2 text-gray-500 hover:text-red-500 z-10" 
+            onClick={(e) => { e.stopPropagation(); onSelect(null); }} 
+          />
+        ) : (
+          <FiChevronDown className={`ml-2 text-gray-500 transition-transform duration-200 ${active ? 'rotate-180' : ''}`} />
+        )}
+      </button>
+
+      {/* Menú Desplegable */}
+      {active && (
+        <div className="absolute top-full left-0 w-full bg-white border border-gray-200 shadow-lg z-50 max-h-60 overflow-y-auto">
+          {options.map((option, index) => (
+            <div
+              key={index}
+              onClick={() => onSelect(option)}
+              className="px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer border-b border-gray-50 last:border-none"
+            >
+              {option}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const Home = () => {
+  const [cafeteriaDestacada, setCafeteriaDestacada] = useState(cafeterias[0]);
+  const [autoplay, setAutoplay] = useState(true);
+  
+  // Estados para los filtros
+  const [activeDropdown, setActiveDropdown] = useState(null); // Cuál menú está abierto
+  const [selectedFilters, setSelectedFilters] = useState({
+    facultad: null,
+    comida: null,
+    precio: null
+  });
+
+  // Manejar la selección de un filtro
+  const handleSelectFilter = (category, value) => {
+    setSelectedFilters(prev => ({ ...prev, [category]: value }));
+    setActiveDropdown(null); // Cerrar menú al seleccionar
   };
-  const anteriorCafeteria = () => {
-     const index = cafeterias.indexOf(cafeteriaDestacada);
-     setCafeteriaDestacada(cafeterias[(index - 1 + cafeterias.length) % cafeterias.length]);
-     setAutoplay(false);
+
+  // Alternar visibilidad del menú
+  const toggleDropdown = (dropdownName) => {
+    setActiveDropdown(activeDropdown === dropdownName ? null : dropdownName);
   };
+
+  // Carrusel (Lógica existente)
   useEffect(() => {
-     let intervalo;
-     if (autoplay) {
-       intervalo = setInterval(() => {
-         const index = cafeterias.indexOf(cafeteriaDestacada);
-         setCafeteriaDestacada(cafeterias[(index + 1) % cafeterias.length]);
-       }, 5000);
-     }
-     return () => clearInterval(intervalo);
+    let intervalo;
+    if (autoplay) {
+      intervalo = setInterval(() => {
+        const index = cafeterias.indexOf(cafeteriaDestacada);
+        setCafeteriaDestacada(cafeterias[(index + 1) % cafeterias.length]);
+      }, 5000);
+    }
+    return () => clearInterval(intervalo);
   }, [cafeteriaDestacada, autoplay]);
-  useEffect(() => { /* ... */ }, []);
-  // --- Fin Estados y useEffects ---
 
   return (
-    // Div principal con estilo inline para el fondo
     <div style={{
       minHeight: "100vh",
       width: "100vw",
@@ -70,7 +123,7 @@ const Home = () => {
       padding: 0,
       display: "flex",
       flexDirection: "column",
-      background: "linear-gradient(-45deg, #161b33, #1f2457, #2a3558)",
+      background: "linear-gradient(135deg, #0f172a, #1e293b, #334155)",
       backgroundSize: "600% 600%",
       animation: "backgroundAnimation 30s ease infinite",
       color: "white",
@@ -78,10 +131,9 @@ const Home = () => {
     }}>
       <Header />
 
-      {/* Contenido Principal con padding general */}
       <main style={{ flexGrow: 1, paddingTop: '5rem', width: '100%' }} className="px-8 sm:px-12 lg:px-16">
 
-        {/* Barra de Búsqueda (centrada) */}
+        {/* Barra de Búsqueda */}
         <div className="relative mb-6 max-w-xl mx-auto">
           <input
             type="text"
@@ -91,33 +143,43 @@ const Home = () => {
           <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
         </div>
 
-        {/* --- INICIO: Sección de Filtros con Botones Blancos --- */}
-        <div className="flex flex-wrap items-center justify-center gap-4 mb-8">
-          {/* Botón Facultad */}
-          {/* <-- CAMBIO AQUÍ: Clases de color modificadas a blanco/gris --> */}
-          <button className="flex items-center justify-between bg-white border border-gray-300 rounded-md px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition duration-150 w-40 shadow-sm">
-            <span>Facultad</span>
-            <FiChevronDown className="ml-2 text-gray-500" />
-          </button>
+        {/* --- Sección de Filtros Avanzados (UI IMPLEMENTADA) --- */}
+        <div className="flex flex-wrap items-center justify-center gap-4 mb-8 relative z-40">
+          
+          {/* Filtro: Facultad */}
+          <FilterDropdown 
+            label="Facultad" 
+            options={filterOptions.facultad} 
+            active={activeDropdown === 'facultad'}
+            onToggle={() => toggleDropdown('facultad')}
+            selectedValue={selectedFilters.facultad}
+            onSelect={(val) => handleSelectFilter('facultad', val)}
+          />
 
-          {/* Botón Categoría */}
-          {/* <-- CAMBIO AQUÍ: Clases de color modificadas a blanco/gris --> */}
-          <button className="flex items-center justify-between bg-white border border-gray-300 rounded-md px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition duration-150 w-40 shadow-sm">
-            <span>Categoría</span>
-            <FiChevronDown className="ml-2 text-gray-500" />
-          </button>
+          {/* Filtro: Tipo de Comida */}
+          <FilterDropdown 
+            label="Tipo de Comida" 
+            options={filterOptions.comida} 
+            active={activeDropdown === 'comida'}
+            onToggle={() => toggleDropdown('comida')}
+            selectedValue={selectedFilters.comida}
+            onSelect={(val) => handleSelectFilter('comida', val)}
+          />
 
-          {/* Botón Abierto */}
-          {/* <-- CAMBIO AQUÍ: Clases de color modificadas a blanco/gris --> */}
-          <button className="flex items-center justify-between bg-white border border-gray-300 rounded-md px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition duration-150 w-40 shadow-sm">
-            <span>Abierto</span>
-            <FiChevronDown className="ml-2 text-gray-500" />
-          </button>
+          {/* Filtro: Precio */}
+          <FilterDropdown 
+            label="Precio" 
+            options={filterOptions.precio} 
+            active={activeDropdown === 'precio'}
+            onToggle={() => toggleDropdown('precio')}
+            selectedValue={selectedFilters.precio}
+            onSelect={(val) => handleSelectFilter('precio', val)}
+          />
+          
         </div>
-        {/* --- FIN: Sección de Filtros con Botones Blancos --- */}
 
-        {/* Botón de Chat (centrado) */}
-        <div className="flex justify-center mb-8">
+        {/* Botón de Chat */}
+        <div className="flex justify-center mb-8 relative z-0">
           <button className="flex items-center gap-2 px-6 py-3 bg-blue-600/70 hover:bg-blue-700/80 backdrop-blur-sm border border-blue-500/50 rounded-full text-white font-semibold transition duration-200 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
             <FiMessageSquare size={18} />
             Chatea con buhito
@@ -130,7 +192,8 @@ const Home = () => {
         </h2>
 
         {/* Grid de Cafeterías */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 pb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-8 relative z-0">
+          {/* Aquí podrías filtrar 'cafeterias' usando 'selectedFilters' */}
           {cafeterias.map((cafeteria, index) => (
             <CafeCard
               key={index}
@@ -145,7 +208,6 @@ const Home = () => {
 
       <Footer />
 
-      {/* Estilos globales */}
       <style jsx global>{`
         @keyframes backgroundAnimation {
           0% { background-position: 0% 50%; }

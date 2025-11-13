@@ -7,7 +7,6 @@ import lcclogo from "/LCCLogo.png";
 const Footer = () => {
   return (
     <footer style={{
-      
       color: "#FFFAF0",
       textAlign: "center",
       padding: "1.5rem 1rem",
@@ -18,9 +17,10 @@ const Footer = () => {
       alignItems: "center",
       gap: "0.75rem",
       backdropFilter: "blur(6px)",
-      
     }}>
-      <div style={{
+      
+      {/* SECCIÓN COMENTADA: Logos UNISON y LCC */}
+      {/* <div style={{
         display: "flex",
         flexDirection: "row",
         justifyContent: "center",
@@ -71,7 +71,8 @@ const Footer = () => {
             }} 
           />
         </a>
-      </div>
+      </div> 
+      */}
 
       {/* GitHub Button */}
       <a 

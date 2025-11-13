@@ -50,7 +50,7 @@ const Registro = () => {
       padding: 0,
       width: "100vw",
       minHeight: "100vh",
-      background: "linear-gradient(-45deg, #161b33, #1f2457, #2a3558)",
+      background: "linear-gradient(135deg, #0f172a, #1e293b, #334155)",
       backgroundSize: "100% 100%",
       color: "white",
       paddingTop: "3.2rem",

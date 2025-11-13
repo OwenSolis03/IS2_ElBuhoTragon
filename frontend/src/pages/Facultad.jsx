@@ -55,7 +55,7 @@ const Facultad = () => {
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
-      background: "linear-gradient(-45deg, #161b33, #1f2457, #2a3558)",
+      background: "linear-gradient(135deg, #0f172a, #1e293b, #334155)",
       backgroundSize: "600% 600%",
       animation: "backgroundAnimation 30s ease infinite",
       color: "white",
