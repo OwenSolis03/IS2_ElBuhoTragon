@@ -20,7 +20,7 @@ const Header = () => {
                Cafeterías
              </Link>
              <Link to="/facultad" className={linkStyle}>
-               Facultad
+               Mapa
              </Link>
              {/* Puedes añadir más enlaces aquí si es necesario */}
           </nav>
