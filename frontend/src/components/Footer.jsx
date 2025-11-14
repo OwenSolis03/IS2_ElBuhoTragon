@@ -1,80 +1,24 @@
 // src/components/Footer.jsx
 import React from "react";
 import { VscGithubAlt } from "react-icons/vsc";
-import unisonLogo from "/EscudoUnison.png";
-import lcclogo from "/LCCLogo.png";
 
 const Footer = () => {
   return (
     <footer style={{
-      color: "#FFFAF0",
+      // CAMBIO: Usamos exactamente el mismo color que el Header (#18181b)
+      backgroundColor: "#18181b", 
+      color: "#e4e4e7", 
       textAlign: "center",
-      padding: "1.5rem 1rem",
-      marginTop: "2rem",
+      padding: "2rem 1rem",
+      marginTop: "auto", 
       fontSize: "0.9rem",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
-      gap: "0.75rem",
-      backdropFilter: "blur(6px)",
+      gap: "1.5rem",
+      borderTop: "1px solid rgba(255, 255, 255, 0.05)" 
     }}>
       
-      {/* SECCIÓN COMENTADA: Logos UNISON y LCC */}
-      {/* <div style={{
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        gap: "2rem"
-      }}>
-        <a 
-          href="https://www.unison.mx/" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          style={{
-            transition: "transform 0.2s ease",
-            display: "inline-block",
-            "&:hover": {
-              transform: "scale(1.05)"
-            }
-          }}
-        >
-          <img 
-            src={unisonLogo} 
-            alt="Logo UNISON" 
-            style={{ 
-              height: "100px", 
-              filter: "drop-shadow(0 0 4px rgba(0,0,0,0.5)) brightness(1.05)",
-              transition: "filter 0.2s ease",
-            }} 
-          />
-        </a>
-        <a 
-          href="https://cc.unison.mx/" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          style={{
-            transition: "transform 0.2s ease",
-            display: "inline-block",
-            "&:hover": {
-              transform: "scale(1.05)"
-            }
-          }}
-        >
-          <img 
-            src={lcclogo} 
-            alt="Logo LCC" 
-            style={{ 
-              height: "100px", 
-              filter: "drop-shadow(0 0 4px rgba(0,0,0,0.5)) brightness(1.05)",
-              transition: "filter 0.2s ease",
-            }} 
-          />
-        </a>
-      </div> 
-      */}
-
-      {/* GitHub Button */}
       <a 
         href="https://github.com/ComputerChemistry/Ing-Software-Proyecto-2025-1"
         target="_blank"
@@ -83,18 +27,25 @@ const Footer = () => {
           display: "flex",
           alignItems: "center",
           gap: "0.5rem",
-          color: "#FFFAF0",
+          color: "#e4e4e7",
           textDecoration: "none",
-          padding: "0.5rem 1rem",
-          borderRadius: "0.5rem",
-          border: "1px solid rgba(205, 138, 57, 0.3)",
+          padding: "0.6rem 1.2rem",
+          borderRadius: "9999px",
+          border: "1px solid rgba(255, 255, 255, 0.1)",
+          backgroundColor: "rgba(255, 255, 255, 0.03)",
           transition: "all 0.2s ease",
           fontSize: "0.9rem",
           fontWeight: "500",
-          "&:hover": {
-            backgroundColor: "rgba(29, 42, 16, 0.7)",
-            borderColor: "rgba(205, 138, 57, 0.5)"
-          }
+        }}
+        onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "rgba(234, 179, 8, 0.1)";
+            e.currentTarget.style.borderColor = "rgba(234, 179, 8, 0.5)";
+            e.currentTarget.style.color = "#fbbf24";
+        }}
+        onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.03)";
+            e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)";
+            e.currentTarget.style.color = "#e4e4e7";
         }}
       >
         <VscGithubAlt size={20} />
@@ -104,15 +55,16 @@ const Footer = () => {
       <div style={{
         display: "flex",
         flexDirection: "column",
-        gap: "0.5rem"
+        gap: "0.5rem",
+        alignItems: "center"
       }}>
-        <span style={{ fontWeight: "500" }}>El Búho Tragón © 2025 - Universidad de Sonora</span>
+        <span style={{ fontWeight: "600", letterSpacing: "0.025em" }}>El Búho Tragón © 2025 - Universidad de Sonora</span>
         <div style={{
           display: "flex",
           justifyContent: "center",
           gap: "1.5rem",
           fontSize: "0.85rem",
-          color: "rgba(255, 250, 240, 0.7)",
+          color: "#a1a1aa",
           marginTop: "0.25rem"
         }}>
           <a href="#" style={{ color: "inherit", textDecoration: "none", transition: "color 0.2s ease" }}>Términos</a>

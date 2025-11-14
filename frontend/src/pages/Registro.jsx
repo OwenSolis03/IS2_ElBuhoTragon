@@ -50,15 +50,15 @@ const Registro = () => {
       padding: 0,
       width: "100vw",
       minHeight: "100vh",
-      background: "linear-gradient(135deg, #0f172a, #1e293b, #334155)",
+      backgroundColor: "#141b2d",
       backgroundSize: "100% 100%",
       color: "white",
       paddingTop: "3.2rem",
       display: "flex",
       flexDirection: "column",
-      alignItems: "center",
+      // alignItems: "center",  <-- ESTA LÍNEA FUE ELIMINADA (CAUSANTE DEL CORTE)
       position: "relative",
-      overflow: "hidden",
+      overflowX: "hidden",
       boxSizing: "border-box"
     }}>
       <Header />
@@ -67,10 +67,11 @@ const Registro = () => {
         flexGrow: 1,
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
+        alignItems: "center", // El centrado se hace AQUI, en el contenido
         justifyContent: "center",
         padding: "2rem",
-        paddingTop: "8rem"
+        paddingTop: "8rem",
+        width: "100%" // Aseguramos que el main ocupe todo el ancho disponible
       }}>
         <h1 style={{
           fontSize: "2rem",
@@ -138,6 +139,7 @@ const Registro = () => {
         </div>
       </main>
 
+      {/* El footer ahora se estirará al 100% porque el padre no lo restringe al centro */}
       <Footer />
     </div>
   );

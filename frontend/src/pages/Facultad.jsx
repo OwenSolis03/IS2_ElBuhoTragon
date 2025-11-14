@@ -14,7 +14,7 @@ const Facultades = () => {
       padding: 0,
       display: "flex",
       flexDirection: "column",
-      background: "linear-gradient(135deg, #0f172a, #1e293b, #334155)",
+      backgroundColor: "#141b2d",
       backgroundSize: "600% 600%",
       animation: "backgroundAnimation 30s ease infinite",
       color: "white",

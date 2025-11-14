@@ -1,3 +1,4 @@
+# backend/apps/cafeteria/views.py
 from rest_framework import serializers
 from rest_framework import viewsets
 from django.contrib.auth.hashers import make_password
@@ -54,10 +55,14 @@ def login_view(request):
                 # Crear tokens JWT para el usuario
                 refresh = RefreshToken.for_user(user)
 
+                # --- CAMBIO REALIZADO AQUÍ ---
+                # Agregamos 'username' y 'es_admin' a la respuesta
                 return Response({
                     'success': True,
                     'access_token': str(refresh.access_token),
-                    'refresh_token': str(refresh)
+                    'refresh_token': str(refresh),
+                    'username': user.nombre_usuario,  # Nombre para mostrar en el Header
+                    'es_admin': user.es_admin         # 1 si es admin, 0 si no
                 }, status=status.HTTP_200_OK)
 
             else:
@@ -161,6 +166,3 @@ def perform_create(self, serializer):
 
 def home(request): 
     return HttpResponse("<h1>Vista previa<h1>")
-
-
-# Create your views here.

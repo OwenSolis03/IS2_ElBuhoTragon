@@ -2,40 +2,45 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const CafeCard = ({ name, image, path, isOpen = false }) => {
+const CafeCard = ({ name, image, path }) => {
   const navigate = useNavigate();
 
   return (
     <div
       onClick={() => navigate(path)}
       className="
-        bg-[#2a3558]/80 backdrop-blur-sm 
+        bg-[#27272a] /* Gris un poco más claro que el fondo */
         rounded-none overflow-hidden 
-        shadow-lg cursor-pointer 
+        shadow-md cursor-pointer 
         transition duration-300 ease-in-out 
-        hover:shadow-xl hover:-translate-y-1 
-        border border-white/10 
-        text-white text-center
+        hover:shadow-2xl hover:-translate-y-1 hover:bg-[#323236] /* Ligeramente más claro al hover */
+        border-b-2 border-transparent hover:border-yellow-500 /* Detalle premium: borde inferior amarillo al hover */
+        text-gray-100 text-center
         flex flex-col h-full
+        group
       "
     >
-      {/* Imagen de la cafetería */}
-      <div className="h-40 w-full overflow-hidden">
+      {/* Imagen */}
+      <div className="h-48 w-full overflow-hidden relative">
         <img
           src={image}
           alt={`Imagen de ${name}`}
-          className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale-[20%] group-hover:grayscale-0"
         />
+        {/* Overlay oscuro sutil sobre la imagen para unificar tonos */}
+        <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300"></div>
       </div>
 
-      {/* Contenido de la tarjeta */}
-      <div className="p-4 flex flex-col flex-grow justify-between">
+      {/* Contenido */}
+      <div className="p-5 flex flex-col flex-grow justify-between">
         <div>
-          <h3 className="text-lg font-semibold mb-1 leading-tight">{name}</h3>
+          <h3 className="text-lg font-bold mb-1 leading-tight text-gray-100 group-hover:text-yellow-400 transition-colors">
+            {name}
+          </h3>
         </div>
 
-        <p className="text-xs text-blue-300/80 mt-3 font-medium">
-          Presione para ver el menú...
+        <p className="text-xs text-gray-500 mt-4 font-medium uppercase tracking-wider group-hover:text-gray-300 transition-colors">
+          Ver menú
         </p>
       </div>
     </div>
