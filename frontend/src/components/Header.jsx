@@ -55,7 +55,7 @@ const Header = () => {
           {/* --- IZQUIERDA --- */}
           <div className="hidden md:flex items-center space-x-6">
             <Link to="/cafeterias" className={navLinkClass}>Cafeterías</Link>
-            <Link to="/facultad" className={navLinkClass}>Facultad</Link>
+            <Link to="/facultad" className={navLinkClass}>Mapa</Link>
             
             {/* --- BOTÓN DE ADMIN (Solo se ve si esAdmin es true) --- */}
             {esAdmin && (

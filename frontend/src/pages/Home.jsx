@@ -3,6 +3,9 @@ import React, { useEffect, useState } from "react";
 import CafeCard from "../components/CafeCard";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import ChatWidget from "../components/ChatWidget"; // <--- IMPORTAR EL CHAT
+
+// Imágenes
 import Derecho1 from "/Derecho1Card.jpeg";
 import TrabajoSocial from "/TrabajoSocial1Card.jpeg";
 import Educacion from "/Eduacion1Card.jpeg";
@@ -15,7 +18,7 @@ import IngenieriaQuimica from "/IngQuimica1Card.jpeg";
 import Geologia from "/Cafeteria-Geologia1Card.jpeg";
 import Matematicas from "/Matematicas1Card.png";
 import Artes from "/Artes1Card.png";
-import { FiSearch, FiMessageSquare, FiChevronDown, FiX } from 'react-icons/fi';
+import { FiSearch, FiChevronDown, FiX } from 'react-icons/fi'; // Quitamos FiMessageSquare que ya no se usa aquí
 
 // --- DATOS DE PRUEBA ---
 const cafeterias = [
@@ -120,7 +123,6 @@ const Home = () => {
       padding: 0,
       display: "flex",
       flexDirection: "column",
-      // CAMBIO: Fondo unicolor sólido (el más oscuro de la paleta Slate)
       backgroundColor: "#141b2d", 
       color: "#e4e4e7",
       overflowX: "hidden"
@@ -167,13 +169,7 @@ const Home = () => {
           />
         </div>
 
-        {/* Botón de Chat */}
-        <div className="flex justify-center mb-12 relative z-0">
-          <button className="flex items-center gap-2 px-8 py-3 bg-yellow-500 hover:bg-yellow-400 text-[#0f172a] rounded-full font-bold transition duration-200 shadow-[0_0_15px_rgba(234,179,8,0.3)] hover:shadow-[0_0_25px_rgba(234,179,8,0.5)] transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-yellow-300">
-            <FiMessageSquare size={20} />
-            Chatea con buhito
-          </button>
-        </div>
+        {/* --- BOTÓN DE CHAT ANTIGUO ELIMINADO --- */}
 
         {/* Título con acento */}
         <div className="flex items-center gap-3 mb-8">
@@ -198,6 +194,10 @@ const Home = () => {
       </main>
 
       <Footer />
+
+      {/* AGREGAMOS EL CHAT WIDGET FLOTANTE */}
+      <ChatWidget />
+      
     </div>
   );
 };

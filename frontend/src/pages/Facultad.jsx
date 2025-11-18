@@ -31,7 +31,7 @@ const Facultades = () => {
             Mapa del Campus
           </h1>
           <p className="text-lg text-gray-300">
-            Ubica tu próxima parada. Explora las cafeterías disponibles en la Unidad Regional Centro.
+            Ubica tu próxima parada. Explora las cafeterías disponibles en el Campus.
           </p>
         </div>
 
