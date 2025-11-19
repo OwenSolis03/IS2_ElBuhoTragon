@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 class Facultades(models.Model):
     id_facultad = models.AutoField(primary_key=True)
@@ -42,6 +43,7 @@ class Usuarios(models.Model):
     id_usuarios = models.AutoField(primary_key=True)
     nombre_usuario = models.CharField(max_length=255)
     contrasena = models.CharField(max_length=255)
+    email = models.EmailField(unique=True) 
     es_admin = models.IntegerField(blank=True, null=True)
     fecha_registro = models.DateTimeField(blank=True, null=True)
 
