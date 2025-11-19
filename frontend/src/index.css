@@ -4,7 +4,8 @@
 @tailwind utilities;
 
 :root {
-  font-family: 'Quicksand', sans-serif;
+  /* CAMBIO 1: Fuente Inter configurada como principal */
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -41,7 +42,12 @@ h1 {
   line-height: 1.1;
 }
 
-button {
+/* CAMBIO 2: Eliminamos los estilos globales de 'button' 
+   para que no interfieran con tus diseños personalizados en Tailwind (filtros, chat, etc).
+   
+   Si necesitas un estilo base, es mejor usar una clase .btn-primary en lugar de afectar a todos los botones.
+*/
+/* button {
   background-color: #f5c16c;
   color: #4b3423;
   padding: 0.6em 1.2em;
@@ -49,20 +55,14 @@ button {
   font-weight: 600;
   border: none;
   border-radius: 0.5rem;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-button:hover {
-  background-color: #e6af4b;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 8px rgba(0,0,0,0.3);
-}
+  transition: background-color 0.3s ease, transform 0.3s ease;
+} 
+*/
 
 button:focus,
 button:focus-visible {
-  outline: 4px solid #f5c16c88;
+  outline: 4px solid auto; /* Outline estándar para accesibilidad */
 }
 
 @media (prefers-color-scheme: light) {
@@ -73,14 +73,29 @@ button:focus-visible {
   a:hover {
     color: #747bff;
   }
-  button {
-    background-color: #f9f9f9;
-  }
 }
 
-/* Hover de las cards de cafeterías */
-.cafeteria-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+/* CAMBIO 3: Animación y Fondo Global reutilizable */
+@keyframes backgroundAnimation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
+.page-bg {
+  min-height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  
+  /* Fondo configurado aquí para usarse en cualquier página */
+  background: linear-gradient(-45deg, #161b33, #1f2457, #2a3558);
+  background-size: 600% 600%;
+  animation: backgroundAnimation 30s ease infinite;
+  
+  color: white;
+  overflow-x: hidden;
+}

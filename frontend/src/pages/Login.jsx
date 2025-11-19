@@ -18,7 +18,7 @@ const Login = () => {
     setError('');
 
     try {
-      console.log("Enviando:", { username, password }); // Debug opcional
+      console.log("Enviando:", { username, password }); 
       const res = await fetch("http://127.0.0.1:8000/api/login/", {
         method: 'POST',
         headers: {
@@ -30,7 +30,15 @@ const Login = () => {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        alert('Login Exitoso');
+        // --- Guardar sesión y estado de ADMIN ---
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('refresh_token', data.refresh_token);
+        localStorage.setItem('username', data.username); 
+        localStorage.setItem('es_admin', data.es_admin); // <--- ¡ESTA ES LA CLAVE!
+        
+        // Avisar a la app que hubo un login
+        window.dispatchEvent(new Event("storage"));
+        
         navigate('/');
       } else {
         setError(data.error || 'Credenciales inválidas');
@@ -50,15 +58,15 @@ const Login = () => {
       padding: 0,
       width: "100vw", 
       minHeight: "100vh",
-      background: "linear-gradient(-45deg, #161b33, #1f2457, #2a3558)",
+      backgroundColor: "#141b2d",
       backgroundSize: "100% 100%", 
       color: "white",
       paddingTop: "3.2rem", 
       display: "flex",
       flexDirection: "column",
-      alignItems: "center",
+      // alignItems: "center", <--- ESTO SE QUITÓ PARA QUE EL FOOTER SE ESTIRE
       position: "relative",
-      overflow: "hidden",
+      overflowX: "hidden", // Importante
       boxSizing: "border-box" 
     }}>
     <Header />
@@ -67,10 +75,11 @@ const Login = () => {
       flexGrow: 1,
       display: "flex",
       flexDirection: "column",
-      alignItems: "center",
+      alignItems: "center", // Centramos el contenido AQUÍ
       justifyContent: "center",
       padding: "2rem",
       paddingTop: "8rem",
+      width: "100%", // El main ocupa todo el ancho
     }}>
       <h1 style={{
         fontSize: "2rem",
@@ -81,15 +90,15 @@ const Login = () => {
         Ingrese su cuenta
       </h1>
       <div style={{
-	backgroundColor: "rgba(0,0,0,0.25)",
-	backdropFilter: "blur(30px)",
-	padding: "2rem",
-	borderRadius: "1rem",
-	width: "100%",
-	maxWidth: "600px", // Aumenta el valor aquí
-	boxShadow: "0 8px 16px rgba(0,0,0,0.3)",
+        backgroundColor: "rgba(0,0,0,0.25)",
+        backdropFilter: "blur(30px)",
+        padding: "2rem",
+        borderRadius: "1rem",
+        width: "100%",
+        maxWidth: "600px", 
+        boxShadow: "0 8px 16px rgba(0,0,0,0.3)",
       }}>
-	<form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
           <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "bold" }}>
             Usuario
           </label>
@@ -120,6 +129,8 @@ const Login = () => {
         </form>
       </div>
     </main>
+    
+    {/* El footer se estira al 100% */}
     <Footer />
     </div>
   );

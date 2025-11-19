@@ -65,7 +65,7 @@ const Cafeterias = () => {
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-	background: "linear-gradient(-45deg, #161b33, #1f2457, #2a3558)",	
+	backgroundColor: "#141b2d",	
 	paddingTop: "3.2rem",
         backgroundSize: "600% 600%",
         animation: "backgroundAnimation 30s ease infinite",

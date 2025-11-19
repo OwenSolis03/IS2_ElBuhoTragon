@@ -1,3 +1,4 @@
+# backend/apps/cafeteria/views.py
 from rest_framework import serializers
 from rest_framework import viewsets
 from django.contrib.auth.hashers import make_password
@@ -56,10 +57,14 @@ def login_view(request):
                 temp_user, _ = User.objects.get_or_create(username=user.nombre_usuario)
                 refresh = RefreshToken.for_user(temp_user)
 
+                # --- CAMBIO REALIZADO AQUÍ ---
+                # Agregamos 'username' y 'es_admin' a la respuesta
                 return Response({
                     'success': True,
                     'access_token': str(refresh.access_token),
-                    'refresh_token': str(refresh)
+                    'refresh_token': str(refresh),
+                    'username': user.nombre_usuario,  # Nombre para mostrar en el Header
+                    'es_admin': user.es_admin         # 1 si es admin, 0 si no
                 }, status=status.HTTP_200_OK)
 
             else:
@@ -164,25 +169,5 @@ class UserRegisterView(generics.CreateAPIView):
 def perform_create(self, serializer):
     user = serializer.save()
 
-def home(request):
+def home(request): 
     return HttpResponse("<h1>Vista previa<h1>")
-
-class ResenaViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint para crear, leer, actualizar y borrar Reseñas.
-    """
-    queryset = Resenas.objects.all()
-    serializer_class = ResenaSerializer
-    
-    # Permisos: Cualquiera puede LEER, solo usuarios autenticados pueden Escribir.
-    permission_classes = [IsAuthenticatedOrReadOnly]
-    
-    # Filtros: Permitir filtrar reseñas por tiendita o por usuario
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['id_tiendita', 'id_usuario']
-    search_fields = ['comentario'] # Para buscar texto en los comentarios
-
-    def perform_create(self, serializer):
-        # NOTA: Asumimos que el 'id_usuario' se envía en el JSON del POST
-        # junto con 'id_tiendita', 'calificacion' y 'comentario'.
-        serializer.save()
