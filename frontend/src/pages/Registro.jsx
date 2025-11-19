@@ -2,18 +2,43 @@
 import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { useNavigate } from "react-router-dom"; 
 
 const Registro = () => {
   const [mostrarContrasena, setMostrarContrasena] = useState(false);
   const [nombreUsuario, setNombreUsuario] = useState("");
+  const [email, setEmail] = useState(""); 
   const [contrasena, setContrasena] = useState("");
+  const [confirmContrasena, setConfirmContrasena] = useState("");
   const [mensaje, setMensaje] = useState("");
+  const [esExito, setEsExito] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMensaje(""); 
 
-    if (!nombreUsuario || !contrasena) {
+    const requiredDomain = "@unison.mx";
+
+    // 1. Validar campos requeridos
+    if (!nombreUsuario || !email || !contrasena || !confirmContrasena) {
       setMensaje("Todos los campos son obligatorios.");
+      setEsExito(false);
+      return;
+    }
+
+    // 2. Validar Dominio de Correo (unison.mx)
+    if (!email.toLowerCase().endsWith(requiredDomain)) {
+      setMensaje(`El correo debe ser institucional de la Universidad de Sonora (${requiredDomain}).`);
+      setEsExito(false);
+      return;
+    }
+
+    // 3. Validar Coincidencia de Contraseña
+    if (contrasena !== confirmContrasena) {
+      setMensaje("Las contraseñas no coinciden.");
+      setEsExito(false);
       return;
     }
 
@@ -23,24 +48,32 @@ const Registro = () => {
         headers: {
           "Content-Type": "application/json"
         },
+        // CAMBIO CLAVE: Incluir el email en el payload
         body: JSON.stringify({
           nombre_usuario: nombreUsuario,
+          email: email, // <-- ¡ENVIANDO CORREO AL BACKEND!
           contrasena: contrasena
         })
       });
 
       if (respuesta.ok) {
-        const data = await respuesta.json();
-        setMensaje("Registro exitoso. Ya puedes iniciar sesión.");
+        // const data = await respuesta.json(); // No se usa data en este bloque
+        setMensaje("¡Cuenta creada con éxito! Serás redirigido al login.");
+        setEsExito(true);
         setNombreUsuario("");
+        setEmail("");
         setContrasena("");
+        setConfirmContrasena("");
+        setTimeout(() => navigate('/login'), 2000); // Redirigir al login
       } else {
         const errorData = await respuesta.json();
-        setMensaje(errorData.mensaje || "Error al registrar.");
+        setMensaje(errorData.mensaje || "Error al registrar. Verifica si el usuario ya existe.");
+        setEsExito(false);
       }
     } catch (error) {
       console.error("Error al enviar datos:", error);
-      setMensaje("No se pudo conectar con el servidor.");
+      setMensaje("No se pudo conectar con el servidor. Verifica que el backend esté activo.");
+      setEsExito(false);
     }
   };
 
@@ -56,7 +89,6 @@ const Registro = () => {
       paddingTop: "3.2rem",
       display: "flex",
       flexDirection: "column",
-      // alignItems: "center",  <-- ESTA LÍNEA FUE ELIMINADA (CAUSANTE DEL CORTE)
       position: "relative",
       overflowX: "hidden",
       boxSizing: "border-box"
@@ -67,11 +99,11 @@ const Registro = () => {
         flexGrow: 1,
         display: "flex",
         flexDirection: "column",
-        alignItems: "center", // El centrado se hace AQUI, en el contenido
+        alignItems: "center",
         justifyContent: "center",
         padding: "2rem",
         paddingTop: "8rem",
-        width: "100%" // Aseguramos que el main ocupe todo el ancho disponible
+        width: "100%"
       }}>
         <h1 style={{
           fontSize: "2rem",
@@ -92,6 +124,8 @@ const Registro = () => {
           boxShadow: "0 8px 16px rgba(0,0,0,0.3)"
         }}>
           <form onSubmit={handleSubmit}>
+            
+            {/* Campo Usuario */}
             <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "bold" }}>
               Nombre de usuario
             </label>
@@ -103,14 +137,39 @@ const Registro = () => {
               style={inputStyle}
             />
 
+            {/* Campo Correo */}
+            <label style={{ display: "block", margin: "1rem 0 0.5rem", fontWeight: "bold" }}>
+              Correo electrónico
+            </label>
+            <input
+              type="email"
+              placeholder="alumno@unison.mx"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={inputStyle}
+            />
+
+            {/* Campo Contraseña */}
             <label style={{ display: "block", margin: "1rem 0 0.5rem", fontWeight: "bold" }}>
               Contraseña
             </label>
             <input
               type={mostrarContrasena ? "text" : "password"}
-              placeholder="Ingresa tu contraseña"
+              placeholder="Crea tu contraseña"
               value={contrasena}
               onChange={(e) => setContrasena(e.target.value)}
+              style={inputStyle}
+            />
+
+            {/* Campo Verificar Contraseña */}
+            <label style={{ display: "block", margin: "1rem 0 0.5rem", fontWeight: "bold" }}>
+              Verificar Contraseña
+            </label>
+            <input
+              type={mostrarContrasena ? "text" : "password"}
+              placeholder="Repite la contraseña"
+              value={confirmContrasena}
+              onChange={(e) => setConfirmContrasena(e.target.value)}
               style={inputStyle}
             />
 
@@ -131,7 +190,7 @@ const Registro = () => {
             </button>
 
             {mensaje && (
-              <p style={{ marginTop: "1rem", color: "lightgreen", textAlign: "center" }}>
+              <p style={{ marginTop: "1rem", color: esExito ? 'lightgreen' : 'red', textAlign: "center" }}>
                 {mensaje}
               </p>
             )}
@@ -139,7 +198,6 @@ const Registro = () => {
         </div>
       </main>
 
-      {/* El footer ahora se estirará al 100% porque el padre no lo restringe al centro */}
       <Footer />
     </div>
   );
