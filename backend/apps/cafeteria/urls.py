@@ -1,20 +1,25 @@
-from django.urls import path, include 
-from rest_framework.routers import DefaultRouter
-from .views import TienditasViewSet, FacultadesViewSet, MenusViewSet, UsuariosViewSet
-from .views import MenusPorTiendita, UsuarioActualView
-from . import views 
+from django.contrib import admin
+from apps.cafeteria.views import UserRegisterView, login_view
+from django.urls import include, path
+from rest_framework import routers
+from django.views.generic import RedirectView
+# IMPORTAMOS ResenaViewSet
+from apps.cafeteria.views import TienditasViewSet, MenusViewSet, FacultadesViewSet, UsuariosViewSet, ResenaViewSet
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-router = DefaultRouter()
-router.register(r'Menus', MenusViewSet)
+router = routers.DefaultRouter()
 router.register(r'Tienditas', TienditasViewSet)
+router.register(r'Menus', MenusViewSet)
 router.register(r'Facultades', FacultadesViewSet)
 router.register(r'Usuarios', UsuariosViewSet)
+router.register(r'Resenas', ResenaViewSet) # <--- ¡AQUÍ ESTÁ!
 
 urlpatterns = [
-    path ('', views.home, name='home'), 
-    path ('', include (router.urls)), 
-    path('cafeteria/Menus/por_tiendita/<int:tiendita_id>/', MenusPorTiendita.as_view()),
-    path('api/usuario-actual/', UsuarioActualView.as_view(), name='usuario-actual'),
-    
-
+    path('admin/', admin.site.urls),  
+    path('', RedirectView.as_view(url='/cafeteria/', permanent=False)),  
+    path('api/', include(router.urls)),  
+    path('api/login/', login_view, name='login'),
+    path('api/register', UserRegisterView.as_view(), name='register'),
+    path('api/token', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
