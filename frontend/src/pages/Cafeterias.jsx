@@ -1,8 +1,10 @@
+// src/pages/Cafeterias.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
+// Imágenes (Importalas todas aquí para el mapeo)
 import tiendaDerecho1 from "../assets/tienda_derecho1.jpg";
 import tiendaDerecho2 from "../assets/tienda_derecho2.jpg";
 import tiendaIngenieriaQuimica from "../assets/tienda_ingenieria-quimica.jpg";
@@ -15,7 +17,6 @@ import tiendaCivilMinas from "../assets/tienda_civil-arqui.jpg";
 import Geologia from "/Cafeteria-Geologia1Card.jpeg";
 import Matematicas from "/Matematicas1Card.png";
 import Artes from "/Artes1Card.png";
-import Medicina2 from "/Medicina2Card.jpeg";
 
 const Cafeterias = () => {
   const [cafeterias, setCafeterias] = useState([]);
@@ -24,7 +25,8 @@ const Cafeterias = () => {
   useEffect(() => {
     const fetchCafeterias = async () => {
       try {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/Tienditas/`);
+        // Obtenemos la lista REAL de la base de datos
+        const response = await fetch("http://127.0.0.1:8000/api/Tienditas/");
         const data = await response.json();
         setCafeterias(data);
       } catch (error) {
@@ -34,7 +36,7 @@ const Cafeterias = () => {
     fetchCafeterias();
   }, []);
 
-
+  // Función auxiliar para asignar imagen según el ID o Nombre
   const getCafeteriaImage = (nombre) => {
     const imagenes = {
       "Cafeteria Derecho": tiendaDerecho1,
@@ -42,22 +44,21 @@ const Cafeterias = () => {
       "Cafeteria de Trabajo Social": tiendaTrabajoSocial,
       "Cafeteria Historia/Sociologia": Historia,
       "Cafeteria Educacion": tienditaEducacion,
-      "Cafeteria Medicina": tiendaMedicina1,
-      "Cafetería Medicina 2": Medicina2,
+      "Cafeteria Medicina": tiendaMedicina1, // Ojo con los acentos en tu BD
+      "Cafetería Medicina": tiendaMedicina1,
+      "Cafetería Medicina 2": tiendaMedicina2,
+      "Cafeteria Medicina 2": tiendaMedicina2,
       "Cafeteria Departemento de Ingenieria Quimica": tiendaIngenieriaQuimica,
       "Cafeteria Departemento de Ingenieria Industrial/Civil": tiendaCivilMinas,
       "Cafetería Matemáticas": Matematicas, 
       "Cafetería Geología": Geologia, 
       "Cafetería Artes": Artes, 
     };
-
-    return imagenes[nombre] || tiendaDerecho1; 
-
+    return imagenes[nombre] || tiendaDerecho1; // Imagen por defecto
   };
 
   return (
-    <div
-      style={{
+    <div style={{
         minHeight: "100vh",
         width: "100vw",
         margin: 0,
@@ -65,14 +66,10 @@ const Cafeterias = () => {
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-	backgroundColor: "#141b2d",	
-	paddingTop: "3.2rem",
-        backgroundSize: "600% 600%",
-        animation: "backgroundAnimation 30s ease infinite",
+        backgroundColor: "#141b2d", // Tu azul oficial
         color: "white",
         overflowX: "hidden",
-      }}
-    >
+    }}>
       <Header />
 
       <main style={{ flexGrow: 1, padding: "2rem", paddingTop: "7rem" }}>
@@ -80,18 +77,18 @@ const Cafeterias = () => {
           Lista de Cafeterías
         </h1>
 
-        <div
-          style={{
+        <div style={{
             display: "flex",
             flexDirection: "column",
             gap: "1.5rem",
             alignItems: "center",
-          }}
-        >
-          {cafeterias.map((cafeteria, index) => (
+        }}>
+          {cafeterias.map((cafeteria) => (
             <div
-              key={index}
-              onClick={() => navigate(`/cafeterias/${cafeteria.nombre.toLowerCase().replace(/\s/g, "-")}`)}
+              key={cafeteria.id_tiendita}
+              // --- AQUÍ ESTÁ EL CAMBIO CLAVE ---
+              // Navegamos usando el ID de la base de datos
+              onClick={() => navigate(`/cafeterias/${cafeteria.id_tiendita}`)}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -118,22 +115,21 @@ const Cafeterias = () => {
                 src={getCafeteriaImage(cafeteria.nombre)} 
                 alt={cafeteria.nombre}
                 style={{
-                  width: "120px",
-                  height: "120px",
-                  objectFit: "cover",
-                  borderRadius: "0.75rem",
-                  marginRight: "1.5rem",
+                  width: "120px", height: "120px", objectFit: "cover",
+                  borderRadius: "0.75rem", marginRight: "1.5rem",
                 }}
               />
               <div>
                 <h2 style={{ fontSize: "1.25rem", fontWeight: "bold" }}>{cafeteria.nombre}</h2>
-                <p style={{ marginTop: "0.5rem" }}>{cafeteria.direccion || "No hay dirección disponible"}</p>
+                <p style={{ marginTop: "0.5rem", color: "#aaa" }}>
+                   {cafeteria.direccion || "Ubicación pendiente"}
+                </p>
               </div>
             </div>
           ))}
         </div>
       </main>
-
+      <Footer />
     </div>
   );
 };

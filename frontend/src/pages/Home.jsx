@@ -20,19 +20,23 @@ import Matematicas from "/Matematicas1Card.png";
 import Artes from "/Artes1Card.png";
 import { FiSearch, FiChevronDown, FiX } from 'react-icons/fi'; // Quitamos FiMessageSquare que ya no se usa aquí
 
-// --- DATOS DE PRUEBA ---
+// En src/pages/Home.jsx
+
 const cafeterias = [
-  { name: "Cafetería Derecho", image: Derecho1, path: "/cafeterias/cafeteria-derecho", tags: ["Desayunos", "Comida"], price: "$" },
-  { name: "Cafetería Trabajo Social", image: TrabajoSocial, path: "/cafeterias/cafeteria-de-trabajo-social", tags: ["Snacks", "Postres"], price: "$$" },
-  { name: "Cafetería Educación", image: Educacion, path: "/cafeterias/cafeteria-educacion", tags: ["Comida Corrida"], price: "$" },
-  { name: "Cafetería Historia/Sociologia", image: Historia, path: "/cafeterias/cafeteria-historia/sociologia", tags: ["Variado"], price: "$$" },
-  { name: "Cafetería Medicina", image: Medicina1, path: "/cafeterias/cafetería-medicina", tags: ["Saludable"], price: "$$$" },
-  { name: "Cafetería Medicina 2", image: Medicina2, path: "/cafeterias/cafetería-medicina-2", tags: ["Café", "Paninis"], price: "$$" },
-  { name: "Cafetería Civil-Minas", image: CivilMinas, path: "/cafeterias/cafeteria-departemento-de-ingenieria-industrial/civil", tags: ["Burritos"], price: "$" },
-  { name: "Cafetería Ingeniería Química", image: IngenieriaQuimica, path: "/cafeterias/cafeteria-departemento-de-ingenieria-quimica", tags: ["Tortas"], price: "$" },
-  { name: "Cafetería Matematicas", image: Matematicas, path: "/cafeterias/cafetería-matemáticas", tags: ["Snacks"], price: "$"},
-  { name: "Cafeteria Geologia", image: Geologia, path: "/cafeterias/cafetería-geología", tags: ["Café"], price: "$$"},
-  { name: "Cafeteria Artes", image: Artes, path: "/cafeterias/cafetería-artes", tags: ["Vegetariano"], price: "$$$"},
+  // Usamos path: "/cafeterias/ID"
+  { name: "Cafetería Derecho", image: Derecho1, path: "/cafeterias/1" },
+  { name: "Cafetería Trabajo Social", image: TrabajoSocial, path: "/cafeterias/2" },
+  { name: "Cafetería Educación", image: Educacion, path: "/cafeterias/3" },
+  // ID 4 es Derecho 2
+  { name: "Cafetería Derecho 2", image: Derecho2, path: "/cafeterias/4" }, 
+  { name: "Cafetería Historia/Sociologia", image: Historia, path: "/cafeterias/5" },
+  { name: "Cafetería Ing. Química", image: IngenieriaQuimica, path: "/cafeterias/6" },
+  { name: "Cafetería Civil-Minas", image: CivilMinas, path: "/cafeterias/7" },
+  { name: "Cafetería Medicina", image: Medicina1, path: "/cafeterias/8" },
+  { name: "Cafetería Matemáticas", image: Matematicas, path: "/cafeterias/9"},
+  { name: "Cafetería Artes", image: Artes, path: "/cafeterias/10"},
+  { name: "Cafetería Geología", image: Geologia, path: "/cafeterias/11"},
+  { name: "Cafetería Medicina 2", image: Medicina2, path: "/cafeterias/13" },
 ];
 
 const filterOptions = {
