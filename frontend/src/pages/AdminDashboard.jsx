@@ -2,60 +2,66 @@
 import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { FiPlus, FiEdit2, FiTrash2, FiX, FiSave, FiImage, FiDollarSign, FiList } from "react-icons/fi";
+import { FiPlus, FiEdit2, FiTrash2, FiX, FiSave, FiImage, FiList, FiCheck, FiXCircle } from "react-icons/fi";
 
 const AdminDashboard = () => {
   const [cafeterias, setCafeterias] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  // --- ESTADOS PARA MODALES ---
-  const [showModal, setShowModal] = useState(false); // Crear
-  const [showEditModal, setShowEditModal] = useState(false); // Editar
-  const [activeTab, setActiveTab] = useState("info"); // "info" o "menu" dentro de editar
-
   const [facultades, setFacultades] = useState([]);
+
+  // --- ESTADOS DE MODALES ---
+  const [showModal, setShowModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   
-  // --- ESTADOS DEL FORMULARIO CREAR ---
+  // --- ESTADOS PARA EDICIÓN DE CAFETERÍA ---
+  const [editingCafe, setEditingCafe] = useState(null);
+  const [cafeMenu, setCafeMenu] = useState([]); 
+  const [activeTab, setActiveTab] = useState("info");
+
+  // --- ESTADOS PARA EDICIÓN DE MENÚ (NUEVO) ---
+  const [newMenuItem, setNewMenuItem] = useState({ nombre: "", precio: "", descripcion: "", categoria: "" });
+  const [editingMenuItemId, setEditingMenuItemId] = useState(null); // ID del platillo que se está editando (null si es nuevo)
+
+  // --- ESTADO PARA CREAR CAFETERÍA ---
   const [newCafe, setNewCafe] = useState({
-    nombre: "",
-    latitud: "",
-    longitud: "",
-    id_facultad: ""
+    nombre: "", direccion: "", id_facultad: "", latitud: "", longitud: "", imagen_url: "", hora_apertura: "", hora_cierre: ""
   });
 
-  // --- ESTADOS PARA EDICIÓN ---
-  const [editingCafe, setEditingCafe] = useState(null);
-  const [cafeMenu, setCafeMenu] = useState([]); // Menú de la cafetería que se está editando
-  const [newMenuItem, setNewMenuItem] = useState({ nombre: "", precio: "", descripcion: "" }); // Nuevo platillo
+  // Categorías para los PLATILLOS
+  const categoriasComida = ["Desayuno", "Almuerzo", "Comida", "Comida Corrida", "Vegana / Vegetariana", "Fit / Saludable", "Bebidas", "Postres", "Snacks"];
 
-  // Cargar datos iniciales
   useEffect(() => {
     fetchCafeterias();
     fetch("http://127.0.0.1:8000/api/Facultades/")
       .then((res) => res.json())
       .then((data) => setFacultades(data))
-      .catch((err) => console.error("Error cargando facultades:", err));
+      .catch((err) => console.error("Error facultades:", err));
   }, []);
 
   const fetchCafeterias = () => {
     fetch("http://127.0.0.1:8000/api/Tienditas/")
       .then((res) => res.json())
-      .then((data) => {
-        setCafeterias(data);
-        setLoading(false);
-      })
-      .catch((err) => console.error("Error cargando cafeterías:", err));
+      .then((data) => { setCafeterias(data); setLoading(false); })
+      .catch((err) => console.error("Error cafeterías:", err));
   };
 
-  // --- LÓGICA DE CREACIÓN ---
-  const handleChange = (e) => {
-    setNewCafe({ ...newCafe, [e.target.name]: e.target.value });
+  const handleImageUpload = (e, isEditing = false) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (isEditing) setEditingCafe({ ...editingCafe, imagen_url: reader.result });
+        else setNewCafe({ ...newCafe, imagen_url: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
   };
+
+  const handleChange = (e) => setNewCafe({ ...newCafe, [e.target.name]: e.target.value });
 
   const handleCreate = async (e) => {
     e.preventDefault();
     if (!newCafe.nombre || !newCafe.id_facultad) return alert("Falta nombre o facultad");
-
     try {
       const res = await fetch("http://127.0.0.1:8000/api/Tienditas/", {
         method: "POST",
@@ -65,33 +71,22 @@ const AdminDashboard = () => {
       if (res.ok) {
         fetchCafeterias();
         setShowModal(false);
-        setNewCafe({ nombre: "", latitud: "", longitud: "", id_facultad: "" });
+        setNewCafe({ nombre: "", direccion: "", id_facultad: "", latitud: "", longitud: "", imagen_url: "", hora_apertura: "", hora_cierre: "" });
         alert("Cafetería creada");
       }
     } catch (error) { console.error(error); }
   };
 
-  // --- LÓGICA DE EDICIÓN ---
   const openEditModal = (cafe) => {
     setEditingCafe(cafe);
-    setActiveTab("info"); // Siempre abrir en la pestaña de info
+    setActiveTab("info");
     setShowEditModal(true);
-    // Cargar el menú de esta cafetería
+    setEditingMenuItemId(null); // Resetear edición de menú al abrir
+    setNewMenuItem({ nombre: "", precio: "", descripcion: "", categoria: "" });
+    
     fetch(`http://127.0.0.1:8000/api/Menus/?id_tiendita=${cafe.id_tiendita}`)
       .then(res => res.json())
       .then(data => setCafeMenu(data));
-  };
-
-  // Convertir imagen local a Base64 para guardarla en el campo de texto
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setEditingCafe({ ...editingCafe, imagen_url: reader.result });
-      };
-      reader.readAsDataURL(file);
-    }
   };
 
   const handleUpdateCafe = async (e) => {
@@ -103,261 +98,238 @@ const AdminDashboard = () => {
         body: JSON.stringify(editingCafe)
       });
       if (res.ok) {
-        alert("Datos actualizados correctamente");
+        alert("Cafetería actualizada");
         fetchCafeterias();
         setShowEditModal(false);
       }
     } catch (error) { console.error(error); }
   };
 
-  // --- LÓGICA DE MENÚ (Dentro de Editar) ---
-  const handleAddMenuItem = async () => {
-    if (!newMenuItem.nombre || !newMenuItem.precio) return alert("Nombre y precio requeridos");
+  // --- GESTIÓN DEL MENÚ (Crear y Editar) ---
+  
+  // 1. Preparar el formulario para editar
+  const startEditMenuItem = (item) => {
+    setNewMenuItem({
+        nombre: item.nombre,
+        precio: item.precio,
+        descripcion: item.descripcion || "",
+        categoria: item.categoria || ""
+    });
+    setEditingMenuItemId(item.id_menu);
+  };
+
+  // 2. Cancelar edición
+  const cancelEditMenuItem = () => {
+    setNewMenuItem({ nombre: "", precio: "", descripcion: "", categoria: "" });
+    setEditingMenuItemId(null);
+  };
+
+  // 3. Guardar (Decide si es Crear o Actualizar)
+  const handleSaveMenuItem = async () => {
+    if (!newMenuItem.nombre || !newMenuItem.precio) return alert("Falta nombre o precio");
+
+    const url = editingMenuItemId 
+        ? `http://127.0.0.1:8000/api/Menus/${editingMenuItemId}/` // URL para editar
+        : "http://127.0.0.1:8000/api/Menus/";                    // URL para crear
+    
+    const method = editingMenuItemId ? "PUT" : "POST";
+
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/Menus/", {
-        method: "POST",
+      const res = await fetch(url, {
+        method: method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...newMenuItem, id_tiendita: editingCafe.id_tiendita })
       });
+
       if (res.ok) {
-        const item = await res.json();
-        setCafeMenu([...cafeMenu, item]);
-        setNewMenuItem({ nombre: "", precio: "", descripcion: "" });
+        const savedItem = await res.json();
+        
+        if (editingMenuItemId) {
+            // Actualizar la lista local
+            setCafeMenu(cafeMenu.map(item => item.id_menu === editingMenuItemId ? savedItem : item));
+            alert("Platillo actualizado");
+        } else {
+            // Agregar a la lista local
+            setCafeMenu([...cafeMenu, savedItem]);
+        }
+        
+        // Limpiar todo
+        cancelEditMenuItem();
       }
     } catch (error) { console.error(error); }
   };
 
   const handleDeleteMenuItem = async (id) => {
-    if(!window.confirm("¿Borrar este platillo?")) return;
+    if(!window.confirm("¿Borrar platillo?")) return;
     await fetch(`http://127.0.0.1:8000/api/Menus/${id}/`, { method: "DELETE" });
     setCafeMenu(cafeMenu.filter(item => item.id_menu !== id));
   };
 
-  // --- ELIMINAR CAFETERÍA ---
   const handleDelete = async (id) => {
-    if (!window.confirm("¿Estás seguro? Se borrará la cafetería y su menú.")) return;
-    try {
-      const res = await fetch(`http://127.0.0.1:8000/api/Tienditas/${id}/`, { method: "DELETE" });
-      if (res.ok) {
-        setCafeterias(cafeterias.filter(c => c.id_tiendita !== id));
-        alert("Cafetería eliminada");
-      }
-    } catch (error) { console.error(error); }
+    if (!window.confirm("¿Eliminar cafetería?")) return;
+    await fetch(`http://127.0.0.1:8000/api/Tienditas/${id}/`, { method: "DELETE" });
+    fetchCafeterias();
   };
 
   return (
-    <div style={{
-      margin: 0, padding: 0, width: "100vw", minHeight: "100vh",
-      backgroundColor: "#141b2d", backgroundSize: "100% 100%", 
-      color: "white", paddingTop: "3.2rem", display: "flex", flexDirection: "column",
-      position: "relative", overflowX: "hidden", boxSizing: "border-box" 
-    }}>
+    <div style={{ margin: 0, padding: 0, width: "100vw", minHeight: "100vh", backgroundColor: "#141b2d", backgroundSize: "100% 100%", color: "white", paddingTop: "3.2rem", display: "flex", flexDirection: "column", position: "relative", overflowX: "hidden", boxSizing: "border-box" }}>
       <Header />
-
-      <main style={{
-        flexGrow: 1, padding: "2rem", paddingTop: "6rem", width: "100%",
-        maxWidth: "1200px", margin: "0 auto", display: "flex", flexDirection: "column"
-      }}>
+      <main style={{ flexGrow: 1, padding: "2rem", paddingTop: "6rem", width: "100%", maxWidth: "1200px", margin: "0 auto", display: "flex", flexDirection: "column" }}>
         
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-white">Panel de Administración</h1>
             <p className="text-gray-400 mt-1">Gestiona las cafeterías del campus</p>
           </div>
-          
-          <button 
-            onClick={() => setShowModal(true)} 
-            className="bg-yellow-500 hover:bg-yellow-400 text-[#141b2d] font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-transform transform hover:-translate-y-1"
-          >
+          <button onClick={() => setShowModal(true)} className="bg-yellow-500 text-[#141b2d] font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition hover:-translate-y-1">
             <FiPlus size={20} /> Nueva Cafetería
           </button>
         </div>
 
-        <div className="bg-[#1e2538] rounded-xl shadow-2xl border border-white/5 overflow-hidden w-full">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead className="bg-[#2a324a] text-gray-300 uppercase text-sm font-semibold">
-                <tr>
-                  <th className="px-6 py-4">ID</th>
-                  <th className="px-6 py-4">Nombre</th>
-                  <th className="px-6 py-4">Ubicación (GPS)</th>
-                  <th className="px-6 py-4 text-center">Acciones</th>
+        <div className="bg-[#1e2538] rounded-xl shadow-2xl border border-white/5 overflow-hidden">
+          <table className="w-full text-left border-collapse">
+            <thead className="bg-[#2a324a] text-gray-300 uppercase text-sm font-semibold">
+              <tr><th className="px-6 py-4">Nombre</th><th className="px-6 py-4">Horario</th><th className="px-6 py-4 text-center">Acciones</th></tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {cafeterias.map((cafe) => (
+                <tr key={cafe.id_tiendita} className="hover:bg-white/5">
+                  <td className="px-6 py-4 font-medium">{cafe.nombre}</td>
+                  <td className="px-6 py-4 text-sm text-gray-300">{cafe.hora_apertura ? `${cafe.hora_apertura.slice(0,5)} - ${cafe.hora_cierre?.slice(0,5)}` : "-"}</td>
+                  <td className="px-6 py-4 flex justify-center gap-3">
+                    <button onClick={() => openEditModal(cafe)} className="p-2 bg-blue-600/20 text-blue-400 rounded hover:bg-blue-600 hover:text-white"><FiEdit2 /></button>
+                    <button onClick={() => handleDelete(cafe.id_tiendita)} className="p-2 bg-red-600/20 text-red-400 rounded hover:bg-red-600 hover:text-white"><FiTrash2 /></button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {loading ? (
-                  <tr><td colSpan="4" className="px-6 py-8 text-center text-gray-400">Cargando...</td></tr>
-                ) : cafeterias.map((cafe) => (
-                  <tr key={cafe.id_tiendita} className="hover:bg-white/5 transition-colors">
-                    <td className="px-6 py-4 text-gray-400 font-mono">#{cafe.id_tiendita}</td>
-                    <td className="px-6 py-4 font-medium text-white">{cafe.nombre}</td>
-                    <td className="px-6 py-4 text-gray-300 text-sm">
-                        {cafe.latitud ? `${parseFloat(cafe.latitud).toFixed(4)}, ${parseFloat(cafe.longitud).toFixed(4)}` : "Sin datos"}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex justify-center gap-3">
-                        <button onClick={() => openEditModal(cafe)} className="p-2 bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600 hover:text-white transition-colors">
-                          <FiEdit2 size={18} />
-                        </button>
-                        <button onClick={() => handleDelete(cafe.id_tiendita)} className="p-2 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600 hover:text-white transition-colors">
-                          <FiTrash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
       </main>
-
       <Footer />
 
-      {/* --- MODAL DE CREACIÓN (Rápida) --- */}
+      {/* MODAL CREAR */}
       {showModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="bg-[#1e2538] w-full max-w-md rounded-xl shadow-2xl border border-white/10 overflow-hidden">
-            <div className="flex justify-between items-center p-4 border-b border-white/10 bg-[#2a324a]">
-              <h3 className="text-lg font-bold text-white">Nueva Cafetería</h3>
-              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-white"><FiX size={24}/></button>
-            </div>
-            <form onSubmit={handleCreate} className="p-6 space-y-4">
-              <input type="text" name="nombre" placeholder="Nombre de la cafetería" className="w-full p-2 bg-[#141b2d] border border-white/10 rounded text-white" value={newCafe.nombre} onChange={handleChange} required />
+          <div className="bg-[#1e2538] w-full max-w-md rounded-xl p-6 border border-white/10 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-bold mb-4">Nueva Cafetería</h3>
+            <form onSubmit={handleCreate} className="space-y-4">
+              {/* ... Inputs de creación (igual que antes) ... */}
+              <input name="nombre" className="w-full p-2 bg-[#141b2d] border border-white/10 rounded text-white" placeholder="Nombre" onChange={handleChange} required />
               <div className="grid grid-cols-2 gap-4">
-                <input type="number" step="any" name="latitud" placeholder="Latitud" className="w-full p-2 bg-[#141b2d] border border-white/10 rounded text-white" value={newCafe.latitud} onChange={handleChange} />
-                <input type="number" step="any" name="longitud" placeholder="Longitud" className="w-full p-2 bg-[#141b2d] border border-white/10 rounded text-white" value={newCafe.longitud} onChange={handleChange} />
+                <input type="time" name="hora_apertura" className="w-full p-2 bg-[#141b2d] border border-white/10 rounded text-white" onChange={handleChange} />
+                <input type="time" name="hora_cierre" className="w-full p-2 bg-[#141b2d] border border-white/10 rounded text-white" onChange={handleChange} />
               </div>
-              <select name="id_facultad" className="w-full p-2 bg-[#141b2d] border border-white/10 rounded text-white" value={newCafe.id_facultad} onChange={handleChange} required>
-                  <option value="">Selecciona facultad...</option>
+              <div className="grid grid-cols-2 gap-4">
+                 <input type="number" step="any" placeholder="Latitud" name="latitud" className="w-full p-2 bg-[#141b2d] border border-white/10 rounded text-white" onChange={handleChange} />
+                 <input type="number" step="any" placeholder="Longitud" name="longitud" className="w-full p-2 bg-[#141b2d] border border-white/10 rounded text-white" onChange={handleChange} />
+              </div>
+              <select name="id_facultad" className="w-full p-2 bg-[#141b2d] border border-white/10 rounded text-white" onChange={handleChange} required>
+                  <option value="">Facultad...</option>
                   {facultades.map(f => <option key={f.id_facultad} value={f.id_facultad}>{f.nombre}</option>)}
               </select>
-              <button type="submit" className="w-full py-2 bg-yellow-500 text-[#141b2d] font-bold rounded">Crear</button>
+              <label className="cursor-pointer bg-blue-600/20 border border-blue-600 text-blue-400 px-4 py-2 rounded text-sm font-bold flex items-center gap-2 justify-center hover:bg-blue-600 hover:text-white transition">
+                   <FiImage /> Imagen (PC) <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, false)} />
+              </label>
+              <div className="flex justify-end gap-2 pt-2">
+                 <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-gray-300">Cancelar</button>
+                 <button type="submit" className="px-4 py-2 bg-yellow-500 text-[#141b2d] font-bold rounded">Crear</button>
+              </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* --- MODAL DE EDICIÓN (Completo) --- */}
+      {/* MODAL EDITAR */}
       {showEditModal && editingCafe && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="bg-[#1e2538] w-full max-w-2xl h-[85vh] rounded-xl shadow-2xl border border-white/10 flex flex-col overflow-hidden">
-            
-            {/* Header Modal */}
-            <div className="flex justify-between items-center p-4 border-b border-white/10 bg-[#2a324a]">
-              <h3 className="text-xl font-bold text-white">Editando: {editingCafe.nombre}</h3>
-              <button onClick={() => setShowEditModal(false)}><FiX size={24} className="text-gray-400 hover:text-white"/></button>
+          <div className="bg-[#1e2538] w-full max-w-2xl h-[85vh] rounded-xl border border-white/10 flex flex-col">
+            <div className="flex justify-between p-4 border-b border-white/10 bg-[#2a324a]">
+              <h3 className="font-bold">Editar: {editingCafe.nombre}</h3>
+              <button onClick={() => setShowEditModal(false)}><FiX /></button>
             </div>
-
-            {/* Tabs de Navegación */}
             <div className="flex border-b border-white/10">
-              <button 
-                onClick={() => setActiveTab("info")}
-                className={`flex-1 py-3 text-sm font-bold transition-colors ${activeTab === "info" ? "bg-[#141b2d] text-yellow-500 border-b-2 border-yellow-500" : "text-gray-400 hover:bg-white/5"}`}
-              >
-                Información y Foto
-              </button>
-              <button 
-                onClick={() => setActiveTab("menu")}
-                className={`flex-1 py-3 text-sm font-bold transition-colors ${activeTab === "menu" ? "bg-[#141b2d] text-yellow-500 border-b-2 border-yellow-500" : "text-gray-400 hover:bg-white/5"}`}
-              >
-                Gestión del Menú
-              </button>
+               <button onClick={() => setActiveTab("info")} className={`flex-1 py-3 ${activeTab==="info" ? "text-yellow-500 border-b-2 border-yellow-500" : "text-gray-400"}`}>Info</button>
+               <button onClick={() => setActiveTab("menu")} className={`flex-1 py-3 ${activeTab==="menu" ? "text-yellow-500 border-b-2 border-yellow-500" : "text-gray-400"}`}>Menú</button>
             </div>
 
-            {/* Contenido del Modal */}
             <div className="flex-1 overflow-y-auto p-6">
-              
-              {/* --- PESTAÑA 1: INFORMACIÓN --- */}
-              {activeTab === "info" && (
-                <form onSubmit={handleUpdateCafe} className="space-y-5">
-                  <div>
-                    <label className="block text-gray-400 text-sm mb-1">Nombre</label>
-                    <input className="w-full p-3 bg-[#141b2d] border border-white/10 rounded text-white focus:border-yellow-500 outline-none" value={editingCafe.nombre} onChange={e => setEditingCafe({...editingCafe, nombre: e.target.value})} />
-                  </div>
-                  <div>
-                    <label className="block text-gray-400 text-sm mb-1">Dirección Física</label>
-                    <input className="w-full p-3 bg-[#141b2d] border border-white/10 rounded text-white focus:border-yellow-500 outline-none" value={editingCafe.direccion || ""} onChange={e => setEditingCafe({...editingCafe, direccion: e.target.value})} />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-gray-400 text-sm mb-1">Latitud</label>
-                        <input type="number" step="any" className="w-full p-3 bg-[#141b2d] border border-white/10 rounded text-white" value={editingCafe.latitud || ""} onChange={e => setEditingCafe({...editingCafe, latitud: e.target.value})} />
-                    </div>
-                    <div>
-                        <label className="block text-gray-400 text-sm mb-1">Longitud</label>
-                        <input type="number" step="any" className="w-full p-3 bg-[#141b2d] border border-white/10 rounded text-white" value={editingCafe.longitud || ""} onChange={e => setEditingCafe({...editingCafe, longitud: e.target.value})} />
-                    </div>
-                  </div>
-
-                  {/* SUBIDA DE IMAGEN LOCAL */}
-                  <div>
-                    <label className="block text-gray-400 text-sm mb-1">Foto de la Cafetería</label>
-                    <div className="flex items-center gap-3">
-                        <label className="cursor-pointer bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded flex items-center gap-2 text-sm font-bold transition">
-                            <FiImage /> Subir desde PC
-                            <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
-                        </label>
-                        <span className="text-xs text-gray-500">
-                            {editingCafe.imagen_url ? "Imagen cargada (Base64)" : "Sin imagen"}
-                        </span>
-                    </div>
-                    {/* Previsualización pequeña */}
-                    {editingCafe.imagen_url && (
-                        <img src={editingCafe.imagen_url} alt="Preview" className="mt-3 h-32 w-full object-cover rounded-lg border border-white/10" />
-                    )}
-                  </div>
-                  
-                  <div className="pt-4">
-                    <button type="submit" className="w-full py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg flex justify-center items-center gap-2 transition">
-                        <FiSave /> Guardar Cambios
-                    </button>
-                  </div>
+              {activeTab === "info" ? (
+                <form onSubmit={handleUpdateCafe} className="space-y-4">
+                   {/* ... Inputs de info (igual que antes) ... */}
+                   <input className="w-full p-3 bg-[#141b2d] border border-white/10 rounded text-white" value={editingCafe.nombre} onChange={e => setEditingCafe({...editingCafe, nombre: e.target.value})} />
+                   <input className="w-full p-3 bg-[#141b2d] border border-white/10 rounded text-white" value={editingCafe.direccion || ""} placeholder="Dirección" onChange={e => setEditingCafe({...editingCafe, direccion: e.target.value})} />
+                   <div className="grid grid-cols-2 gap-4">
+                      <input type="time" className="w-full p-3 bg-[#141b2d] border border-white/10 rounded text-white" value={editingCafe.hora_apertura || ""} onChange={e => setEditingCafe({...editingCafe, hora_apertura: e.target.value})} />
+                      <input type="time" className="w-full p-3 bg-[#141b2d] border border-white/10 rounded text-white" value={editingCafe.hora_cierre || ""} onChange={e => setEditingCafe({...editingCafe, hora_cierre: e.target.value})} />
+                   </div>
+                   <div className="grid grid-cols-2 gap-4">
+                      <input type="number" step="any" className="w-full p-3 bg-[#141b2d] border border-white/10 rounded text-white" value={editingCafe.latitud || ""} onChange={e => setEditingCafe({...editingCafe, latitud: e.target.value})} />
+                      <input type="number" step="any" className="w-full p-3 bg-[#141b2d] border border-white/10 rounded text-white" value={editingCafe.longitud || ""} onChange={e => setEditingCafe({...editingCafe, longitud: e.target.value})} />
+                   </div>
+                   <label className="cursor-pointer bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded text-sm font-bold flex items-center gap-2 justify-center transition">
+                       <FiImage /> Cambiar Foto <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, true)} />
+                   </label>
+                   <button type="submit" className="w-full py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded flex justify-center gap-2"><FiSave /> Guardar Cambios</button>
                 </form>
-              )}
+              ) : (
+                <div className="space-y-4">
+                   {/* --- FORMULARIO DE MENÚ (Ahora edita y crea) --- */}
+                   <div className="bg-[#2a324a] p-4 rounded border border-white/10">
+                      <h4 className={`font-bold mb-2 flex items-center gap-2 ${editingMenuItemId ? "text-blue-400" : "text-yellow-500"}`}>
+                          {editingMenuItemId ? <><FiEdit2/> Editando Platillo</> : <><FiPlus/> Nuevo Platillo</>}
+                      </h4>
+                      
+                      <div className="grid grid-cols-3 gap-2 mb-2">
+                         <input className="col-span-2 p-2 bg-[#1e2538] border border-white/10 rounded text-white text-sm" placeholder="Nombre" value={newMenuItem.nombre} onChange={e => setNewMenuItem({...newMenuItem, nombre: e.target.value})} />
+                         <input className="col-span-1 p-2 bg-[#1e2538] border border-white/10 rounded text-white text-sm" type="number" placeholder="$" value={newMenuItem.precio} onChange={e => setNewMenuItem({...newMenuItem, precio: e.target.value})} />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 mb-2">
+                          <select className="p-2 bg-[#1e2538] border border-white/10 rounded text-white text-sm" value={newMenuItem.categoria} onChange={e => setNewMenuItem({...newMenuItem, categoria: e.target.value})}>
+                              <option value="">Categoría...</option>
+                              {categoriasComida.map(c => <option key={c} value={c}>{c}</option>)}
+                          </select>
+                          <input className="p-2 bg-[#1e2538] border border-white/10 rounded text-white text-sm" placeholder="Descripción" value={newMenuItem.descripcion} onChange={e => setNewMenuItem({...newMenuItem, descripcion: e.target.value})} />
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        {editingMenuItemId && (
+                            <button onClick={cancelEditMenuItem} className="w-1/3 py-1 bg-gray-600 hover:bg-gray-500 text-white text-sm font-bold rounded">Cancelar</button>
+                        )}
+                        <button onClick={handleSaveMenuItem} className={`flex-1 py-1 font-bold rounded text-white text-sm ${editingMenuItemId ? "bg-blue-600 hover:bg-blue-500" : "bg-green-600 hover:bg-green-500"}`}>
+                            {editingMenuItemId ? "Actualizar" : "Agregar"}
+                        </button>
+                      </div>
+                   </div>
 
-              {/* --- PESTAÑA 2: MENÚ --- */}
-              {activeTab === "menu" && (
-                <div className="space-y-6">
-                  {/* Formulario Agregar Item */}
-                  <div className="bg-[#2a324a] p-4 rounded-lg border border-white/10">
-                    <h4 className="text-yellow-500 font-bold mb-3 flex items-center gap-2"><FiPlus/> Agregar Platillo</h4>
-                    <div className="flex gap-2 mb-2">
-                        <input className="flex-1 p-2 bg-[#141b2d] border border-white/10 rounded text-white text-sm" placeholder="Nombre (ej. Burrito)" value={newMenuItem.nombre} onChange={e => setNewMenuItem({...newMenuItem, nombre: e.target.value})} />
-                        <div className="relative w-24">
-                            <span className="absolute left-2 top-2 text-gray-400">$</span>
-                            <input className="w-full p-2 pl-5 bg-[#141b2d] border border-white/10 rounded text-white text-sm" type="number" placeholder="0" value={newMenuItem.precio} onChange={e => setNewMenuItem({...newMenuItem, precio: e.target.value})} />
-                        </div>
-                    </div>
-                    <button onClick={handleAddMenuItem} className="w-full py-2 bg-yellow-500 hover:bg-yellow-400 text-[#141b2d] text-sm font-bold rounded transition">Agregar al Menú</button>
-                  </div>
-
-                  {/* Lista de Items */}
-                  <div>
-                    <h4 className="text-white font-bold mb-3 flex items-center gap-2"><FiList/> Platillos Actuales ({cafeMenu.length})</h4>
-                    <div className="space-y-2 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
-                        {cafeMenu.length === 0 && <p className="text-gray-500 text-sm text-center py-4">El menú está vacío.</p>}
-                        {cafeMenu.map(item => (
-                            <div key={item.id_menu} className="flex justify-between items-center bg-[#141b2d] p-3 rounded border border-white/5 hover:border-white/20 transition">
-                                <div>
-                                    <p className="font-bold text-white text-sm">{item.nombre}</p>
-                                    <p className="text-xs text-green-400 font-mono">${parseFloat(item.precio).toFixed(2)}</p>
-                                </div>
-                                <button onClick={() => handleDeleteMenuItem(item.id_menu)} className="p-2 text-red-400 hover:bg-red-500/10 rounded transition" title="Borrar">
-                                    <FiTrash2 />
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                  </div>
+                   {/* --- LISTA DE PLATILLOS --- */}
+                   <div>
+                      <h4 className="text-white font-bold mb-3 flex items-center gap-2"><FiList/> Menú Actual</h4>
+                      <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                          {cafeMenu.length === 0 && <p className="text-gray-500 text-center text-sm py-4">Menú vacío.</p>}
+                          {cafeMenu.map(item => (
+                              <div key={item.id_menu} className="flex justify-between items-center bg-[#141b2d] p-3 rounded border border-white/5 hover:border-white/20 transition group">
+                                  <div>
+                                      <p className="font-bold text-white text-sm">{item.nombre}</p>
+                                      <p className="text-xs text-gray-400">{item.categoria} • {item.descripcion}</p> 
+                                      <p className="text-xs text-green-400 font-mono">${parseFloat(item.precio).toFixed(2)}</p>
+                                  </div>
+                                  <div className="flex gap-2">
+                                      {/* BOTÓN EDITAR ITEM */}
+                                      <button onClick={() => startEditMenuItem(item)} className="p-2 text-blue-400 hover:bg-blue-500/10 rounded transition"><FiEdit2 /></button>
+                                      {/* BOTÓN BORRAR ITEM */}
+                                      <button onClick={() => handleDeleteMenuItem(item.id_menu)} className="p-2 text-red-400 hover:bg-red-500/10 rounded transition"><FiTrash2 /></button>
+                                  </div>
+                              </div>
+                          ))}
+                      </div>
+                   </div>
                 </div>
               )}
-
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 };
