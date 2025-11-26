@@ -36,6 +36,9 @@ const Home = () => {
   const [filterFacultad, setFilterFacultad] = useState("");
   const [filterComida, setFilterComida] = useState("");
   const [filterPrecio, setFilterPrecio] = useState("");
+  
+  // NUEVO: Estado para la búsqueda profunda
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Opciones de comida (Hardcodeadas para consistencia visual)
   const categoriasOptions = [
@@ -95,7 +98,6 @@ const Home = () => {
 
     // B) Filtro por Comida (Busca en los menús)
     if (filterComida) {
-        // Encontramos los IDs de tiendas que venden esa comida
         const tiendasConComida = allMenus
             .filter(m => m.categoria === filterComida)
             .map(m => m.id_tiendita);
@@ -105,15 +107,28 @@ const Home = () => {
     // C) Filtro por Precio (Busca platillos accesibles)
     if (filterPrecio) {
         const maxPrecio = parseFloat(filterPrecio);
-        // Encontramos tiendas con al menos un platillo en ese rango
         const tiendasEnPresupuesto = allMenus
             .filter(m => parseFloat(m.precio) <= maxPrecio)
             .map(m => m.id_tiendita);
         result = result.filter(c => tiendasEnPresupuesto.includes(c.id_tiendita));
     }
 
+    // D) NUEVO: Búsqueda Profunda (Nombre Tienda O Nombre Platillo)
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      result = result.filter(c => {
+        // Coincidencia en nombre de cafetería
+        const matchNombre = c.nombre.toLowerCase().includes(term);
+        // Coincidencia en algún platillo de esta cafetería
+        const matchMenu = allMenus.some(m => 
+          m.id_tiendita === c.id_tiendita && m.nombre.toLowerCase().includes(term)
+        );
+        return matchNombre || matchMenu;
+      });
+    }
+
     setFilteredCafeterias(result);
-  }, [filterFacultad, filterComida, filterPrecio, cafeterias, allMenus]);
+  }, [filterFacultad, filterComida, filterPrecio, searchTerm, cafeterias, allMenus]);
 
   // 3. LÓGICA DE HORARIOS (Abiertas/Cerradas)
   const getHorarioStatus = (list) => {
@@ -181,11 +196,13 @@ const Home = () => {
 
       <main style={{ flexGrow: 1, paddingTop: '7rem', width: '100%' }} className="px-8 sm:px-12 lg:px-16">
 
-        {/* Buscador */}
+        {/* Buscador Conectado */}
         <div className="relative mb-12 max-w-xl mx-auto">
           <input
             type="text"
             placeholder="¿Qué se te antoja hoy?"
+            value={searchTerm} // Conectado al estado
+            onChange={(e) => setSearchTerm(e.target.value)} // Actualiza al escribir
             className="w-full pl-10 pr-4 py-3 bg-[#1e2538] border border-white/10 rounded-full text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all"
           />
           <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
@@ -229,16 +246,20 @@ const Home = () => {
                 value={filterPrecio}
                 onChange={(e) => setFilterPrecio(e.target.value)}
              />
-             {/* Si hay texto, mostramos una X para limpiar rápido */}
              {filterPrecio && (
                  <FiChevronDown className="absolute right-3 top-3 text-yellow-500 pointer-events-none rotate-180" /> 
              )}
           </div>
           
-          {/* Botón Limpiar (Solo aparece si hay filtros activos) */}
-          {(filterFacultad || filterComida || filterPrecio) && (
+          {/* Botón Limpiar */}
+          {(filterFacultad || filterComida || filterPrecio || searchTerm) && (
               <button 
-                onClick={() => {setFilterFacultad(""); setFilterComida(""); setFilterPrecio("");}}
+                onClick={() => {
+                  setFilterFacultad(""); 
+                  setFilterComida(""); 
+                  setFilterPrecio("");
+                  setSearchTerm("");
+                }}
                 className="text-xs text-red-400 hover:text-red-300 underline decoration-red-400/50 underline-offset-4"
               >
                 Limpiar Filtros
@@ -262,10 +283,13 @@ const Home = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 relative z-0">
                         {abiertas.map((cafeteria) => (
                             <CafeCard
-                            key={cafeteria.id_tiendita}
-                            name={cafeteria.nombre}
-                            image={getImageSource(cafeteria)}
-                            path={`/cafeterias/${cafeteria.id_tiendita}`}
+                              key={cafeteria.id_tiendita}
+                              name={cafeteria.nombre}
+                              image={getImageSource(cafeteria)}
+                              path={`/cafeterias/${cafeteria.id_tiendita}`}
+                              // PROPS NUEVAS PARA BUSQUEDA
+                              searchTerm={searchTerm}
+                              cafeteriaMenus={allMenus.filter(m => m.id_tiendita === cafeteria.id_tiendita)}
                             />
                         ))}
                     </div>
@@ -285,10 +309,13 @@ const Home = () => {
                         {cerradas.map((cafeteria) => (
                             <div key={cafeteria.id_tiendita} className="relative filter grayscale-[30%] hover:grayscale-0 transition-all duration-300">
                                 <CafeCard
-                                key={cafeteria.id_tiendita}
-                                name={cafeteria.nombre}
-                                image={getImageSource(cafeteria)}
-                                path={`/cafeterias/${cafeteria.id_tiendita}`}
+                                  key={cafeteria.id_tiendita}
+                                  name={cafeteria.nombre}
+                                  image={getImageSource(cafeteria)}
+                                  path={`/cafeterias/${cafeteria.id_tiendita}`}
+                                  // PROPS NUEVAS PARA BUSQUEDA
+                                  searchTerm={searchTerm}
+                                  cafeteriaMenus={allMenus.filter(m => m.id_tiendita === cafeteria.id_tiendita)}
                                 />
                                 <div className="absolute top-4 right-4 bg-red-600/90 text-white text-xs font-bold px-2 py-1 rounded shadow-lg pointer-events-none">
                                     CERRADO

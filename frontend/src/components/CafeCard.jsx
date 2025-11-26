@@ -2,8 +2,16 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const CafeCard = ({ name, image, path }) => {
+const CafeCard = ({ name, image, path, searchTerm, cafeteriaMenus }) => {
   const navigate = useNavigate();
+
+  // Lógica para encontrar coincidencias de productos
+  // Solo se ejecuta si hay algo escrito en el buscador y recibimos menús
+  const matches = (searchTerm && cafeteriaMenus)
+    ? cafeteriaMenus.filter(m => 
+        m.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
   return (
     <div
@@ -37,6 +45,18 @@ const CafeCard = ({ name, image, path }) => {
           <h3 className="text-lg font-bold mb-1 leading-tight text-gray-100 group-hover:text-yellow-400 transition-colors">
             {name}
           </h3>
+
+          {/* --- SECCIÓN DE RESULTADOS DE BÚSQUEDA --- */}
+          {matches.length > 0 && (
+            <div className="mt-2 text-left">
+              <span className="text-xs text-yellow-500 font-semibold block mb-1">
+                Encontrado:
+              </span>
+              <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">
+                {matches.map(m => m.nombre).join(", ")}
+              </p>
+            </div>
+          )}
         </div>
 
         <p className="text-xs text-gray-500 mt-4 font-medium uppercase tracking-wider group-hover:text-gray-300 transition-colors">
