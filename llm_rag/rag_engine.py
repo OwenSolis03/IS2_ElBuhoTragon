@@ -74,7 +74,7 @@ class BuhoRAG:
                 "text-generation",
                 model=model,
                 tokenizer=self.tokenizer,
-                device="cpu"
+                # Don't specify device when using device_map
             )
 
             print("✅ Models loaded successfully")
@@ -296,7 +296,7 @@ class BuhoRAG:
 
         # Build anti-hallucination prompt for TinyLlama
         prompt = f"""<|system|>
-Eres 'El Buhito', asistente de cafeterías universitarias.
+Eres 'El Búho Sabio', asistente de cafeterías universitarias.
 
 REGLAS IMPORTANTES:
 - Usa SOLO información del CONTEXTO abajo
