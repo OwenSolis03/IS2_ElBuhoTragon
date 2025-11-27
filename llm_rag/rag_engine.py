@@ -1,6 +1,7 @@
 """
 Production RAG Engine - El Búho Tragón
-CPU-optimized with anti-hallucination strategies
+FREE CPU-optimized with TinyLlama (fastest option)
+Perfect for school projects and multi-user chatbots
 """
 
 import json
@@ -10,13 +11,13 @@ from sentence_transformers import SentenceTransformer
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 from math import radians, sin, cos, sqrt, atan2
 from typing import List, Dict, Optional
-import os
+import torch
 
 
 class BuhoRAG:
     """
     Production RAG system for El Búho Tragón cafeteria queries.
-    Optimized for CPU with minimal hallucination.
+    Using TinyLlama - fastest free model for CPU
     """
 
     def __init__(self, data_path: str = "rag_data_fixed.json"):
@@ -37,6 +38,7 @@ class BuhoRAG:
         # Models (will be loaded on first use)
         self.embedding_model = None
         self.llm_pipeline = None
+        self.tokenizer = None
 
         # User location cache
         self.current_user_lat = None
@@ -53,31 +55,29 @@ class BuhoRAG:
             )
 
         if self.llm_pipeline is None:
-            print("📥 Loading LLM (this may take a few minutes first time)...")
+            print("📥 Loading LLM (TinyLlama - this will take ~2 minutes)...")
 
-            # Phi-3-mini: Best balance of speed and accuracy on CPU
-            model_id = "microsoft/Phi-3-mini-4k-instruct"
+            # TinyLlama: Fastest, smallest, works great on CPU
+            # No authentication needed, completely free
+            model_id = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
 
-            tokenizer = AutoTokenizer.from_pretrained(
-                model_id,
-                trust_remote_code=True
-            )
+            self.tokenizer = AutoTokenizer.from_pretrained(model_id)
 
             model = AutoModelForCausalLM.from_pretrained(
                 model_id,
+                torch_dtype=torch.float32,  # CPU requires float32
                 device_map="cpu",
-                torch_dtype="auto",
-                trust_remote_code=True,
-                low_cpu_mem_usage=True  # Optimize for CPU
+                low_cpu_mem_usage=True
             )
 
             self.llm_pipeline = pipeline(
                 "text-generation",
                 model=model,
-                tokenizer=tokenizer,
+                tokenizer=self.tokenizer,
+                device="cpu"
             )
 
-            print("✅ Models loaded")
+            print("✅ Models loaded successfully")
 
     def load_data(self):
         """Load data from JSON file"""
@@ -294,45 +294,42 @@ class BuhoRAG:
         context_str = "\n\n".join([f"[{i+1}] {doc}"
                                    for i, doc in enumerate(context_docs)])
 
-        # Build anti-hallucination prompt
-        system_prompt = """Eres 'El Búho Sabio', asistente oficial de las cafeterías de la Universidad de Sonora.
+        # Build anti-hallucination prompt for TinyLlama
+        prompt = f"""<|system|>
+Eres 'El Buhito', asistente de cafeterías universitarias.
 
-REGLAS CRÍTICAS:
-1. SOLO usa información EXACTA del CONTEXTO proporcionado
-2. NO inventes nombres de cafeterías, platillos, precios o ubicaciones
-3. Si la información NO está en el CONTEXTO, responde: "No tengo esa información disponible"
-4. Cita precios EXACTOS como aparecen en el contexto
-5. Menciona distancias cuando estén disponibles
-6. Sé breve, preciso y natural
-
-Si el usuario pregunta algo que no está en el contexto, admítelo honestamente."""
-
-        user_prompt = f"""CONTEXTO (ÚNICA FUENTE DE INFORMACIÓN VÁLIDA):
-
+REGLAS IMPORTANTES:
+- Usa SOLO información del CONTEXTO abajo
+- NO inventes precios, nombres o ubicaciones
+- Si NO está en el contexto, responde: "No tengo esa información disponible"
+- Sé breve y directo (máximo 2-3 oraciones)
+- Responde en español</s>
+<|user|>
+CONTEXTO DISPONIBLE:
 {context_str}
 
 PREGUNTA DEL USUARIO:
-{question}
+{question}</s>
+<|assistant|>
+"""
 
-Responde basándote EXCLUSIVAMENTE en el contexto anterior. Si la información no está ahí, dilo claramente."""
-
-        # Generate response
-        messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ]
-
+        # Generate response with strict parameters
         outputs = self.llm_pipeline(
-            messages,
-            max_new_tokens=200,
+            prompt,
+            max_new_tokens=120,
             return_full_text=False,
-            temperature=0.1,  # Very low = less creativity/hallucination
-            top_p=0.95,
+            temperature=0.1,  # Very low to reduce hallucination
+            top_p=0.9,
             do_sample=True,
-            pad_token_id=self.llm_pipeline.tokenizer.eos_token_id,
+            repetition_penalty=1.2,
+            pad_token_id=self.tokenizer.eos_token_id,
+            eos_token_id=self.tokenizer.eos_token_id,
         )
 
         answer = outputs[0]['generated_text'].strip()
+
+        # Clean up any remaining special tokens
+        answer = answer.replace("</s>", "").replace("<|assistant|>", "").strip()
 
         return {
             'answer': answer,
@@ -347,6 +344,14 @@ def get_rag_engine(data_path: str = "rag_data_fixed.json") -> BuhoRAG:
     """
     Get or create RAG engine singleton
     Use this in production to avoid reloading models
+
+    Example in Flask:
+        @app.route('/api/chat', methods=['POST'])
+        def chat():
+            rag = get_rag_engine()
+            question = request.json.get('question')
+            result = rag.query(question)
+            return jsonify(result)
     """
     global _rag_instance
     if _rag_instance is None:
@@ -359,7 +364,7 @@ def get_rag_engine(data_path: str = "rag_data_fixed.json") -> BuhoRAG:
 # Example usage and testing
 if __name__ == "__main__":
     print("="*70)
-    print("Testing RAG Engine")
+    print("Testing RAG Engine with TinyLlama")
     print("="*70)
 
     # Initialize
@@ -374,7 +379,7 @@ if __name__ == "__main__":
         "¿Cuánto cuesta la Torta Cubana?",
         "¿Cuál es la cafetería más cercana?",
         "¿A qué hora abre la Cafetería de Derecho?",
-        "¿Venden hamburguesas?",  # Should say "no tengo esa información"
+        "¿Venden pizzas?",  # Should say "no tengo esa información"
     ]
 
     for i, q in enumerate(test_questions, 1):
