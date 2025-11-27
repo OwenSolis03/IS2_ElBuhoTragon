@@ -247,8 +247,8 @@ class BuhoRAG:
 
         print(f"✅ Index built with {self.faiss_index.ntotal} vectors")
 
-    def _retrieve_context(self, query: str, k: int = 3) -> List[str]:
-        """Retrieve relevant documents for query (reduced to 3 for less noise)"""
+    def _retrieve_context(self, query: str, k: int = 5) -> List[str]:
+        """Retrieve relevant documents for query"""
         if not self.faiss_index:
             raise ValueError("Index not built. Call build_index() first.")
 
@@ -278,6 +278,16 @@ class BuhoRAG:
         Returns:
             Dict with 'answer' and 'context'
         """
+        # Detectar si pregunta por ubicación/cercanía sin coordenadas
+        location_keywords = ['cercana', 'cerca', 'cerca de', 'más cerca', 'closest', 'nearest']
+        asking_location = any(keyword in question.lower() for keyword in location_keywords)
+
+        if asking_location and not (user_lat and user_lon):
+            return {
+                'answer': 'Necesito tu ubicación para encontrar la cafetería más cercana. ¿Me puedes compartir tu ubicación?',
+                'context': []
+            }
+
         # Rebuild index if location changed
         if user_lat and user_lon:
             if (user_lat != self.current_user_lat or
@@ -292,8 +302,8 @@ class BuhoRAG:
         # Load models if needed
         self._load_models()
 
-        # Retrieve context (solo 3 documentos para evitar ruido)
-        context_docs = self._retrieve_context(question, k=3)
+        # Retrieve context (5 documentos para mejor cobertura)
+        context_docs = self._retrieve_context(question, k=5)
 
         # Limpiar el contexto para que sea más legible para el modelo
         clean_context = []
@@ -304,17 +314,18 @@ class BuhoRAG:
 
         context_str = "\n\n".join(clean_context)
 
-        # Prompt optimizado para Qwen2.5
+        # Prompt mejorado para respuestas específicas
         prompt = f"""<|im_start|>system
 Eres El Buhito, asistente de cafeterías de la Universidad de Sonora.
 
-REGLAS ESTRICTAS:
-- Responde SOLO usando la INFORMACIÓN DISPONIBLE abajo
-- Si la información NO está disponible, di: "No tengo esa información"
-- NO inventes precios, horarios, nombres o ubicaciones
-- Sé breve y directo (máximo 2 oraciones)
-- NO menciones "información disponible", "contexto" o términos técnicos
-- Responde de forma natural y conversacional<|im_end|>
+REGLAS IMPORTANTES:
+1. Usa SOLO la información de abajo
+2. Sé ESPECÍFICO: menciona nombres de cafeterías, precios exactos y ubicaciones
+3. Si preguntan por un platillo: di el precio Y en qué cafeterías está disponible
+4. Si preguntan por ubicación SIN coordenadas del usuario: di "Necesito tu ubicación para encontrar la más cercana"
+5. Si preguntan qué venden: lista las cafeterías que lo tienen
+6. Si NO hay información: di "No tengo esa información"
+7. Máximo 3 oraciones, pero incluye todos los detalles relevantes<|im_end|>
 <|im_start|>user
 INFORMACIÓN DISPONIBLE:
 {context_str}
@@ -323,10 +334,10 @@ Pregunta: {question}<|im_end|>
 <|im_start|>assistant
 """
 
-        # Parámetros optimizados para Qwen2.5
+        # Parámetros para respuestas más detalladas
         outputs = self.llm_pipeline(
             prompt,
-            max_new_tokens=60,  # Más corto = respuestas más directas
+            max_new_tokens=120,  # Más tokens para respuestas completas
             return_full_text=False,
             temperature=0.1,
             top_p=0.8,
@@ -402,9 +413,9 @@ if __name__ == "__main__":
     # Test queries
     test_questions = [
         "¿Cuánto cuesta la Torta Cubana?",
-        "¿Cuál es la cafetería más cercana?",  # Debe decir "necesito tu ubicación"
+        "¿Dónde venden pizzas?",
         "¿A qué hora abre la Cafetería de Derecho?",
-        "¿Venden pizzas?",
+        "¿Cuánto cuesta un licuado?",
     ]
 
     for i, q in enumerate(test_questions, 1):
