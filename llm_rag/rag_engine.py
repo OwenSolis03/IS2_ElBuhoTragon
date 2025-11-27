@@ -172,13 +172,16 @@ class BuhoRAG:
                 parts.append(f"Categoría: {menu['categoria']}")
 
             if menu.get('descripcion'):
-                parts.append(f"Descripción: {menu['descripcion']}")
+                # NO incluir descripción si es muy larga (reduce ruido)
+                desc = menu['descripcion']
+                if len(desc) < 100:  # Solo descripciones cortas
+                    parts.append(f"Descripción: {desc}")
 
             if tienda.get('nombre'):
-                parts.append(f"Disponible en: {tienda['nombre']}")
+                parts.append(f"Cafetería: {tienda['nombre']}")
 
             if tienda.get('distancia_metros'):
-                parts.append(f"A {tienda['distancia_metros']:.0f} metros de distancia")
+                parts.append(f"Distancia: {tienda['distancia_metros']:.0f} metros")
 
             doc = ". ".join(parts) + "."
 
@@ -205,7 +208,7 @@ class BuhoRAG:
                 parts.append(f"Horario: {apertura} a {cierre}")
 
             if tienda.get('distancia_metros'):
-                parts.append(f"A {tienda['distancia_metros']:.0f} metros de tu ubicación")
+                parts.append(f"Distancia: {tienda['distancia_metros']:.0f} metros")
 
             doc = ". ".join(parts) + "."
 
@@ -244,8 +247,8 @@ class BuhoRAG:
 
         print(f"✅ Index built with {self.faiss_index.ntotal} vectors")
 
-    def _retrieve_context(self, query: str, k: int = 5) -> List[str]:
-        """Retrieve relevant documents for query"""
+    def _retrieve_context(self, query: str, k: int = 3) -> List[str]:
+        """Retrieve relevant documents for query (reduced to 3 for less noise)"""
         if not self.faiss_index:
             raise ValueError("Index not built. Call build_index() first.")
 
@@ -289,47 +292,69 @@ class BuhoRAG:
         # Load models if needed
         self._load_models()
 
-        # Retrieve context
-        context_docs = self._retrieve_context(question, k=5)
-        context_str = "\n\n".join([f"[{i+1}] {doc}"
-                                   for i, doc in enumerate(context_docs)])
+        # Retrieve context (solo 3 documentos para evitar ruido)
+        context_docs = self._retrieve_context(question, k=3)
 
-        # Build anti-hallucination prompt for TinyLlama
+        # Limpiar el contexto para que sea más legible para el modelo
+        clean_context = []
+        for doc in context_docs:
+            # Remover números de referencia si existen en los docs
+            clean_doc = doc.replace("[1]", "").replace("[2]", "").replace("[3]", "")
+            clean_context.append(clean_doc)
+
+        context_str = "\n\n".join(clean_context)
+
+        # Build strict anti-hallucination prompt
         prompt = f"""<|system|>
-Eres 'El Búho Sabio', asistente de cafeterías universitarias.
+Eres 'El Buhito', el asistente virtual de las cafeterías de la Universidad de Sonora.
 
-REGLAS IMPORTANTES:
-- Usa SOLO información del CONTEXTO abajo
-- NO inventes precios, nombres o ubicaciones
-- Si NO está en el contexto, responde: "No tengo esa información disponible"
-- Sé breve y directo (máximo 2-3 oraciones)
-- Responde en español</s>
+INSTRUCCIONES CRÍTICAS:
+1. Responde SOLO con información del CONTEXTO
+2. NUNCA inventes información, redes sociales, horarios o precios
+3. NUNCA incluyas números como [1], [2] en tu respuesta
+4. NUNCA menciones "contexto", "pregunta del usuario" o términos técnicos
+5. Si la info NO está en el contexto, di: "No tengo esa información"
+6. Sé conversacional y breve (1-2 oraciones máximo)
+7. NO expliques tu razonamiento, solo da la respuesta directa</s>
 <|user|>
-CONTEXTO DISPONIBLE:
+INFORMACIÓN DISPONIBLE:
 {context_str}
 
-PREGUNTA DEL USUARIO:
-{question}</s>
+Pregunta: {question}</s>
 <|assistant|>
 """
 
-        # Generate response with strict parameters
+        # Generate response with very strict parameters to avoid hallucination
         outputs = self.llm_pipeline(
             prompt,
-            max_new_tokens=120,
+            max_new_tokens=80,  # Más corto = menos alucinaciones
             return_full_text=False,
-            temperature=0.1,  # Very low to reduce hallucination
-            top_p=0.9,
+            temperature=0.05,  # Casi determinístico
+            top_p=0.85,
+            top_k=40,
             do_sample=True,
-            repetition_penalty=1.2,
+            repetition_penalty=1.3,
             pad_token_id=self.tokenizer.eos_token_id,
             eos_token_id=self.tokenizer.eos_token_id,
         )
 
         answer = outputs[0]['generated_text'].strip()
 
-        # Clean up any remaining special tokens
-        answer = answer.replace("</s>", "").replace("<|assistant|>", "").strip()
+        # Limpieza agresiva de tokens especiales y artefactos
+        answer = answer.replace("</s>", "")
+        answer = answer.replace("<|assistant|>", "")
+        answer = answer.replace("<|user|>", "")
+        answer = answer.replace("<|system|>", "")
+
+        # Remover referencias al contexto y razonamiento interno
+        import re
+        answer = re.sub(r'\[[\d,\s]+\]', '', answer)  # Elimina [1], [2], etc.
+        answer = re.sub(r'CONTEXTO.*?:', '', answer, flags=re.IGNORECASE)
+        answer = re.sub(r'(la )?pregunta del usuario.*?:', '', answer, flags=re.IGNORECASE)
+        answer = re.sub(r'(en el|del|según el) context[oa]?', '', answer, flags=re.IGNORECASE)
+
+        # Limpiar espacios múltiples
+        answer = re.sub(r'\s+', ' ', answer).strip()
 
         return {
             'answer': answer,
@@ -371,15 +396,16 @@ if __name__ == "__main__":
     rag = BuhoRAG()
     rag.load_data()
 
-    # Build index with sample location (Engineering faculty)
-    rag.build_index(user_lat=29.082, user_lon=-110.963)
+    # Build index SIN ubicación (para probar que no invente distancias)
+    print("\n⚠️  Construyendo índice SIN ubicación de usuario...")
+    rag.build_index()  # Sin lat/lon
 
     # Test queries
     test_questions = [
         "¿Cuánto cuesta la Torta Cubana?",
-        "¿Cuál es la cafetería más cercana?",
+        "¿Cuál es la cafetería más cercana?",  # Debe decir "necesito tu ubicación"
         "¿A qué hora abre la Cafetería de Derecho?",
-        "¿Venden pizzas?",  # Should say "no tengo esa información"
+        "¿Venden pizzas?",
     ]
 
     for i, q in enumerate(test_questions, 1):
