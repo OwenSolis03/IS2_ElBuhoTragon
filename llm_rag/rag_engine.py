@@ -1,7 +1,7 @@
 """
 Production RAG Engine - El Búho Tragón
 Optimized for Qwen2.5 (CPU)
-Groups data by Cafeteria to avoid fragmentation and cleans output.
+MERGED VERSION: Grouped Indexing + Regex Cleaning + Original Tests
 """
 
 import json
@@ -13,6 +13,7 @@ from math import radians, sin, cos, sqrt, atan2
 from typing import List, Dict, Optional
 import torch
 import os
+import re
 
 class BuhoRAG:
     """
@@ -89,7 +90,7 @@ class BuhoRAG:
 
     def build_index(self, user_lat: Optional[float] = None, user_lon: Optional[float] = None):
         """
-        Build search index grouping menus by cafeteria
+        Build search index grouping menus by cafeteria (CORRECTED LOGIC)
         """
         if not self.data:
             self.load_data()
@@ -174,11 +175,30 @@ class BuhoRAG:
         self.faiss_index.add(np.array(embeddings).astype('float32'))
         print(f"✅ Index built with {self.faiss_index.ntotal} vectors")
 
+    def _retrieve_context(self, query: str, k: int = 3) -> List[str]:
+        """Retrieve relevant documents for query"""
+        if not self.faiss_index:
+            raise ValueError("Index not built.")
+        query_embedding = self.embedding_model.encode([query])
+        distances, indices = self.faiss_index.search(
+            np.array(query_embedding).astype('float32'), k
+        )
+        return [self.documents[i] for i in indices[0]]
+
     def query(self, question: str, user_lat=None, user_lon=None):
+        # 1. Lógica de Ubicación (Del código de Claude)
+        location_keywords = ['cercana', 'cerca', 'cerca de', 'más cerca', 'closest', 'nearest']
+        asking_location = any(keyword in question.lower() for keyword in location_keywords)
+
+        if asking_location and not (user_lat and user_lon):
+            return {
+                'answer': 'Necesito tu ubicación para encontrar la cafetería más cercana. ¿Me puedes compartir tu ubicación?',
+                'context': []
+            }
+
         if not self.faiss_index:
             self.build_index(user_lat, user_lon)
 
-        # If location changed, rebuild (simple approach)
         if user_lat and user_lon and (user_lat != self.current_user_lat or user_lon != self.current_user_lon):
             self.build_index(user_lat, user_lon)
             self.current_user_lat = user_lat
@@ -186,72 +206,91 @@ class BuhoRAG:
 
         self._load_models()
 
-        # Retrieve Top-3 relevant cafeterias
-        q_emb = self.embedding_model.encode([question])
-        D, I = self.faiss_index.search(np.array(q_emb).astype('float32'), k=3)
+        # Retrieve Context
+        context_docs = self._retrieve_context(question, k=3)
 
-        context_str = "\n\n".join([f"[OPCIÓN {i+1}]\n{self.documents[idx]}" for i, idx in enumerate(I[0])])
+        # Clean context for prompt
+        clean_context = []
+        for doc in context_docs:
+            clean_context.append(doc) # Docs are already clean from build_index
 
-        system_prompt = """Eres 'El Búho Tragón', un experto en cafeterías de la UNISON.
-Usa la información proporcionada para responder. 
-- Si preguntan precios, compara entre las opciones encontradas.
-- Si preguntan ubicación, sé preciso.
-- Responde de forma natural y útil."""
+        context_str = "\n\n".join(clean_context)
 
-        user_prompt = f"""INFORMACIÓN DE CAFETERÍAS:
+        # 2. Prompt Style (Del código de Claude, ChatML format)
+        prompt = f"""<|im_start|>system
+Eres El Buhito, asistente de cafeterías de la Universidad de Sonora.
+
+REGLAS IMPORTANTES:
+1. Usa SOLO la información de abajo
+2. Sé ESPECÍFICO: menciona nombres de cafeterías, precios exactos y ubicaciones
+3. Si preguntan por un platillo: di el precio Y en qué cafeterías está disponible
+4. Si NO hay información: di "No tengo esa información"
+5. Máximo 3 oraciones, pero incluye todos los detalles relevantes<|im_end|>
+<|im_start|>user
+INFORMACIÓN DISPONIBLE:
 {context_str}
 
-PREGUNTA DEL ESTUDIANTE: {question}
-
-Respuesta:"""
-
-        messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ]
+Pregunta: {question}<|im_end|>
+<|im_start|>assistant
+"""
 
         outputs = self.llm_pipeline(
-            messages,
-            max_new_tokens=250,
-            temperature=0.3,
+            prompt,
+            max_new_tokens=150,
+            return_full_text=False,
+            temperature=0.1,
+            top_p=0.8,
             do_sample=True,
+            pad_token_id=self.tokenizer.eos_token_id,
+            eos_token_id=self.tokenizer.eos_token_id,
         )
 
-        # --- LIMPIEZA DE RESPUESTA ---
-        generated_data = outputs[0]['generated_text']
+        # 3. Limpieza Estricta (Del código de Claude)
+        answer = outputs[0]['generated_text'].strip()
 
-        # Si devuelve una lista (formato chat completo), extraemos el último mensaje
-        if isinstance(generated_data, list):
-            # Buscar el último mensaje con role='assistant'
-            answer = generated_data[-1]['content']
-        else:
-            # Si devuelve texto plano (fallback)
-            answer = str(generated_data)
+        answer = answer.replace("<|im_end|>", "")
+        answer = answer.replace("<|im_start|>", "")
+        answer = answer.replace("assistant", "")
+        answer = answer.replace("user", "")
+        answer = answer.replace("system", "")
+
+        # Regex cleaning requested by user
+        answer = re.sub(r'Respuesta:?\s*', '', answer, flags=re.IGNORECASE)
+        answer = re.sub(r'La respuesta es:?\s*', '', answer, flags=re.IGNORECASE)
+        answer = re.sub(r'\[[\d,\s]+\]', '', answer) # Removes [1], [OPCIÓN 1], etc if present
+        answer = re.sub(r'INFORMACIÓN DISPONIBLE.*?:', '', answer, flags=re.IGNORECASE)
+        answer = re.sub(r'\s+', ' ', answer).strip()
 
         return {
             'answer': answer,
-            'context': [self.documents[i] for i in I[0]]
+            'context': context_docs
         }
 
-# Example usage and testing
+# Example usage (LAS PREGUNTAS ORIGINALES)
 if __name__ == "__main__":
     print("="*70)
-    print("Testing RAG Engine (Grouped Strategy)")
+    print("Testing RAG Engine with Qwen2.5 (Corrected)")
     print("="*70)
 
     rag = BuhoRAG()
-    # Force build to see the count
-    rag.build_index()
+    rag.load_data()
+
+    print("\n⚠️  Construyendo índice SIN ubicación de usuario...")
+    rag.build_index()  # Sin lat/lon
 
     test_questions = [
-        "¿Dónde venden Torta Cubana?",
-        "¿Cuál es la cafetería más cercana a Ingeniería?",
+        "¿Cuánto cuesta la Torta Cubana?",
+        "¿Dónde venden pizzas?",
+        "¿A qué hora abre la Cafetería de Derecho?",
+        "¿Cuánto cuesta un licuado?",
     ]
 
-    for q in test_questions:
-        print(f"\n❓ Pregunta: {q}")
-        print("-" * 50)
+    for i, q in enumerate(test_questions, 1):
+        print(f"\n[{i}/{len(test_questions)}] {q}")
+        print("-" * 70)
         result = rag.query(q)
         print(f"🦉 {result['answer']}")
 
     print("\n" + "="*70)
+    print("✅ Testing complete")
+    print("="*70)
