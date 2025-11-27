@@ -247,8 +247,8 @@ class BuhoRAG:
 
         print(f"✅ Index built with {self.faiss_index.ntotal} vectors")
 
-    def _retrieve_context(self, query: str, k: int = 5) -> List[str]:
-        """Retrieve relevant documents for query"""
+    def _retrieve_context(self, query: str, k: int = 3) -> List[str]:
+        """Retrieve relevant documents for query (k=3 cafeterías completas)"""
         if not self.faiss_index:
             raise ValueError("Index not built. Call build_index() first.")
 
@@ -302,8 +302,8 @@ class BuhoRAG:
         # Load models if needed
         self._load_models()
 
-        # Retrieve context (5 documentos para mejor cobertura)
-        context_docs = self._retrieve_context(question, k=5)
+        # Retrieve context (3 cafeterías completas es suficiente)
+        context_docs = self._retrieve_context(question, k=3)
 
         # Limpiar el contexto para que sea más legible para el modelo
         clean_context = []
@@ -375,7 +375,7 @@ Pregunta: {question}<|im_end|>
 # Singleton instance for production use
 _rag_instance = None
 
-def get_rag_engine(data_path: str = "rag_data_fixed.json") -> BuhoRAG:
+def get_rag_engine(data_path: str = "rag_data_clean.json") -> BuhoRAG:
     """
     Get or create RAG engine singleton
     Use this in production to avoid reloading models
