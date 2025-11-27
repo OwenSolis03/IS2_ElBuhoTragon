@@ -55,11 +55,11 @@ class BuhoRAG:
             )
 
         if self.llm_pipeline is None:
-            print("📥 Loading LLM (TinyLlama - this will take ~2 minutes)...")
+            print("📥 Loading LLM (Qwen2.5 - best for RAG)...")
 
-            # TinyLlama: Fastest, smallest, works great on CPU
-            # No authentication needed, completely free
-            model_id = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+            # Qwen2.5: Mejor para seguir instrucciones y RAG
+            # Más inteligente que TinyLlama, sigue contexto estrictamente
+            model_id = "Qwen/Qwen2.5-1.5B-Instruct"
 
             self.tokenizer = AutoTokenizer.from_pretrained(model_id)
 
@@ -304,56 +304,55 @@ class BuhoRAG:
 
         context_str = "\n\n".join(clean_context)
 
-        # Build strict anti-hallucination prompt
-        prompt = f"""<|system|>
-Eres 'El Buhito', el asistente virtual de las cafeterías de la Universidad de Sonora.
+        # Prompt optimizado para Qwen2.5
+        prompt = f"""<|im_start|>system
+Eres El Buhito, asistente de cafeterías de la Universidad de Sonora.
 
-INSTRUCCIONES CRÍTICAS:
-1. Responde SOLO con información del CONTEXTO
-2. NUNCA inventes información, redes sociales, horarios o precios
-3. NUNCA incluyas números como [1], [2] en tu respuesta
-4. NUNCA menciones "contexto", "pregunta del usuario" o términos técnicos
-5. Si la info NO está en el contexto, di: "No tengo esa información"
-6. Sé conversacional y breve (1-2 oraciones máximo)
-7. NO expliques tu razonamiento, solo da la respuesta directa</s>
-<|user|>
+REGLAS ESTRICTAS:
+- Responde SOLO usando la INFORMACIÓN DISPONIBLE abajo
+- Si la información NO está disponible, di: "No tengo esa información"
+- NO inventes precios, horarios, nombres o ubicaciones
+- Sé breve y directo (máximo 2 oraciones)
+- NO menciones "información disponible", "contexto" o términos técnicos
+- Responde de forma natural y conversacional<|im_end|>
+<|im_start|>user
 INFORMACIÓN DISPONIBLE:
 {context_str}
 
-Pregunta: {question}</s>
-<|assistant|>
+Pregunta: {question}<|im_end|>
+<|im_start|>assistant
 """
 
-        # Generate response with very strict parameters to avoid hallucination
+        # Parámetros optimizados para Qwen2.5
         outputs = self.llm_pipeline(
             prompt,
-            max_new_tokens=80,  # Más corto = menos alucinaciones
+            max_new_tokens=60,  # Más corto = respuestas más directas
             return_full_text=False,
-            temperature=0.05,  # Casi determinístico
-            top_p=0.85,
-            top_k=40,
+            temperature=0.1,
+            top_p=0.8,
             do_sample=True,
-            repetition_penalty=1.3,
+            repetition_penalty=1.1,
             pad_token_id=self.tokenizer.eos_token_id,
             eos_token_id=self.tokenizer.eos_token_id,
         )
 
         answer = outputs[0]['generated_text'].strip()
 
-        # Limpieza agresiva de tokens especiales y artefactos
-        answer = answer.replace("</s>", "")
-        answer = answer.replace("<|assistant|>", "")
-        answer = answer.replace("<|user|>", "")
-        answer = answer.replace("<|system|>", "")
+        # Limpieza de tokens especiales de Qwen
+        answer = answer.replace("<|im_end|>", "")
+        answer = answer.replace("<|im_start|>", "")
+        answer = answer.replace("assistant", "")
+        answer = answer.replace("user", "")
+        answer = answer.replace("system", "")
 
-        # Remover referencias al contexto y razonamiento interno
+        # Remover artefactos del razonamiento
         import re
-        answer = re.sub(r'\[[\d,\s]+\]', '', answer)  # Elimina [1], [2], etc.
-        answer = re.sub(r'CONTEXTO.*?:', '', answer, flags=re.IGNORECASE)
-        answer = re.sub(r'(la )?pregunta del usuario.*?:', '', answer, flags=re.IGNORECASE)
+        answer = re.sub(r'Respuesta:?\s*', '', answer, flags=re.IGNORECASE)
+        answer = re.sub(r'La respuesta es:?\s*', '', answer, flags=re.IGNORECASE)
+        answer = re.sub(r'\[[\d,\s]+\]', '', answer)
+        answer = re.sub(r'INFORMACIÓN DISPONIBLE.*?:', '', answer, flags=re.IGNORECASE)
+        answer = re.sub(r'(la )?pregunta.*?:', '', answer, flags=re.IGNORECASE)
         answer = re.sub(r'(en el|del|según el) context[oa]?', '', answer, flags=re.IGNORECASE)
-
-        # Limpiar espacios múltiples
         answer = re.sub(r'\s+', ' ', answer).strip()
 
         return {
@@ -389,7 +388,7 @@ def get_rag_engine(data_path: str = "rag_data_fixed.json") -> BuhoRAG:
 # Example usage and testing
 if __name__ == "__main__":
     print("="*70)
-    print("Testing RAG Engine with TinyLlama")
+    print("Testing RAG Engine with Qwen2.5")
     print("="*70)
 
     # Initialize
