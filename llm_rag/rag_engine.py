@@ -5,15 +5,17 @@ MERGED VERSION: Grouped Indexing + Regex Cleaning + Original Tests
 """
 
 import json
-import numpy as np
-import faiss
-from sentence_transformers import SentenceTransformer
-from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
-from math import radians, sin, cos, sqrt, atan2
-from typing import List, Dict, Optional
-import torch
 import os
 import re
+from math import radians, sin, cos, sqrt, atan2
+from typing import List, Optional
+
+import faiss
+import numpy as np
+import torch
+from sentence_transformers import SentenceTransformer
+from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+
 
 class BuhoRAG:
     """
@@ -207,7 +209,7 @@ class BuhoRAG:
         self._load_models()
 
         # Retrieve Context
-        context_docs = self._retrieve_context(question, k=3)
+        context_docs = self._retrieve_context(question, k=7)
 
         # Clean context for prompt
         clean_context = []
