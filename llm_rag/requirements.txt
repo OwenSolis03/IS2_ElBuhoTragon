@@ -2,16 +2,19 @@
 # El Búho Tragón - UNISON
 
 # Core RAG
-faiss-cpu==1.7.4
-sentence-transformers==2.2.2
+# faiss-cpu 1.7.4 no soporta Py3.12, subimos a >=1.8.0
+faiss-cpu>=1.8.0
+# sentence-transformers 2.2.2 puede dar problemas con dependencias nuevas, mejor >=2.6.0
+sentence-transformers>=2.6.0
 
 # LLM (CPU-optimized)
-transformers==4.36.0
-torch==2.1.0
-accelerate==0.25.0
+# Dejamos que transformers busque la version compatible con torch
+transformers>=4.36.0
+torch>=2.1.0
+accelerate>=0.25.0
 
 # Database
 pymysql==1.1.0
 
 # Utilities
-numpy==1.24.3
+numpy>=1.24.3
