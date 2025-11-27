@@ -1,7 +1,7 @@
 """
 Production RAG Engine - El Búho Tragón
 Optimized for Qwen2.5 (CPU)
-Groups data by Cafeteria to avoid fragmentation
+Groups data by Cafeteria to avoid fragmentation and cleans output.
 """
 
 import json
@@ -217,15 +217,41 @@ Respuesta:"""
             do_sample=True,
         )
 
+        # --- LIMPIEZA DE RESPUESTA ---
+        generated_data = outputs[0]['generated_text']
+
+        # Si devuelve una lista (formato chat completo), extraemos el último mensaje
+        if isinstance(generated_data, list):
+            # Buscar el último mensaje con role='assistant'
+            answer = generated_data[-1]['content']
+        else:
+            # Si devuelve texto plano (fallback)
+            answer = str(generated_data)
+
         return {
-            'answer': outputs[0]['generated_text'],
+            'answer': answer,
             'context': [self.documents[i] for i in I[0]]
         }
 
+# Example usage and testing
 if __name__ == "__main__":
+    print("="*70)
+    print("Testing RAG Engine (Grouped Strategy)")
+    print("="*70)
+
     rag = BuhoRAG()
     # Force build to see the count
     rag.build_index()
 
-    print("\n--- PRUEBA DE CONSULTA ---")
-    print(rag.query("¿Dónde venden Torta Cubana?")['answer'])
+    test_questions = [
+        "¿Dónde venden Torta Cubana?",
+        "¿Cuál es la cafetería más cercana a Ingeniería?",
+    ]
+
+    for q in test_questions:
+        print(f"\n❓ Pregunta: {q}")
+        print("-" * 50)
+        result = rag.query(q)
+        print(f"🦉 {result['answer']}")
+
+    print("\n" + "="*70)
