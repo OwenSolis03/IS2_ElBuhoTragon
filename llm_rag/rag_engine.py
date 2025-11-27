@@ -1,21 +1,19 @@
 """
 Production RAG Engine - El Búho Tragón
 Optimized for Qwen2.5 (CPU)
-MERGED VERSION: Grouped Indexing + Regex Cleaning + Original Tests
+FINAL VERSION: Grouped Indexing + Strict Prompting + Extended Search (k=7)
 """
 
 import json
-import os
-import re
-from math import radians, sin, cos, sqrt, atan2
-from typing import List, Optional
-
-import faiss
 import numpy as np
-import torch
+import faiss
 from sentence_transformers import SentenceTransformer
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
-
+from math import radians, sin, cos, sqrt, atan2
+from typing import List, Dict, Optional
+import torch
+import os
+import re
 
 class BuhoRAG:
     """
@@ -92,7 +90,7 @@ class BuhoRAG:
 
     def build_index(self, user_lat: Optional[float] = None, user_lon: Optional[float] = None):
         """
-        Build search index grouping menus by cafeteria (CORRECTED LOGIC)
+        Build search index grouping menus by cafeteria
         """
         if not self.data:
             self.load_data()
@@ -177,8 +175,8 @@ class BuhoRAG:
         self.faiss_index.add(np.array(embeddings).astype('float32'))
         print(f"✅ Index built with {self.faiss_index.ntotal} vectors")
 
-    def _retrieve_context(self, query: str, k: int = 3) -> List[str]:
-        """Retrieve relevant documents for query"""
+    def _retrieve_context(self, query: str, k: int = 7) -> List[str]:
+        """Retrieve relevant documents for query. k=7 ensures broad coverage."""
         if not self.faiss_index:
             raise ValueError("Index not built.")
         query_embedding = self.embedding_model.encode([query])
@@ -188,7 +186,7 @@ class BuhoRAG:
         return [self.documents[i] for i in indices[0]]
 
     def query(self, question: str, user_lat=None, user_lon=None):
-        # 1. Lógica de Ubicación (Del código de Claude)
+        # 1. Lógica de Ubicación
         location_keywords = ['cercana', 'cerca', 'cerca de', 'más cerca', 'closest', 'nearest']
         asking_location = any(keyword in question.lower() for keyword in location_keywords)
 
@@ -208,26 +206,26 @@ class BuhoRAG:
 
         self._load_models()
 
-        # Retrieve Context
+        # 2. Retrieve Extended Context (k=7)
         context_docs = self._retrieve_context(question, k=7)
 
-        # Clean context for prompt
         clean_context = []
         for doc in context_docs:
-            clean_context.append(doc) # Docs are already clean from build_index
+            clean_context.append(doc)
 
         context_str = "\n\n".join(clean_context)
 
-        # 2. Prompt Style (Del código de Claude, ChatML format)
+        # 3. Prompt Estricto
         prompt = f"""<|im_start|>system
-Eres El Buhito, asistente de cafeterías de la Universidad de Sonora.
+Eres El Buhito, asistente de cafeterías de la UNISON.
 
-REGLAS IMPORTANTES:
-1. Usa SOLO la información de abajo
-2. Sé ESPECÍFICO: menciona nombres de cafeterías, precios exactos y ubicaciones
-3. Si preguntan por un platillo: di el precio Y en qué cafeterías está disponible
-4. Si NO hay información: di "No tengo esa información"
-5. Máximo 3 oraciones, pero incluye todos los detalles relevantes<|im_end|>
+REGLAS OBLIGATORIAS:
+1. Usa SOLO la información de abajo.
+2. Si das un precio, TIENES QUE DECIR EL NOMBRE DE LA CAFETERÍA.
+   - MAL: "Cuesta $50 en todas".
+   - BIEN: "Cuesta $50 en Cafetería Artes y Cafetería Derecho".
+3. Si la lista es larga, usa viñetas.
+4. Si no sabes la respuesta, di "No tengo información sobre ese producto".<|im_end|>
 <|im_start|>user
 INFORMACIÓN DISPONIBLE:
 {context_str}
@@ -238,7 +236,7 @@ Pregunta: {question}<|im_end|>
 
         outputs = self.llm_pipeline(
             prompt,
-            max_new_tokens=150,
+            max_new_tokens=200,
             return_full_text=False,
             temperature=0.1,
             top_p=0.8,
@@ -247,7 +245,7 @@ Pregunta: {question}<|im_end|>
             eos_token_id=self.tokenizer.eos_token_id,
         )
 
-        # 3. Limpieza Estricta (Del código de Claude)
+        # 4. Limpieza Estricta
         answer = outputs[0]['generated_text'].strip()
 
         answer = answer.replace("<|im_end|>", "")
@@ -256,10 +254,9 @@ Pregunta: {question}<|im_end|>
         answer = answer.replace("user", "")
         answer = answer.replace("system", "")
 
-        # Regex cleaning requested by user
         answer = re.sub(r'Respuesta:?\s*', '', answer, flags=re.IGNORECASE)
         answer = re.sub(r'La respuesta es:?\s*', '', answer, flags=re.IGNORECASE)
-        answer = re.sub(r'\[[\d,\s]+\]', '', answer) # Removes [1], [OPCIÓN 1], etc if present
+        answer = re.sub(r'\[[\d,\s]+\]', '', answer)
         answer = re.sub(r'INFORMACIÓN DISPONIBLE.*?:', '', answer, flags=re.IGNORECASE)
         answer = re.sub(r'\s+', ' ', answer).strip()
 
@@ -268,10 +265,26 @@ Pregunta: {question}<|im_end|>
             'context': context_docs
         }
 
-# Example usage (LAS PREGUNTAS ORIGINALES)
+
+# Singleton instance for production use
+_rag_instance = None
+
+def get_rag_engine(data_path: str = "rag_data_fixed.json") -> BuhoRAG:
+    """
+    Get or create RAG engine singleton
+    """
+    global _rag_instance
+    if _rag_instance is None:
+        _rag_instance = BuhoRAG(data_path=data_path)
+        _rag_instance.load_data()
+        _rag_instance.build_index()
+    return _rag_instance
+
+
+# Example usage and testing
 if __name__ == "__main__":
     print("="*70)
-    print("Testing RAG Engine with Qwen2.5 (Corrected)")
+    print("Testing RAG Engine with Qwen2.5 (Final Version)")
     print("="*70)
 
     rag = BuhoRAG()
