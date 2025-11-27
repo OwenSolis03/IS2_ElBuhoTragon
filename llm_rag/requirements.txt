@@ -1,0 +1,17 @@
+# Production RAG System - Requirements
+# El Búho Tragón - UNISON
+
+# Core RAG
+faiss-cpu==1.7.4
+sentence-transformers==2.2.2
+
+# LLM (CPU-optimized)
+transformers==4.36.0
+torch==2.1.0
+accelerate==0.25.0
+
+# Database
+pymysql==1.1.0
+
+# Utilities
+numpy==1.24.3
