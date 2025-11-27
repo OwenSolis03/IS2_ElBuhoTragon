@@ -1,7 +1,7 @@
 """
 Production RAG Engine - El Búho Tragón
-FREE CPU-optimized with TinyLlama (fastest option)
-Perfect for school projects and multi-user chatbots
+Optimized for Qwen2.5 (CPU)
+Groups data by Cafeteria to avoid fragmentation
 """
 
 import json
@@ -12,21 +12,15 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 from math import radians, sin, cos, sqrt, atan2
 from typing import List, Dict, Optional
 import torch
-
+import os
 
 class BuhoRAG:
     """
-    Production RAG system for El Búho Tragón cafeteria queries.
-    Using TinyLlama - fastest free model for CPU
+    Production RAG system for El Búho Tragón.
+    Grouping Strategy: One document per Cafeteria containing its full menu.
     """
 
     def __init__(self, data_path: str = "rag_data_fixed.json"):
-        """
-        Initialize RAG engine
-
-        Args:
-            data_path: Path to JSON data file
-        """
         print("🦉 Initializing El Búho Tragón RAG System...")
 
         self.data_path = data_path
@@ -35,19 +29,19 @@ class BuhoRAG:
         self.metadata = []
         self.faiss_index = None
 
-        # Models (will be loaded on first use)
+        # Models
         self.embedding_model = None
         self.llm_pipeline = None
         self.tokenizer = None
 
-        # User location cache
+        # Location cache
         self.current_user_lat = None
         self.current_user_lon = None
 
         print("✅ RAG System initialized")
 
     def _load_models(self):
-        """Lazy load models (only when needed)"""
+        """Lazy load models"""
         if self.embedding_model is None:
             print("📥 Loading embedding model...")
             self.embedding_model = SentenceTransformer(
@@ -55,17 +49,13 @@ class BuhoRAG:
             )
 
         if self.llm_pipeline is None:
-            print("📥 Loading LLM (Qwen2.5 - best for RAG)...")
-
-            # Qwen2.5: Mejor para seguir instrucciones y RAG
-            # Más inteligente que TinyLlama, sigue contexto estrictamente
+            print("📥 Loading LLM (Qwen2.5)...")
             model_id = "Qwen/Qwen2.5-1.5B-Instruct"
 
             self.tokenizer = AutoTokenizer.from_pretrained(model_id)
-
             model = AutoModelForCausalLM.from_pretrained(
                 model_id,
-                torch_dtype=torch.float32,  # CPU requires float32
+                torch_dtype=torch.float32,
                 device_map="cpu",
                 low_cpu_mem_usage=True
             )
@@ -74,356 +64,168 @@ class BuhoRAG:
                 "text-generation",
                 model=model,
                 tokenizer=self.tokenizer,
-                # Don't specify device when using device_map
             )
-
             print("✅ Models loaded successfully")
 
     def load_data(self):
         """Load data from JSON file"""
-        print(f"📊 Loading data from {self.data_path}...")
+        if not os.path.exists(self.data_path):
+            print(f"❌ Error: File {self.data_path} not found.")
+            return
 
+        print(f"📊 Loading data from {self.data_path}...")
         with open(self.data_path, 'r', encoding='utf-8') as f:
             self.data = json.load(f)
 
-        print(f"✅ Loaded: {len(self.data.get('menus', []))} menus, "
-              f"{len(self.data.get('tienditas', []))} tienditas, "
-              f"{len(self.data.get('facultades', []))} facultades")
-
     @staticmethod
-    def calculate_distance(lat1: float, lon1: float,
-                           lat2: float, lon2: float) -> float:
-        """Calculate distance in meters using Haversine formula"""
-        R = 6371000  # Earth radius in meters
-
+    def calculate_distance(lat1, lon1, lat2, lon2):
+        R = 6371000
         lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
         dlat = lat2 - lat1
         dlon = lon2 - lon1
-
         a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
         c = 2 * atan2(sqrt(a), sqrt(1-a))
-
         return R * c
 
-    def _add_distances(self, tienditas: List[Dict],
-                       user_lat: float, user_lon: float) -> List[Dict]:
-        """Add distance information to tienditas"""
-        result = []
-        for tienda in tienditas:
-            tienda = tienda.copy()
-            if tienda.get('latitud') and tienda.get('longitud'):
-                dist = self.calculate_distance(
-                    user_lat, user_lon,
-                    float(tienda['latitud']),
-                    float(tienda['longitud'])
-                )
-                tienda['distancia_metros'] = round(dist, 1)
-            else:
-                tienda['distancia_metros'] = None
-            result.append(tienda)
-
-        # Sort by distance
-        result = [t for t in result if t['distancia_metros'] is not None]
-        result.sort(key=lambda x: x['distancia_metros'])
-
-        return result
-
-    def build_index(self, user_lat: Optional[float] = None,
-                    user_lon: Optional[float] = None):
+    def build_index(self, user_lat: Optional[float] = None, user_lon: Optional[float] = None):
         """
-        Build search index from data
-
-        Args:
-            user_lat: User latitude for distance calculation
-            user_lon: User longitude for distance calculation
+        Build search index grouping menus by cafeteria
         """
         if not self.data:
             self.load_data()
 
-        # Load models if not loaded
         self._load_models()
-
-        print("🔨 Building search index...")
-
-        self.current_user_lat = user_lat
-        self.current_user_lon = user_lon
+        print("🔨 Building search index (Grouped Strategy)...")
 
         self.documents = []
         self.metadata = []
 
-        # Create tienditas lookup with distances
-        tienditas_list = self.data.get('tienditas', [])
-        if user_lat and user_lon:
-            tienditas_list = self._add_distances(tienditas_list, user_lat, user_lon)
-
-        tienditas_dict = {t['id_tiendita']: t for t in tienditas_list}
-
-        # Build documents from menus
+        # 1. Pre-process: Group menus by store ID
+        menus_by_store = {}
         for menu in self.data.get('menus', []):
-            tienda = tienditas_dict.get(menu.get('id_tiendita'), {})
+            tid = menu.get('id_tiendita')
+            if tid not in menus_by_store:
+                menus_by_store[tid] = []
+            menus_by_store[tid].append(menu)
 
-            # Create rich document with all context
-            parts = [
-                f"Platillo: {menu.get('nombre', 'N/A')}",
-                f"Precio: ${float(menu.get('precio', 0)):.2f} pesos",
-            ]
+        # 2. Process Tienditas (Main Documents)
+        tienditas = self.data.get('tienditas', [])
 
-            if menu.get('categoria'):
-                parts.append(f"Categoría: {menu['categoria']}")
+        # Calculate distances if user location provided
+        if user_lat and user_lon:
+            for t in tienditas:
+                if t.get('latitud') and t.get('longitud'):
+                    t['distancia'] = self.calculate_distance(
+                        user_lat, user_lon,
+                        float(t['latitud']), float(t['longitud'])
+                    )
+            # Sort by distance
+            tienditas.sort(key=lambda x: x.get('distancia', 9999999))
 
-            if menu.get('descripcion'):
-                # NO incluir descripción si es muy larga (reduce ruido)
-                desc = menu['descripcion']
-                if len(desc) < 100:  # Solo descripciones cortas
-                    parts.append(f"Descripción: {desc}")
+        for tienda in tienditas:
+            tid = tienda.get('id_tiendita')
+            store_menus = menus_by_store.get(tid, [])
 
-            if tienda.get('nombre'):
-                parts.append(f"Cafetería: {tienda['nombre']}")
+            # --- BUILD THE BIG DOCUMENT ---
+            lines = []
+            lines.append(f"CAFETERÍA: {tienda.get('nombre', 'Desconocida')}")
+            lines.append(f"UBICACIÓN: {tienda.get('direccion', '')}, {tienda.get('facultad_nombre', '')}")
 
-            if tienda.get('distancia_metros'):
-                parts.append(f"Distancia: {tienda['distancia_metros']:.0f} metros")
+            if tienda.get('hora_apertura'):
+                lines.append(f"HORARIO: {str(tienda['hora_apertura'])[:5]} - {str(tienda['hora_cierre'])[:5]}")
 
-            doc = ". ".join(parts) + "."
+            if 'distancia' in tienda:
+                lines.append(f"DISTANCIA: A {tienda['distancia']:.0f} metros de ti.")
 
+            lines.append("\nMENÚ COMPLETO:")
+            if not store_menus:
+                lines.append("(No hay menú registrado)")
+            else:
+                # Group by category for better reading
+                cats = {}
+                for m in store_menus:
+                    c = m.get('categoria', 'Varios')
+                    if c not in cats: cats[c] = []
+                    cats[c].append(m)
+
+                for cat, items in cats.items():
+                    lines.append(f"--- {cat} ---")
+                    for m in items:
+                        lines.append(f"- {m['nombre']}: ${float(m['precio']):.2f}")
+
+            full_doc = "\n".join(lines)
+
+            self.documents.append(full_doc)
+            self.metadata.append({'type': 'tiendita_full', 'id': tid, 'name': tienda.get('nombre')})
+
+        # 3. Add Faculties as separate documents (Context)
+        for fac in self.data.get('facultades', []):
+            doc = f"FACULTAD: {fac.get('nombre')}\nDESCRIPCIÓN: {fac.get('descripcion')}"
             self.documents.append(doc)
-            self.metadata.append({
-                'tipo': 'menu',
-                'id': menu.get('id_menu'),
-                'tiendita': tienda.get('nombre')
-            })
+            self.metadata.append({'type': 'facultad', 'id': fac.get('id_facultad')})
 
-        # Build documents from tienditas
-        for tienda in tienditas_list:
-            parts = [
-                f"Cafetería: {tienda.get('nombre', 'N/A')}",
-                f"Ubicación: {tienda.get('direccion', 'N/A')}",
-            ]
-
-            if tienda.get('facultad_nombre'):
-                parts.append(f"En la {tienda['facultad_nombre']}")
-
-            if tienda.get('hora_apertura') and tienda.get('hora_cierre'):
-                apertura = str(tienda['hora_apertura'])[:5]  # HH:MM
-                cierre = str(tienda['hora_cierre'])[:5]
-                parts.append(f"Horario: {apertura} a {cierre}")
-
-            if tienda.get('distancia_metros'):
-                parts.append(f"Distancia: {tienda['distancia_metros']:.0f} metros")
-
-            doc = ". ".join(parts) + "."
-
-            self.documents.append(doc)
-            self.metadata.append({
-                'tipo': 'tiendita',
-                'id': tienda.get('id_tiendita')
-            })
-
-        # Build documents from facultades
-        for facultad in self.data.get('facultades', []):
-            doc = (
-                f"Facultad: {facultad.get('nombre', 'N/A')}. "
-                f"Incluye: {facultad.get('descripcion', 'N/A')}."
-            )
-            self.documents.append(doc)
-            self.metadata.append({
-                'tipo': 'facultad',
-                'id': facultad.get('id_facultad')
-            })
-
-        print(f"📝 Created {len(self.documents)} documents")
+        print(f"📝 Created {len(self.documents)} consolidated documents (1 per cafeteria + faculties)")
 
         # Generate embeddings
         print("🔢 Generating embeddings...")
-        embeddings = self.embedding_model.encode(
-            self.documents,
-            show_progress_bar=False,
-            batch_size=32
-        )
+        embeddings = self.embedding_model.encode(self.documents, show_progress_bar=False)
 
-        # Build FAISS index
-        dimension = embeddings.shape[1]
-        self.faiss_index = faiss.IndexFlatL2(dimension)
+        self.faiss_index = faiss.IndexFlatL2(embeddings.shape[1])
         self.faiss_index.add(np.array(embeddings).astype('float32'))
-
         print(f"✅ Index built with {self.faiss_index.ntotal} vectors")
 
-    def _retrieve_context(self, query: str, k: int = 3) -> List[str]:
-        """Retrieve relevant documents for query (k=3 cafeterías completas)"""
+    def query(self, question: str, user_lat=None, user_lon=None):
         if not self.faiss_index:
-            raise ValueError("Index not built. Call build_index() first.")
+            self.build_index(user_lat, user_lon)
 
-        # Encode query
-        query_embedding = self.embedding_model.encode([query])
+        # If location changed, rebuild (simple approach)
+        if user_lat and user_lon and (user_lat != self.current_user_lat or user_lon != self.current_user_lon):
+            self.build_index(user_lat, user_lon)
+            self.current_user_lat = user_lat
+            self.current_user_lon = user_lon
 
-        # Search
-        distances, indices = self.faiss_index.search(
-            np.array(query_embedding).astype('float32'),
-            k
-        )
-
-        # Return documents
-        return [self.documents[i] for i in indices[0]]
-
-    def query(self, question: str,
-              user_lat: Optional[float] = None,
-              user_lon: Optional[float] = None) -> Dict:
-        """
-        Main query interface
-
-        Args:
-            question: User's question
-            user_lat: User latitude (optional)
-            user_lon: User longitude (optional)
-
-        Returns:
-            Dict with 'answer' and 'context'
-        """
-        # Detectar si pregunta por ubicación/cercanía sin coordenadas
-        location_keywords = ['cercana', 'cerca', 'cerca de', 'más cerca', 'closest', 'nearest']
-        asking_location = any(keyword in question.lower() for keyword in location_keywords)
-
-        if asking_location and not (user_lat and user_lon):
-            return {
-                'answer': 'Necesito tu ubicación para encontrar la cafetería más cercana. ¿Me puedes compartir tu ubicación?',
-                'context': []
-            }
-
-        # Rebuild index if location changed
-        if user_lat and user_lon:
-            if (user_lat != self.current_user_lat or
-                    user_lon != self.current_user_lon):
-                print("📍 Location changed, rebuilding index...")
-                self.build_index(user_lat, user_lon)
-
-        # Ensure index exists
-        if not self.faiss_index:
-            self.build_index()
-
-        # Load models if needed
         self._load_models()
 
-        # Retrieve context (3 cafeterías completas es suficiente)
-        context_docs = self._retrieve_context(question, k=3)
+        # Retrieve Top-3 relevant cafeterias
+        q_emb = self.embedding_model.encode([question])
+        D, I = self.faiss_index.search(np.array(q_emb).astype('float32'), k=3)
 
-        # Limpiar el contexto para que sea más legible para el modelo
-        clean_context = []
-        for doc in context_docs:
-            # Remover números de referencia si existen en los docs
-            clean_doc = doc.replace("[1]", "").replace("[2]", "").replace("[3]", "")
-            clean_context.append(clean_doc)
+        context_str = "\n\n".join([f"[OPCIÓN {i+1}]\n{self.documents[idx]}" for i, idx in enumerate(I[0])])
 
-        context_str = "\n\n".join(clean_context)
+        system_prompt = """Eres 'El Búho Tragón', un experto en cafeterías de la UNISON.
+Usa la información proporcionada para responder. 
+- Si preguntan precios, compara entre las opciones encontradas.
+- Si preguntan ubicación, sé preciso.
+- Responde de forma natural y útil."""
 
-        # Prompt mejorado para respuestas específicas
-        prompt = f"""<|im_start|>system
-Eres El Buhito, asistente de cafeterías de la Universidad de Sonora.
-
-REGLAS IMPORTANTES:
-1. Usa SOLO la información de abajo
-2. Sé ESPECÍFICO: menciona nombres de cafeterías, precios exactos y ubicaciones
-3. Si preguntan por un platillo: di el precio Y en qué cafeterías está disponible
-4. Si preguntan por ubicación SIN coordenadas del usuario: di "Necesito tu ubicación para encontrar la más cercana"
-5. Si preguntan qué venden: lista las cafeterías que lo tienen
-6. Si NO hay información: di "No tengo esa información"
-7. Máximo 3 oraciones, pero incluye todos los detalles relevantes<|im_end|>
-<|im_start|>user
-INFORMACIÓN DISPONIBLE:
+        user_prompt = f"""INFORMACIÓN DE CAFETERÍAS:
 {context_str}
 
-Pregunta: {question}<|im_end|>
-<|im_start|>assistant
-"""
+PREGUNTA DEL ESTUDIANTE: {question}
 
-        # Parámetros para respuestas más detalladas
+Respuesta:"""
+
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ]
+
         outputs = self.llm_pipeline(
-            prompt,
-            max_new_tokens=120,  # Más tokens para respuestas completas
-            return_full_text=False,
-            temperature=0.1,
-            top_p=0.8,
+            messages,
+            max_new_tokens=250,
+            temperature=0.3,
             do_sample=True,
-            repetition_penalty=1.1,
-            pad_token_id=self.tokenizer.eos_token_id,
-            eos_token_id=self.tokenizer.eos_token_id,
         )
 
-        answer = outputs[0]['generated_text'].strip()
-
-        # Limpieza de tokens especiales de Qwen
-        answer = answer.replace("<|im_end|>", "")
-        answer = answer.replace("<|im_start|>", "")
-        answer = answer.replace("assistant", "")
-        answer = answer.replace("user", "")
-        answer = answer.replace("system", "")
-
-        # Remover artefactos del razonamiento
-        import re
-        answer = re.sub(r'Respuesta:?\s*', '', answer, flags=re.IGNORECASE)
-        answer = re.sub(r'La respuesta es:?\s*', '', answer, flags=re.IGNORECASE)
-        answer = re.sub(r'\[[\d,\s]+\]', '', answer)
-        answer = re.sub(r'INFORMACIÓN DISPONIBLE.*?:', '', answer, flags=re.IGNORECASE)
-        answer = re.sub(r'(la )?pregunta.*?:', '', answer, flags=re.IGNORECASE)
-        answer = re.sub(r'(en el|del|según el) context[oa]?', '', answer, flags=re.IGNORECASE)
-        answer = re.sub(r'\s+', ' ', answer).strip()
-
         return {
-            'answer': answer,
-            'context': context_docs
+            'answer': outputs[0]['generated_text'],
+            'context': [self.documents[i] for i in I[0]]
         }
 
-
-# Singleton instance for production use
-_rag_instance = None
-
-def get_rag_engine(data_path: str = "rag_data_clean.json") -> BuhoRAG:
-    """
-    Get or create RAG engine singleton
-    Use this in production to avoid reloading models
-
-    Example in Flask:
-        @app.route('/api/chat', methods=['POST'])
-        def chat():
-            rag = get_rag_engine()
-            question = request.json.get('question')
-            result = rag.query(question)
-            return jsonify(result)
-    """
-    global _rag_instance
-    if _rag_instance is None:
-        _rag_instance = BuhoRAG(data_path=data_path)
-        _rag_instance.load_data()
-        _rag_instance.build_index()
-    return _rag_instance
-
-
-# Example usage and testing
 if __name__ == "__main__":
-    print("="*70)
-    print("Testing RAG Engine with Qwen2.5")
-    print("="*70)
-
-    # Initialize
     rag = BuhoRAG()
-    rag.load_data()
+    # Force build to see the count
+    rag.build_index()
 
-    # Build index SIN ubicación (para probar que no invente distancias)
-    print("\n⚠️  Construyendo índice SIN ubicación de usuario...")
-    rag.build_index()  # Sin lat/lon
-
-    # Test queries
-    test_questions = [
-        "¿Cuánto cuesta la Torta Cubana?",
-        "¿Dónde venden pizzas?",
-        "¿A qué hora abre la Cafetería de Derecho?",
-        "¿Cuánto cuesta un licuado?",
-    ]
-
-    for i, q in enumerate(test_questions, 1):
-        print(f"\n[{i}/{len(test_questions)}] {q}")
-        print("-" * 70)
-        result = rag.query(q)
-        print(f"🦉 {result['answer']}")
-
-    print("\n" + "="*70)
-    print("✅ Testing complete")
-    print("="*70)
+    print("\n--- PRUEBA DE CONSULTA ---")
+    print(rag.query("¿Dónde venden Torta Cubana?")['answer'])
