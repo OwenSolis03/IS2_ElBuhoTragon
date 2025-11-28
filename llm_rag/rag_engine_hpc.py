@@ -2,7 +2,7 @@
 Production RAG Engine - El Búho Tragón
 Target: HPC Cluster 'Yuca' (AMD MI210 GPU)
 Model: Qwen2.5-14B-Instruct (FP16)
-Features: Smart Budgeting + Precise Geo-Awareness + Nuanced Distance Logic
+Features: Smart Budgeting + Geo-Awareness + CONVERSATIONAL MEMORY
 """
 
 import json
@@ -18,12 +18,13 @@ import re
 
 class BuhoRAG:
     def __init__(self, data_path: str = "rag_data_fixed.json"):
-        print("🦉 Initializing El Búho Tragón RAG System (Precision V3)...")
+        print("🦉 Initializing El Búho Tragón RAG System (Memory Edition)...")
 
         self.data_path = data_path
         self.data = None
         self.documents = []
         self.faiss_index = None
+        self.chat_history = [] # 🧠 AQUÍ GUARDAMOS LA MEMORIA
 
         # 📍 MAPA MENTAL DEL BÚHO (Campus Hermosillo) 📍
         self.known_locations = {
@@ -153,7 +154,6 @@ class BuhoRAG:
             for t in tienditas:
                 dist = self.calculate_distance(ref_lat, ref_lon, t.get('latitud'), t.get('longitud'))
                 t['distancia_temp'] = dist
-            # Ordenar por cercanía
             tienditas.sort(key=lambda x: x.get('distancia_temp', 9999999))
             print("📍 Cafeterías reordenadas por proximidad.")
 
@@ -164,17 +164,16 @@ class BuhoRAG:
             lines = [f"CAFETERÍA: {tienda.get('nombre', 'Desconocida')}"]
             lines.append(f"UBICACIÓN: {tienda.get('direccion', '')}, {tienda.get('facultad_nombre', '')}")
 
-            # --- LÓGICA DE PROXIMIDAD MEJORADA ---
+            # --- LÓGICA DE PROXIMIDAD REFINADA (SEMÁNTICA) ---
             if 'distancia_temp' in tienda:
                 dist = tienda['distancia_temp']
-                if dist < 30:
-                    lines.append(f"DISTANCIA: ¡ESTÁS AQUÍ MISMO! (A solo {dist:.0f} metros)")
+                if dist < 60: # Muy cerca
+                    lines.append(f"DISTANCIA: ESTÁ EN TU MISMA FACULTAD/ZONA (A solo {dist:.0f} metros)")
                 elif dist < 250:
-                    # Rango de "misma facultad / muy cerca"
-                    lines.append(f"DISTANCIA: MUY CERCA, EN TU ZONA (A {dist:.0f} metros)")
+                    lines.append(f"DISTANCIA: MUY CERCA CAMINANDO (A {dist:.0f} metros)")
                 elif dist < 1500:
                     lines.append(f"DISTANCIA: A {dist:.0f} metros.")
-            # -------------------------------------
+            # -------------------------------------------------
 
             if tienda.get('hora_apertura'):
                 lines.append(f"HORARIO: {str(tienda['hora_apertura'])[:5]} - {str(tienda['hora_cierre'])[:5]}")
@@ -186,7 +185,6 @@ class BuhoRAG:
                 for m in store_menus:
                     try:
                         price = float(m['precio'])
-                        # Formato estricto para evitar alucinaciones
                         lines.append(f" - {m['nombre']}: ${price:.2f}")
                     except:
                         pass
@@ -214,10 +212,15 @@ class BuhoRAG:
         if not target_lat:
             target_lat, target_lon = self.get_coords_from_query(question)
 
+        # Si cambian las coordenadas, reconstruimos.
+        # IMPORTANTE: Si el usuario NO cambia de ubicación (ya está en chat_history), mantenemos las coordenadas actuales.
         if target_lat and target_lon:
             self.build_index(target_lat, target_lon)
             self.current_user_lat = target_lat
             self.current_user_lon = target_lon
+        elif self.current_user_lat and self.current_user_lon:
+            # Mantener ubicación anterior si el usuario sigue hablando del mismo tema
+            pass
         elif not self.faiss_index:
             self.build_index()
 
@@ -226,21 +229,31 @@ class BuhoRAG:
         context_docs = self._retrieve_context(question, k=15)
         context_str = "\n\n".join(context_docs)
 
+        # --- MEMORIA CONVERSACIONAL ---
+        history_str = ""
+        # Tomamos los últimos 3 turnos para dar contexto sin saturar
+        for q, a in self.chat_history[-3:]:
+            history_str += f"Usuario: {q}\nBúho: {a}\n---\n"
+
         budget_instruction = ""
         if budget_val:
-            budget_instruction = f"\n⚠️ REGLA DE PRESUPUESTO: El usuario tiene ${budget_val} pesos. Muestra SOLO lo que pueda comprar con esa cantidad. NO inventes precios."
+            budget_instruction = f"\n⚠️ REGLA DE PRESUPUESTO: El usuario tiene ${budget_val} pesos. Muestra SOLO lo que pueda comprar con esa cantidad."
 
         prompt = f"""<|im_start|>system
-Eres El Buhito, experto en cafeterías de la UNISON.
+Eres El Buhito, experto en cafeterías de la UNISON (Campus Hermosillo).
+
+CONTEXTO ANTERIOR (MEMORIA):
+{history_str}
 
 REGLAS DE ORO:
-1. Usa SOLO la información provista.{budget_instruction}
-2. Si la distancia dice "MUY CERCA, EN TU ZONA", dile al usuario que está a unos pasos (no digas "estás ahí").
-3. Copia los nombres de los platillos EXACTAMENTE como aparecen. No mezcles palabras.
+1. Usa SOLO la información provista abajo.{budget_instruction}
+2. Si dice "ESTÁ EN TU MISMA FACULTAD/ZONA", dile que esa es su opción más inmediata, NO le digas "estás en la cafetería", dile "la cafetería está en tu zona".
+3. Copia los nombres de los platillos EXACTAMENTE.
 4. Menciona el nombre de la cafetería SIEMPRE junto al precio.
+5. Usa el historial para entender el contexto (ej. si pregunta "y qué más?", se refiere a la pregunta anterior).
 
 <|im_start|>user
-INFORMACIÓN DISPONIBLE:
+INFORMACIÓN ACTUALIZADA:
 {context_str}
 
 Pregunta: {question}<|im_end|>
@@ -264,21 +277,24 @@ Pregunta: {question}<|im_end|>
 
         answer = re.sub(r'Respuesta:?\s*', '', answer, flags=re.IGNORECASE)
         answer = re.sub(r'\[[\d,\s]+\]', '', answer)
-        answer = re.sub(r'INFORMACIÓN DISPONIBLE.*?:', '', answer, flags=re.IGNORECASE)
+        answer = re.sub(r'INFORMACIÓN ACTUALIZADA.*?:', '', answer, flags=re.IGNORECASE)
         answer = re.sub(r'\s+', ' ', answer).strip()
+
+        # Guardar en memoria
+        self.chat_history.append((question, answer))
 
         return {'answer': answer, 'context': context_docs}
 
 if __name__ == "__main__":
     print("="*70)
-    print("🦉 EL BÚHO TRAGÓN - MODO INTELIGENTE (V3 - LÓGICA REFINADA)")
+    print("🦉 EL BÚHO TRAGÓN - MODO INTELIGENTE (MEMORIA + GEO)")
     print("="*70)
 
     rag = BuhoRAG()
     rag.load_data()
     rag.build_index()
 
-    print("\n✅ Listo. Escribe 'salir' para terminar.")
+    print("\n✅ Listo. ¡Ya tengo memoria! Prueba conversar conmigo.")
 
     while True:
         try:
