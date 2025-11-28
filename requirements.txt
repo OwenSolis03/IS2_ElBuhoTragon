@@ -6,7 +6,6 @@ django-cors-headers==4.7.0
 django-filter==25.2
 djangorestframework==3.16.0
 djangorestframework_simplejwt==5.5.0
-mysqlclient==2.2.7
 numpy==2.3.3
 pandas==2.3.3
 pycparser==2.23
