@@ -11,12 +11,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-import pymysql 
 import os
 from dotenv import load_dotenv
 from datetime import timedelta 
 
-pymysql.install_as_MySQLdb()
 # load variables from .env
 load_dotenv()
 
@@ -133,20 +131,10 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": os.getenv("DB_NAME", "el_buho_tragon"),
-        "USER": os.getenv("DB_USER", "buhotragon"),     # O el usuario que estés usando
-        "PASSWORD": os.getenv("DB_PASSWORD", "3054"),   # O tu contraseña
-        "HOST": os.getenv("DB_HOST", "127.0.0.1"),
-        "PORT": os.getenv("DB_PORT", "3306"),
-        # --- AGREGA ESTE BLOQUE ---
-        "OPTIONS": {
-            "charset": "utf8mb4",
-            "use_unicode": True,
-        },
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",  # Crea el archivo en la raíz del proyecto
     }
 }
-
 API_URL = os.getenv("API_URL", "http://127.0.0.1:8000")
 
 # Password validation
