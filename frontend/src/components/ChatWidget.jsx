@@ -123,11 +123,12 @@ const ChatWidget = () => {
                         {chatHistory.map((msg, index) => (
                             <div key={index} className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}>
                                 <div
-                                    className={`max-w-[80%] p-3 rounded-2xl text-sm ${
+                                    className={`max-w-[80%] p-3 rounded-2xl text-sm whitespace-pre-line ${
                                         msg.type === "user"
                                             ? "bg-yellow-500 text-[#141b2d] rounded-br-none font-medium"
-                                            : "bg-[#2a324a] text-gray-200 rounded-bl-none border border-white/5"
+                                            : "bg-[#2a324a] text-gray-200 rounded-bl-none border border-white/5 leading-relaxed"
                                     }`}
+                                    style={msg.type === "bot" ? { textIndent: "-1em", paddingLeft: "1em" } : {}}
                                 >
                                     {msg.text}
                                 </div>
