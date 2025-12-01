@@ -40,10 +40,7 @@ class BuhoRAG:
     def __init__(self, data_path: str = None):
         logger.info("🦉 Inicializando El Búho Tragón RAG System...")
 
-        # ✅ FIX: Si no se especifica ruta, usar la del directorio del script
-        if data_path is None:
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            data_path = os.path.join(script_dir, "rag_data_fixed.json")
+
 
         self.data_path = data_path
         self.data = None
