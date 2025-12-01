@@ -1,7 +1,7 @@
 """
 🦉 El Búho Tragón - Sistema RAG para Chatbot Web
-Versión: 2.0 (Producción)
-Optimizado para: Respuestas rápidas, contexto conversacional, integración web
+Versión: 2.1 (Producción - ROCm Optimizado)
+Optimizado para: AMD GPU (ROCm), Respuestas rápidas, contexto conversacional
 """
 
 import json
@@ -35,12 +35,13 @@ class BuhoRAG:
     - Memoria conversacional
     - Filtrado por presupuesto
     - Respuestas naturales y concisas
+    - Optimizado para AMD GPU (ROCm)
     """
 
     def __init__(self, data_path: str = None):
         logger.info("🦉 Inicializando El Búho Tragón RAG System...")
 
-        # ✅ FIX: Si no se especifica ruta, usar la del directorio del script
+        # ✅ Auto-detectar ruta del archivo de datos
         if data_path is None:
             script_dir = os.path.dirname(os.path.abspath(__file__))
             data_path = os.path.join(script_dir, "rag_data_fixed.json")
@@ -55,6 +56,7 @@ class BuhoRAG:
         self.embedding_model = None
         self.llm_pipeline = None
         self.tokenizer = None
+        self.device = None  # Se detectará automáticamente
 
         # Cache de ubicación
         self.current_user_lat = None
@@ -114,6 +116,26 @@ class BuhoRAG:
 
         logger.info("✅ RAG System inicializado correctamente")
 
+    def _detect_device(self):
+        """Detecta el mejor dispositivo disponible (ROCm GPU > CPU)"""
+        if torch.cuda.is_available():
+            device_name = torch.cuda.get_device_name(0)
+            device_count = torch.cuda.device_count()
+
+            # Detectar si es ROCm (AMD) o CUDA (NVIDIA)
+            backend = "ROCm" if "AMD" in device_name or "Radeon" in device_name else "CUDA"
+
+            logger.info(f"🎮 GPU detectada: {device_name}")
+            logger.info(f"🔧 Backend: {backend}")
+            logger.info(f"📊 Dispositivos disponibles: {device_count}")
+            logger.info(f"💾 VRAM disponible: {torch.cuda.get_device_properties(0).total_memory / 1e9:.2f} GB")
+
+            return "cuda:0", torch.float16
+        else:
+            logger.warning("⚠️ No se detectó GPU - usando CPU (ADVERTENCIA: MUY LENTO para LLM)")
+            logger.warning("⚠️ Para ROCm, asegúrate de tener PyTorch instalado con: pip install torch --index-url https://download.pytorch.org/whl/rocm6.1")
+            return "cpu", torch.float32
+
     def load_data(self):
         """Carga datos de cafeterías desde JSON"""
         if not os.path.exists(self.data_path):
@@ -126,33 +148,61 @@ class BuhoRAG:
         logger.info(f"📂 Datos cargados: {len(self.data.get('tienditas', []))} cafeterías")
 
     def _load_models(self):
-        """Carga los modelos de ML (lazy loading para optimizar memoria)"""
+        """Carga los modelos de ML con optimización ROCm (lazy loading)"""
+
+        # Detectar dispositivo una sola vez
+        if self.device is None:
+            self.device, self.dtype = self._detect_device()
+
+        # 1. Modelo de embeddings (CPU es suficiente y más estable)
         if self.embedding_model is None:
             logger.info("📥 Cargando modelo de embeddings...")
             self.embedding_model = SentenceTransformer(
                 'sentence-transformers/all-MiniLM-L6-v2',
-                device='cpu'
+                device='cpu'  # Embeddings pequeños, CPU es OK
             )
-            logger.info("✅ Modelo de embeddings listo")
+            logger.info("✅ Modelo de embeddings listo (CPU)")
 
+        # 2. LLM (GPU crítico aquí)
         if self.llm_pipeline is None:
-            logger.info("📥 Cargando LLM (esto puede tardar 1-2 minutos)...")
+            logger.info("📥 Cargando LLM Qwen 14B (esto puede tardar 1-2 minutos)...")
             model_id = "Qwen/Qwen2.5-14B-Instruct"
 
-            self.tokenizer = AutoTokenizer.from_pretrained(model_id)
-            model = AutoModelForCausalLM.from_pretrained(
+            # Cargar tokenizer
+            self.tokenizer = AutoTokenizer.from_pretrained(
                 model_id,
-                torch_dtype=torch.float16,
-                device_map="auto",
-                low_cpu_mem_usage=True
+                trust_remote_code=True
             )
 
+            # Cargar modelo con configuración óptima para ROCm
+            logger.info(f"🔧 Configuración: device={self.device}, dtype={self.dtype}")
+
+            model = AutoModelForCausalLM.from_pretrained(
+                model_id,
+                torch_dtype=self.dtype,
+                device_map=self.device,
+                trust_remote_code=True,
+                low_cpu_mem_usage=True,
+                # Optimizaciones ROCm
+                attn_implementation="eager",  # Más compatible con ROCm
+            )
+
+            # Crear pipeline
             self.llm_pipeline = pipeline(
                 "text-generation",
                 model=model,
-                tokenizer=self.tokenizer
+                tokenizer=self.tokenizer,
+                device=0 if self.device == "cuda:0" else -1,  # 0=GPU, -1=CPU
+                torch_dtype=self.dtype,
             )
+
             logger.info(f"✅ LLM cargado en: {model.device}")
+
+            # Mostrar estadísticas de memoria si es GPU
+            if self.device == "cuda:0":
+                allocated = torch.cuda.memory_allocated(0) / 1e9
+                reserved = torch.cuda.memory_reserved(0) / 1e9
+                logger.info(f"💾 Memoria GPU: {allocated:.2f}GB asignada, {reserved:.2f}GB reservada")
 
     @staticmethod
     def calculate_distance(lat1, lon1, lat2, lon2):
@@ -348,15 +398,18 @@ Pregunta: {question}<|im_end|>
 <|im_start|>assistant
 """
 
-        # 9. Generar respuesta
+        # 9. Generar respuesta con configuración optimizada
+        logger.info("🤖 Generando respuesta...")
+
         outputs = self.llm_pipeline(
             prompt,
-            max_new_tokens=200,  # Respuestas más cortas
+            max_new_tokens=200,
             return_full_text=False,
-            temperature=0.3,  # Más determinista
+            temperature=0.3,
             top_p=0.85,
             do_sample=True,
-            pad_token_id=self.tokenizer.eos_token_id
+            pad_token_id=self.tokenizer.eos_token_id,
+            repetition_penalty=1.1,  # Evita repeticiones
         )
 
         answer = outputs[0]['generated_text'].strip()
