@@ -34,7 +34,7 @@ const Contacto = () => {
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-white">Ubicación</h3>
-                                    <p className="text-gray-400">Universidad de Sonora<br/>Hermosillo, Sonora</p>
+                                    <p className="text-gray-400">Universidad de Sonora<br/>Departamento de Matematicas<br/>Licenciatura en Ciencias de la Computacion<br/>Hermosillo, Sonora</p>
                                 </div>
                             </div>
 
@@ -44,7 +44,7 @@ const Contacto = () => {
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-white">Correo Electrónico</h3>
-                                    <p className="text-gray-400">soporte@buhotragon.unison.mx</p>
+                                    <p className="text-gray-400">a223201053@unison.mx</p>
                                 </div>
                             </div>
 
@@ -54,7 +54,7 @@ const Contacto = () => {
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-white">Proyecto Open Source</h3>
-                                    <p className="text-gray-400">github.com/el-buho-tragon</p>
+                                    <p className="text-gray-400">https://github.com/OwenSolis03/IS2_ElBuhoTragon</p>
                                 </div>
                             </div>
                         </div>
