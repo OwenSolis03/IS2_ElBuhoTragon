@@ -330,18 +330,28 @@ Pregunta: {question}
         for tag in ["<|im_end|>", "<|im_start|>", "assistant", "user", "system"]:
             answer = answer.replace(tag, "")
 
-        # --- NUEVA LIMPIEZA DE FORMATO ---
-        # 1. Eliminar asteriscos de negritas
+        # --- LIMPIEZA DE FORMATO DEFINITIVA ---
+
+        # 1. Eliminar asteriscos de negritas (Markdown)
         answer = answer.replace("**", "").replace("__", "")
 
-        # Si el modelo escribe ": -", forzamos un salto de línea ahí
-        answer = answer.replace(": -", ":\n-")
+        # 2. Forzar salto de línea antes de cualquier Bullet (•)
+        # Si encuentra un bullet precedido de espacio, lo cambia por \n•
+        answer = answer.replace(" •", "\n•")
+        answer = answer.replace("• ", "\n• ") # Por si el LLM pone el bullet pegado
 
-        # Si el modelo escribe " - " (espacio guion espacio), lo convertimos en salto de línea + guion
-        # Esto separa los elementos que están pegados
-        answer = answer.replace(" - ", "\n- ")
+        # 3. Forzar salto de línea antes de guiones usados como lista
+        # (Solo si hay espacio antes y después, para no romper palabras compuestas)
+        answer = re.sub(r'(\s)-\s', r'\n- ', answer)
 
-        # Limpieza final de espacios extra y etiquetas
+        # 4. Arreglar el inicio de la lista (después de los dos puntos)
+        # Convierte "están en: •" en "están en:\n•"
+        answer = answer.replace(": •", ":\n•").replace(": -", ":\n-")
+
+        # 5. Eliminar saltos de línea dobles o triples que hayan quedado
+        answer = re.sub(r'\n\s*\n', '\n', answer)
+
+        # Limpieza final
         answer = re.sub(r'Respuesta:?\s*', '', answer, flags=re.IGNORECASE).strip()
 
         self.chat_history.append((question, answer))
