@@ -326,11 +326,14 @@ Pregunta: {question}
         # 1. Eliminar asteriscos de negritas
         answer = answer.replace("**", "").replace("__", "")
 
-        # 2. Forzar saltos de línea si el modelo usó listas numeradas pegadas (ej: "1. Comida 2. Cena")
-        # Esto busca "numero. " y le pone un salto de línea antes
-        answer = re.sub(r'(\s)(\d+\.)', r'\n\2', answer)
+        # Si el modelo escribe ": -", forzamos un salto de línea ahí
+        answer = answer.replace(": -", ":\n-")
 
-        # 3. Eliminar etiqueta de "Respuesta:" si la hubiera
+        # Si el modelo escribe " - " (espacio guion espacio), lo convertimos en salto de línea + guion
+        # Esto separa los elementos que están pegados
+        answer = answer.replace(" - ", "\n- ")
+
+        # Limpieza final de espacios extra y etiquetas
         answer = re.sub(r'Respuesta:?\s*', '', answer, flags=re.IGNORECASE).strip()
 
         self.chat_history.append((question, answer))
