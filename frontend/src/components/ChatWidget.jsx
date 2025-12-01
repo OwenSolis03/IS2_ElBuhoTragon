@@ -74,8 +74,21 @@ const ChatWidget = () => {
             const data = await response.json();
 
             if (data.success) {
-                // OPCIÓN 1: Agregar espacios alrededor de bullets para legibilidad
-                let formattedAnswer = data.answer.replace(/•/g, ' • ');
+                let formattedAnswer = data.answer;
+
+                // Caso 1: Si JSON escapó los \n como \\n literales (texto)
+                if (formattedAnswer.includes('\\n')) {
+                    formattedAnswer = formattedAnswer.replace(/\\n/g, '\n');
+                }
+
+                // Caso 2: Si tiene bullets pero SIN saltos de línea, forzarlos
+                if (formattedAnswer.includes('•') && !formattedAnswer.includes('\n•')) {
+                    formattedAnswer = formattedAnswer
+                        .split('•')
+                        .map((part, i) => i === 0 ? part : '• ' + part.trim())
+                        .join('\n')
+                        .trim();
+                }
 
                 setChatHistory((prev) => [
                     ...prev,
