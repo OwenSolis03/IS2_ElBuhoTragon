@@ -132,7 +132,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",  # Crea el archivo en la raíz del proyecto
+        "NAME": BASE_DIR / "el_buho_tragon.db",  # Crea el archivo en la raíz del proyecto
     }
 }
 API_URL = os.getenv("API_URL", "http://127.0.0.1:8000")

@@ -1,46 +1,78 @@
+# backend/export_for_rag.py
+"""
+Exporta datos desde SQLite Django a JSON para el RAG
+"""
+
 import json
-import pymysql
+import os
+import django
+import sys
 
-connection = pymysql.connect(
-    host='localhost',
-    user='root',
-    password='owen1234',
-    database='el_buho_tragon',
-    charset='utf8mb4',
-    cursorclass=pymysql.cursors.DictCursor
-)
+# Configurar Django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+django.setup()
 
-data = {}
+from apps.cafeteria.models import Menus, Tienditas, Facultades
 
-with connection.cursor() as cursor:
-    # Export menus (all columns)
-    print("Exporting menus...")
-    cursor.execute("SELECT * FROM menus")
-    data['menus'] = cursor.fetchall()
+def export_data():
+    print("🦉 Exportando datos desde SQLite...")
 
-    # Export tienditas with faculty name (exclude imagen_url)
-    print("Exporting tienditas...")
-    cursor.execute("""
-                   SELECT t.id_tiendita, t.nombre, t.direccion, t.foro_url,
-                          t.id_facultad, f.nombre as facultad_nombre,
-                          t.latitud, t.longitud, t.hora_apertura, t.hora_cierre
-                   FROM tienditas t
-                            LEFT JOIN facultades f ON t.id_facultad = f.id_facultad
-                   """)
-    data['tienditas'] = cursor.fetchall()
+    data = {}
 
-    # Export facultades (all columns)
-    print("Exporting facultades...")
-    cursor.execute("SELECT * FROM facultades")
-    data['facultades'] = cursor.fetchall()
+    # Export menus
+    print("📋 Exportando menús...")
+    menus = Menus.objects.all().values(
+        'id_menu', 'nombre', 'descripcion', 'precio',
+        'id_tiendita__id_tiendita', 'categoria'
+    )
 
-    print(f"\n📊 Summary:")
+    data['menus'] = []
+    for menu in menus:
+        data['menus'].append({
+            'id_menu': menu['id_menu'],
+            'nombre': menu['nombre'],
+            'descripcion': menu.get('descripcion', ''),
+            'precio': str(menu.get('precio', '0.00')),
+            'id_tiendita': menu.get('id_tiendita__id_tiendita'),
+            'categoria': menu.get('categoria', '')
+        })
+
+    # Export tienditas
+    print("🏪 Exportando cafeterías...")
+    tienditas = Tienditas.objects.select_related('id_facultad').all()
+
+    data['tienditas'] = []
+    for t in tienditas:
+        data['tienditas'].append({
+            'id_tiendita': t.id_tiendita,
+            'nombre': t.nombre,
+            'direccion': t.direccion or '',
+            'foro_url': t.foro_url or '',
+            'id_facultad': t.id_facultad.id_facultad if t.id_facultad else None,
+            'facultad_nombre': t.id_facultad.nombre if t.id_facultad else '',
+            'latitud': str(t.latitud) if t.latitud else None,
+            'longitud': str(t.longitud) if t.longitud else None,
+            'hora_apertura': str(t.hora_apertura) if t.hora_apertura else None,
+            'hora_cierre': str(t.hora_cierre) if t.hora_cierre else None
+        })
+
+    # Export facultades
+    print("📚 Exportando facultades...")
+    facultades = Facultades.objects.all().values()
+    data['facultades'] = list(facultades)
+
+    # Resumen
+    print(f"\n📊 Resumen:")
     for table, rows in data.items():
-        print(f"  - {table}: {len(rows)} records")
+        print(f"  - {table}: {len(rows)} registros")
 
-connection.close()
+    # Guardar JSON
+    output_path = 'rag_data.json'
+    with open(output_path, 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
 
-with open('rag_data.json', 'w', encoding='utf-8') as f:
-    json.dump(data, f, indent=2, ensure_ascii=False, default=str)
+    print(f"\n✅ Datos exportados a {output_path}")
+    return output_path
 
-print("\n✅ Data exported to rag_data.json (images excluded)")
+if __name__ == '__main__':
+    export_data()
