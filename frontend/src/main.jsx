@@ -2,38 +2,37 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-// Páginas Principales
+// Importamos App para usarlo como página principal
+import App from "./App.jsx";
+
 import Home from "./pages/Home.jsx";
 import Cafeterias from "./pages/Cafeterias.jsx";
 import Facultad from "./pages/Facultad.jsx";
 import Login from "./pages/Login.jsx";
 import Registro from "./pages/Registro.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
-
-// Plantilla Dinámica (La que reemplaza a todas las demás)
 import PlantillaCafeteria from "./pages/PlantillaCafeteria.jsx";
 
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
-        {/* --- RUTAS GENERALES --- */}
-        <Route path="/" element={<Home />} />
-        <Route path="/cafeterias" element={<Cafeterias />} />
-        <Route path="/facultad" element={<Facultad />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/registro" element={<Registro />} />
-        
-        {/* --- RUTA DE ADMINISTRACIÓN --- */}
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+    <React.StrictMode>
+        <BrowserRouter>
+            <Routes>
 
-        {/* --- RUTA DINÁMICA DE CAFETERÍAS --- */}
-        {/* Esta única línea maneja la vista de CUALQUIER cafetería usando su ID */}
-        <Route path="/cafeterias/:id" element={<PlantillaCafeteria />} />
+                {/* --- CAMBIO AQUÍ: Usamos App en la raíz para ver el mapa --- */}
+                <Route path="/" element={<App />} />
 
-      </Routes>
-    </BrowserRouter>
-  </React.StrictMode>
+                <Route path="/home" element={<Home />} />
+                <Route path="/cafeterias" element={<Cafeterias />} />
+                <Route path="/facultad" element={<Facultad />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/registro" element={<Registro />} />
+
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                <Route path="/cafeterias/:id" element={<PlantillaCafeteria />} />
+
+            </Routes>
+        </BrowserRouter>
+    </React.StrictMode>
 );
