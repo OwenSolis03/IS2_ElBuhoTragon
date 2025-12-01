@@ -230,6 +230,9 @@ def get_rag_instance():
     return _rag_instance
 
 
+# Reemplaza SOLO esta función en tu views.py existente
+# (desde la línea 227 aproximadamente, donde empieza @api_view(['POST']))
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def chatbot_query(request):
@@ -276,9 +279,13 @@ def chatbot_query(request):
         rag = get_rag_instance()
         result = rag.query(message, user_lat=user_lat, user_lon=user_lon)
 
+        # FIX: Verificar que los saltos de línea están presentes
+        answer_text = result['answer']
+        logger.info(f"📝 Respuesta con {answer_text.count(chr(10))} saltos de línea")
+
         return Response({
             'success': True,
-            'answer': result['answer'],
+            'answer': answer_text,
             'metadata': {
                 'budget_detected': result.get('budget_detected'),
                 'location_used': result.get('location_used'),
