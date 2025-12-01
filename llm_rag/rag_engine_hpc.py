@@ -348,7 +348,7 @@ class BuhoRAG:
 
         # 6. Historial conversacional
         history_str = ""
-        for q, a in self.chat_history[-2:]:
+        for q, a in self.chat_history[-6:]:
             history_str += f"Usuario: {q}\nBúho: {a}\n---\n"
 
         # 7. Instrucción de presupuesto
@@ -358,21 +358,23 @@ class BuhoRAG:
 
         # 8. Construir prompt
         prompt = f"""<|im_start|>system
-Eres "El Búho Tragón", un asistente útil de la Universidad de Sonora.
-Tu objetivo es responder preguntas sobre menús de cafeterías basándote EXCLUSIVAMENTE en el contexto proporcionado.
+Eres "El Búho Tragón", asistente de cafeterías UNISON.
+Tu memoria es limitada, así que apóyate en el contexto visual.
 
-REGLAS:
-1. Usa lenguaje natural y fluido en español.
-2. Si mencionas precios, usa el formato estándar (ej: $50.00).
-3. No menciones "Contexto" o "Documentos" en tu respuesta, integra la información naturalmente.
-4. Si la respuesta no está en el contexto, di "No tengo esa información en los menús actuales".
+REGLAS DE ORO:
+1. Si el usuario pregunta "¿Y más barato?" o "¿Y en otro lado?", REFIÉRETE AL PLATILLO del que estaban hablando antes (ej: si hablaban de Pizza, busca precios de Pizza).
+2. Solo si el usuario cambia explícitamente de tema, busca otros platillos.
+3. Sé breve y directo.
 {budget_instruction}
 <|im_end|>
 <|im_start|>user
-Información de las cafeterías (Contexto):
+HISTORIAL DE CONVERSACIÓN:
+{history_str}
+
+INFORMACIÓN NUEVA ENCONTRADA (Contexto RAG):
 {context_str}
 
-Pregunta del usuario: {question}
+Pregunta actual: {question}
 <|im_end|>
 <|im_start|>assistant
 """
