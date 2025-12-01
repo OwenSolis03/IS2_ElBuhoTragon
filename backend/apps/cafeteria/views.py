@@ -66,6 +66,7 @@ def login_view(request):
 
         user = Usuarios.objects.get(nombre_usuario=username)
 
+        # Verificación segura de contraseña (hash)
         if not check_password(password, user.contrasena):
             return Response(
                 {'success': False, 'error': 'Credenciales inválidas'},
@@ -91,13 +92,14 @@ def login_view(request):
 
 
 class UserRegisterSerializer(ModelSerializer):
-    """Serializador para registro de usuarios"""
+    """Serializador para registro de usuarios con Hashing"""
     class Meta:
         model = Usuarios
         fields = ['nombre_usuario', 'email', 'contrasena']
         extra_kwargs = {'contrasena': {'write_only': True}}
 
     def create(self, validated_data):
+        # AQUI ESTA EL CAMBIO DE SEGURIDAD
         validated_data['contrasena'] = make_password(validated_data['contrasena'])
         validated_data['es_admin'] = 0
         validated_data['fecha_registro'] = timezone.now()
@@ -153,23 +155,31 @@ class UsuariosViewSet(viewsets.ModelViewSet):
     serializer_class = UsuariosSerializer
 
 
+# --- AQUI ESTA EL CAMBIO NUCLEAR PARA LAS RESEÑAS ---
 class ResenaViewSet(viewsets.ModelViewSet):
-    """CRUD de Reseñas - Solo autenticados pueden crear"""
+    """
+    CRUD de Reseñas - MODIFICADO PARA DEMO
+    Se ha deshabilitado la seguridad estricta para permitir el flujo sin tokens complejos.
+    El Frontend DEBE enviar 'id_usuario'.
+    """
     queryset = Resenas.objects.all()
     serializer_class = ResenaSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    
+    # 1. Esto evita que Django intente leer el Token y falle
+    authentication_classes = [] 
+    # 2. Esto deja pasar la petición sin preguntar quién es
+    permission_classes = [AllowAny] 
+
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['id_tiendita']
     ordering_fields = ['fecha_registro', 'calificacion']
     ordering = ['-fecha_registro']
 
     def perform_create(self, serializer):
-        """Asigna automáticamente el usuario autenticado"""
-        try:
-            usuario_app = Usuarios.objects.get(nombre_usuario=self.request.user.username)
-            serializer.save(id_usuario=usuario_app)
-        except:
-            serializer.save()
+        # Guardamos directamente usando el id_usuario que viene del frontend
+        # Ya no intentamos leer self.request.user
+        serializer.save()
+# ----------------------------------------------------
 
 
 class MenusPorTiendita(generics.ListAPIView):
@@ -182,7 +192,7 @@ class MenusPorTiendita(generics.ListAPIView):
 
 
 # ========================================
-# CHATBOT RAG
+# CHATBOT RAG (Mantenido intacto)
 # ========================================
 
 # Importar el motor RAG
@@ -225,20 +235,6 @@ def get_rag_instance():
 def chatbot_query(request):
     """
     Endpoint para el chatbot RAG
-
-    Body esperado:
-    {
-        "message": "¿dónde hay tortas?",
-        "lat": 29.081,      // Opcional
-        "lon": -110.961     // Opcional
-    }
-
-    Respuesta:
-    {
-        "success": true,
-        "answer": "...",
-        "metadata": { ... }
-    }
     """
     try:
         # Validar entrada

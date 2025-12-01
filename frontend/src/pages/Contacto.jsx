@@ -1,3 +1,4 @@
+// src/pages/Contacto.jsx
 import React, { useState } from 'react';
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -13,99 +14,128 @@ const Contacto = () => {
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-gray-900 text-white">
+        // 1. ESTRUCTURA SEGURA (Fondo CSS Inline)
+        <div style={{
+            minHeight: "100vh",
+            width: "100vw",
+            margin: 0,
+            padding: 0,
+            display: "flex",
+            flexDirection: "column",
+            backgroundColor: "#141b2d", // Azul Nocturno Oficial
+            color: "white",
+            overflowX: "hidden",
+            position: "relative"
+        }}>
             <Header />
 
-            <main className="flex-grow container mx-auto px-6 py-20">
-                <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
+            {/* 2. CONTENIDO PRINCIPAL */}
+            <main style={{ flexGrow: 1, paddingTop: '8rem' }} className="px-6 pb-20 w-full flex justify-center">
+                
+                <div className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-12">
 
                     {/* Columna Izquierda: Info */}
-                    <div>
-                        <h1 className="text-4xl font-bold text-yellow-400 mb-6">Contáctanos</h1>
-                        <p className="text-gray-300 mb-8 text-lg">
+                    <div className="flex flex-col justify-center">
+                        <h1 className="text-4xl font-extrabold text-white mb-6 tracking-tight">
+                            Contáctanos
+                        </h1>
+                        <p className="text-gray-400 mb-8 text-lg leading-relaxed">
                             ¿Encontraste un error en el menú? ¿Quieres sugerir una nueva cafetería o reportar un bug?
-                            Estamos aquí para escucharte.
+                            <br />Estamos aquí para escucharte.
                         </p>
 
-                        <div className="space-y-6">
-                            <div className="flex items-start gap-4">
-                                <div className="bg-gray-800 p-3 rounded-lg text-orange-400">
+                        <div className="space-y-8">
+                            <div className="flex items-start gap-4 group">
+                                <div className="bg-[#1e2538] p-4 rounded-xl border border-white/10 text-yellow-500 group-hover:border-yellow-500/50 transition-colors shadow-lg">
                                     <FiMapPin size={24} />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-white">Ubicación</h3>
-                                    <p className="text-gray-400">Universidad de Sonora<br/>Departamento de Matematicas<br/>Licenciatura en Ciencias de la Computacion<br/>Hermosillo, Sonora</p>
+                                    <h3 className="font-bold text-white text-lg">Ubicación</h3>
+                                    <p className="text-gray-400 text-sm mt-1">
+                                        Universidad de Sonora<br/>
+                                        Departamento de Matemáticas<br/>
+                                        Licenciatura en Ciencias de la Computación<br/>
+                                        Hermosillo, Sonora
+                                    </p>
                                 </div>
                             </div>
 
-                            <div className="flex items-start gap-4">
-                                <div className="bg-gray-800 p-3 rounded-lg text-orange-400">
+                            <div className="flex items-center gap-4 group">
+                                <div className="bg-[#1e2538] p-4 rounded-xl border border-white/10 text-yellow-500 group-hover:border-yellow-500/50 transition-colors shadow-lg">
                                     <FiMail size={24} />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-white">Correo Electrónico</h3>
-                                    <p className="text-gray-400">a223201053@unison.mx</p>
+                                    <h3 className="font-bold text-white text-lg">Correo Electrónico</h3>
+                                    <p className="text-gray-400 text-sm mt-1">a223201053@unison.mx</p>
                                 </div>
                             </div>
 
-                            <div className="flex items-start gap-4">
-                                <div className="bg-gray-800 p-3 rounded-lg text-orange-400">
+                            <div className="flex items-center gap-4 group">
+                                <div className="bg-[#1e2538] p-4 rounded-xl border border-white/10 text-yellow-500 group-hover:border-yellow-500/50 transition-colors shadow-lg">
                                     <FiGithub size={24} />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-white">Proyecto Open Source</h3>
-                                    <p className="text-gray-400">https://github.com/OwenSolis03/IS2_ElBuhoTragon</p>
+                                    <h3 className="font-bold text-white text-lg">Proyecto Open Source</h3>
+                                    <a href="https://github.com/OwenSolis03/IS2_ElBuhoTragon" target="_blank" rel="noopener noreferrer" className="text-blue-400 text-sm mt-1 hover:underline">
+                                        github.com/OwenSolis03/IS2_ElBuhoTragon
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Columna Derecha: Formulario */}
-                    <div className="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700">
+                    {/* Columna Derecha: Formulario (Glassmorphism) */}
+                    <div className="bg-[#1e2538]/60 backdrop-blur-lg border border-white/10 p-8 rounded-3xl shadow-2xl relative overflow-hidden">
+                        
+                        {/* Decoración superior */}
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-600 to-yellow-400"></div>
+
                         {enviado ? (
-                            <div className="h-full flex flex-col items-center justify-center text-center py-10">
-                                <div className="text-green-400 text-6xl mb-4">✓</div>
-                                <h3 className="text-2xl font-bold mb-2">¡Mensaje Enviado!</h3>
-                                <p className="text-gray-400">Gracias por tus comentarios. Te responderemos pronto.</p>
+                            <div className="h-full flex flex-col items-center justify-center text-center py-10 animate-fade-in">
+                                <div className="text-green-400 text-7xl mb-6 drop-shadow-[0_0_10px_rgba(74,222,128,0.5)]">✓</div>
+                                <h3 className="text-3xl font-bold text-white mb-2">¡Mensaje Enviado!</h3>
+                                <p className="text-gray-400 mb-8">Gracias por tus comentarios. El equipo del Búho los leerá pronto.</p>
                                 <button
                                     onClick={() => setEnviado(false)}
-                                    className="mt-6 text-yellow-400 hover:text-yellow-300 underline font-semibold"
+                                    className="px-6 py-2 border border-yellow-500/50 text-yellow-500 rounded-full hover:bg-yellow-500 hover:text-[#141b2d] transition-all font-bold"
                                 >
                                     Enviar otro mensaje
                                 </button>
                             </div>
                         ) : (
-                            <form onSubmit={handleSubmit} className="space-y-4">
+                            <form onSubmit={handleSubmit} className="space-y-5">
+                                <h2 className="text-2xl font-bold text-white mb-6">Envíanos un mensaje</h2>
+                                
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-400 mb-1">Nombre</label>
+                                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Nombre</label>
                                     <input
                                         type="text"
                                         required
-                                        className="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 text-white focus:border-yellow-400 focus:outline-none transition-colors"
+                                        className="w-full bg-[#141b2d] border border-gray-600 rounded-xl p-3 text-white focus:border-yellow-500 focus:outline-none transition-colors placeholder-gray-600"
                                         placeholder="Tu nombre"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-400 mb-1">Correo</label>
+                                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Correo</label>
                                     <input
                                         type="email"
                                         required
-                                        className="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 text-white focus:border-yellow-400 focus:outline-none transition-colors"
+                                        className="w-full bg-[#141b2d] border border-gray-600 rounded-xl p-3 text-white focus:border-yellow-500 focus:outline-none transition-colors placeholder-gray-600"
                                         placeholder="tucorreo@ejemplo.com"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-400 mb-1">Mensaje</label>
+                                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Mensaje</label>
                                     <textarea
                                         rows="4"
                                         required
-                                        className="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 text-white focus:border-yellow-400 focus:outline-none transition-colors resize-none"
+                                        className="w-full bg-[#141b2d] border border-gray-600 rounded-xl p-3 text-white focus:border-yellow-500 focus:outline-none transition-colors resize-none placeholder-gray-600"
                                         placeholder="¿En qué podemos ayudarte?"
                                     ></textarea>
                                 </div>
                                 <button
                                     type="submit"
-                                    className="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 rounded-lg transition-transform transform hover:scale-[1.02] shadow-md"
+                                    className="w-full bg-yellow-500 hover:bg-yellow-400 text-[#141b2d] font-bold py-3.5 rounded-xl transition-transform transform hover:scale-[1.02] shadow-lg mt-2"
                                 >
                                     Enviar Mensaje
                                 </button>

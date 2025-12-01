@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { FiPlus, FiEdit2, FiTrash2, FiX, FiSave, FiImage, FiList, FiCheck, FiXCircle } from "react-icons/fi";
+import { FiPlus, FiEdit2, FiTrash2, FiX, FiSave, FiImage, FiList, FiMessageSquare, FiUser } from "react-icons/fi";
+import { FaStar } from "react-icons/fa";
 
 const AdminDashboard = () => {
   const [cafeterias, setCafeterias] = useState([]);
@@ -16,18 +17,21 @@ const AdminDashboard = () => {
   // --- ESTADOS PARA EDICIÓN DE CAFETERÍA ---
   const [editingCafe, setEditingCafe] = useState(null);
   const [cafeMenu, setCafeMenu] = useState([]); 
+  
+  // ESTADO: Reseñas de la cafetería actual
+  const [cafeReviews, setCafeReviews] = useState([]);
+
   const [activeTab, setActiveTab] = useState("info");
 
-  // --- ESTADOS PARA EDICIÓN DE MENÚ (NUEVO) ---
+  // --- ESTADOS PARA EDICIÓN DE MENÚ ---
   const [newMenuItem, setNewMenuItem] = useState({ nombre: "", precio: "", descripcion: "", categoria: "" });
-  const [editingMenuItemId, setEditingMenuItemId] = useState(null); // ID del platillo que se está editando (null si es nuevo)
+  const [editingMenuItemId, setEditingMenuItemId] = useState(null);
 
   // --- ESTADO PARA CREAR CAFETERÍA ---
   const [newCafe, setNewCafe] = useState({
     nombre: "", direccion: "", id_facultad: "", latitud: "", longitud: "", imagen_url: "", hora_apertura: "", hora_cierre: ""
   });
 
-  // Categorías para los PLATILLOS
   const categoriasComida = ["Desayuno", "Almuerzo", "Comida", "Comida Corrida", "Vegana / Vegetariana", "Fit / Saludable", "Bebidas", "Postres", "Snacks"];
 
   useEffect(() => {
@@ -81,12 +85,19 @@ const AdminDashboard = () => {
     setEditingCafe(cafe);
     setActiveTab("info");
     setShowEditModal(true);
-    setEditingMenuItemId(null); // Resetear edición de menú al abrir
+    setEditingMenuItemId(null);
     setNewMenuItem({ nombre: "", precio: "", descripcion: "", categoria: "" });
     
+    // 1. Cargar Menú
     fetch(`http://127.0.0.1:8000/api/Menus/?id_tiendita=${cafe.id_tiendita}`)
       .then(res => res.json())
       .then(data => setCafeMenu(data));
+
+    // 2. Cargar Reseñas
+    fetch(`http://127.0.0.1:8000/api/Resenas/?id_tiendita=${cafe.id_tiendita}`)
+      .then(res => res.json())
+      .then(data => setCafeReviews(data))
+      .catch(err => console.error("Error cargando reseñas", err));
   };
 
   const handleUpdateCafe = async (e) => {
@@ -105,9 +116,7 @@ const AdminDashboard = () => {
     } catch (error) { console.error(error); }
   };
 
-  // --- GESTIÓN DEL MENÚ (Crear y Editar) ---
-  
-  // 1. Preparar el formulario para editar
+  // --- GESTIÓN DEL MENÚ ---
   const startEditMenuItem = (item) => {
     setNewMenuItem({
         nombre: item.nombre,
@@ -118,19 +127,17 @@ const AdminDashboard = () => {
     setEditingMenuItemId(item.id_menu);
   };
 
-  // 2. Cancelar edición
   const cancelEditMenuItem = () => {
     setNewMenuItem({ nombre: "", precio: "", descripcion: "", categoria: "" });
     setEditingMenuItemId(null);
   };
 
-  // 3. Guardar (Decide si es Crear o Actualizar)
   const handleSaveMenuItem = async () => {
     if (!newMenuItem.nombre || !newMenuItem.precio) return alert("Falta nombre o precio");
 
     const url = editingMenuItemId 
-        ? `http://127.0.0.1:8000/api/Menus/${editingMenuItemId}/` // URL para editar
-        : "http://127.0.0.1:8000/api/Menus/";                    // URL para crear
+        ? `http://127.0.0.1:8000/api/Menus/${editingMenuItemId}/` 
+        : "http://127.0.0.1:8000/api/Menus/"; 
     
     const method = editingMenuItemId ? "PUT" : "POST";
 
@@ -145,15 +152,11 @@ const AdminDashboard = () => {
         const savedItem = await res.json();
         
         if (editingMenuItemId) {
-            // Actualizar la lista local
             setCafeMenu(cafeMenu.map(item => item.id_menu === editingMenuItemId ? savedItem : item));
             alert("Platillo actualizado");
         } else {
-            // Agregar a la lista local
             setCafeMenu([...cafeMenu, savedItem]);
         }
-        
-        // Limpiar todo
         cancelEditMenuItem();
       }
     } catch (error) { console.error(error); }
@@ -163,6 +166,35 @@ const AdminDashboard = () => {
     if(!window.confirm("¿Borrar platillo?")) return;
     await fetch(`http://127.0.0.1:8000/api/Menus/${id}/`, { method: "DELETE" });
     setCafeMenu(cafeMenu.filter(item => item.id_menu !== id));
+  };
+
+  // --- GESTIÓN DE RESEÑAS (CORREGIDO CON TOKEN) ---
+  const handleDeleteReview = async (id) => {
+      if(!window.confirm("¿Estás seguro de eliminar esta reseña permanentemente?")) return;
+      
+      // 1. OBTENEMOS EL TOKEN
+      const token = localStorage.getItem("access_token");
+
+      try {
+          const res = await fetch(`http://127.0.0.1:8000/api/Resenas/${id}/`, { 
+              method: "DELETE",
+              // 2. ENVIAMOS EL TOKEN EN LOS HEADERS
+              headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${token}`
+              }
+          });
+
+          if(res.ok) {
+              setCafeReviews(cafeReviews.filter(r => r.id_resena !== id));
+              alert("Reseña eliminada.");
+          } else {
+              alert("Error al eliminar. Verifica permisos.");
+          }
+      } catch (error) {
+          console.error(error);
+          alert("Error de conexión");
+      }
   };
 
   const handleDelete = async (id) => {
@@ -214,7 +246,6 @@ const AdminDashboard = () => {
           <div className="bg-[#1e2538] w-full max-w-md rounded-xl p-6 border border-white/10 max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-bold mb-4">Nueva Cafetería</h3>
             <form onSubmit={handleCreate} className="space-y-4">
-              {/* ... Inputs de creación (igual que antes) ... */}
               <input name="nombre" className="w-full p-2 bg-[#141b2d] border border-white/10 rounded text-white" placeholder="Nombre" onChange={handleChange} required />
               <div className="grid grid-cols-2 gap-4">
                 <input type="time" name="hora_apertura" className="w-full p-2 bg-[#141b2d] border border-white/10 rounded text-white" onChange={handleChange} />
@@ -240,7 +271,7 @@ const AdminDashboard = () => {
         </div>
       )}
 
-      {/* MODAL EDITAR */}
+      {/* MODAL EDITAR (Con Tabs) */}
       {showEditModal && editingCafe && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
           <div className="bg-[#1e2538] w-full max-w-2xl h-[85vh] rounded-xl border border-white/10 flex flex-col">
@@ -248,15 +279,19 @@ const AdminDashboard = () => {
               <h3 className="font-bold">Editar: {editingCafe.nombre}</h3>
               <button onClick={() => setShowEditModal(false)}><FiX /></button>
             </div>
+            
+            {/* TABS DE NAVEGACIÓN */}
             <div className="flex border-b border-white/10">
-               <button onClick={() => setActiveTab("info")} className={`flex-1 py-3 ${activeTab==="info" ? "text-yellow-500 border-b-2 border-yellow-500" : "text-gray-400"}`}>Info</button>
-               <button onClick={() => setActiveTab("menu")} className={`flex-1 py-3 ${activeTab==="menu" ? "text-yellow-500 border-b-2 border-yellow-500" : "text-gray-400"}`}>Menú</button>
+               <button onClick={() => setActiveTab("info")} className={`flex-1 py-3 font-medium transition-colors ${activeTab==="info" ? "text-yellow-500 border-b-2 border-yellow-500 bg-white/5" : "text-gray-400 hover:text-white"}`}>Info General</button>
+               <button onClick={() => setActiveTab("menu")} className={`flex-1 py-3 font-medium transition-colors ${activeTab==="menu" ? "text-yellow-500 border-b-2 border-yellow-500 bg-white/5" : "text-gray-400 hover:text-white"}`}>Menú</button>
+               <button onClick={() => setActiveTab("reviews")} className={`flex-1 py-3 font-medium transition-colors ${activeTab==="reviews" ? "text-yellow-500 border-b-2 border-yellow-500 bg-white/5" : "text-gray-400 hover:text-white"}`}>Reseñas ({cafeReviews.length})</button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-6">
-              {activeTab === "info" ? (
+              
+              {/* --- TAB 1: INFO --- */}
+              {activeTab === "info" && (
                 <form onSubmit={handleUpdateCafe} className="space-y-4">
-                   {/* ... Inputs de info (igual que antes) ... */}
                    <input className="w-full p-3 bg-[#141b2d] border border-white/10 rounded text-white" value={editingCafe.nombre} onChange={e => setEditingCafe({...editingCafe, nombre: e.target.value})} />
                    <input className="w-full p-3 bg-[#141b2d] border border-white/10 rounded text-white" value={editingCafe.direccion || ""} placeholder="Dirección" onChange={e => setEditingCafe({...editingCafe, direccion: e.target.value})} />
                    <div className="grid grid-cols-2 gap-4">
@@ -272,14 +307,15 @@ const AdminDashboard = () => {
                    </label>
                    <button type="submit" className="w-full py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded flex justify-center gap-2"><FiSave /> Guardar Cambios</button>
                 </form>
-              ) : (
+              )}
+
+              {/* --- TAB 2: MENÚ --- */}
+              {activeTab === "menu" && (
                 <div className="space-y-4">
-                   {/* --- FORMULARIO DE MENÚ (Ahora edita y crea) --- */}
                    <div className="bg-[#2a324a] p-4 rounded border border-white/10">
                       <h4 className={`font-bold mb-2 flex items-center gap-2 ${editingMenuItemId ? "text-blue-400" : "text-yellow-500"}`}>
                           {editingMenuItemId ? <><FiEdit2/> Editando Platillo</> : <><FiPlus/> Nuevo Platillo</>}
                       </h4>
-                      
                       <div className="grid grid-cols-3 gap-2 mb-2">
                          <input className="col-span-2 p-2 bg-[#1e2538] border border-white/10 rounded text-white text-sm" placeholder="Nombre" value={newMenuItem.nombre} onChange={e => setNewMenuItem({...newMenuItem, nombre: e.target.value})} />
                          <input className="col-span-1 p-2 bg-[#1e2538] border border-white/10 rounded text-white text-sm" type="number" placeholder="$" value={newMenuItem.precio} onChange={e => setNewMenuItem({...newMenuItem, precio: e.target.value})} />
@@ -291,7 +327,6 @@ const AdminDashboard = () => {
                           </select>
                           <input className="p-2 bg-[#1e2538] border border-white/10 rounded text-white text-sm" placeholder="Descripción" value={newMenuItem.descripcion} onChange={e => setNewMenuItem({...newMenuItem, descripcion: e.target.value})} />
                       </div>
-                      
                       <div className="flex gap-2">
                         {editingMenuItemId && (
                             <button onClick={cancelEditMenuItem} className="w-1/3 py-1 bg-gray-600 hover:bg-gray-500 text-white text-sm font-bold rounded">Cancelar</button>
@@ -302,7 +337,6 @@ const AdminDashboard = () => {
                       </div>
                    </div>
 
-                   {/* --- LISTA DE PLATILLOS --- */}
                    <div>
                       <h4 className="text-white font-bold mb-3 flex items-center gap-2"><FiList/> Menú Actual</h4>
                       <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
@@ -315,9 +349,7 @@ const AdminDashboard = () => {
                                       <p className="text-xs text-green-400 font-mono">${parseFloat(item.precio).toFixed(2)}</p>
                                   </div>
                                   <div className="flex gap-2">
-                                      {/* BOTÓN EDITAR ITEM */}
                                       <button onClick={() => startEditMenuItem(item)} className="p-2 text-blue-400 hover:bg-blue-500/10 rounded transition"><FiEdit2 /></button>
-                                      {/* BOTÓN BORRAR ITEM */}
                                       <button onClick={() => handleDeleteMenuItem(item.id_menu)} className="p-2 text-red-400 hover:bg-red-500/10 rounded transition"><FiTrash2 /></button>
                                   </div>
                               </div>
@@ -326,6 +358,55 @@ const AdminDashboard = () => {
                    </div>
                 </div>
               )}
+
+              {/* --- TAB 3: RESEÑAS --- */}
+              {activeTab === "reviews" && (
+                  <div className="space-y-4">
+                      <div className="flex justify-between items-center mb-4">
+                          <h4 className="text-white font-bold flex items-center gap-2">
+                              <FiMessageSquare className="text-yellow-500"/> Comentarios de Usuarios
+                          </h4>
+                          <span className="text-xs text-gray-400 bg-white/5 px-2 py-1 rounded">Total: {cafeReviews.length}</span>
+                      </div>
+
+                      {cafeReviews.length === 0 ? (
+                          <div className="text-center py-10 bg-[#141b2d] rounded border border-white/5">
+                              <p className="text-gray-500">No hay reseñas para esta cafetería aún.</p>
+                          </div>
+                      ) : (
+                          <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
+                              {cafeReviews.map((review) => (
+                                  <div key={review.id_resena} className="bg-[#141b2d] p-4 rounded border-l-4 border-yellow-500 hover:bg-[#1a2236] transition flex justify-between gap-4">
+                                      <div className="flex-1">
+                                          <div className="flex items-center gap-2 mb-1">
+                                              <div className="flex items-center gap-1 text-sm font-bold text-gray-200">
+                                                  <FiUser className="text-blue-400"/> {review.nombre_usuario || "Anónimo"}
+                                              </div>
+                                              <span className="text-xs text-gray-500">• {new Date(review.fecha_registro).toLocaleDateString()}</span>
+                                          </div>
+                                          <div className="flex mb-2">
+                                              {[...Array(5)].map((_, i) => (
+                                                  <FaStar key={i} size={12} className={i < review.calificacion ? "text-yellow-500" : "text-gray-700"} />
+                                              ))}
+                                          </div>
+                                          <p className="text-sm text-gray-300 italic">"{review.comentario}"</p>
+                                      </div>
+                                      <div className="flex items-center">
+                                          <button 
+                                              onClick={() => handleDeleteReview(review.id_resena)}
+                                              className="p-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded transition"
+                                              title="Eliminar comentario"
+                                          >
+                                              <FiTrash2 size={18} />
+                                          </button>
+                                      </div>
+                                  </div>
+                              ))}
+                          </div>
+                      )}
+                  </div>
+              )}
+
             </div>
           </div>
         </div>
