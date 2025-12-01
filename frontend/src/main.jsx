@@ -13,6 +13,11 @@ import AdminDashboard from "./pages/AdminDashboard.jsx";
 // Plantilla Dinámica
 import PlantillaCafeteria from "./pages/PlantillaCafeteria.jsx";
 
+// --- NUEVAS PÁGINAS ---
+import Terminos from "./pages/Terminos.jsx";
+import Privacidad from "./pages/Privacidad.jsx";
+import Contacto from "./pages/Contacto.jsx";
+
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -31,6 +36,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 
                 {/* --- RUTA DINÁMICA DE CAFETERÍAS --- */}
                 <Route path="/cafeterias/:id" element={<PlantillaCafeteria />} />
+
+                {/* --- RUTAS DEL FOOTER (NUEVAS) --- */}
+                <Route path="/terminos" element={<Terminos />} />
+                <Route path="/privacidad" element={<Privacidad />} />
+                <Route path="/contacto" element={<Contacto />} />
 
             </Routes>
         </BrowserRouter>
