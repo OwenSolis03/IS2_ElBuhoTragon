@@ -325,13 +325,24 @@ class BuhoRAG:
 
         # 2. Detectar ubicación en la consulta
         target_lat, target_lon = user_lat, user_lon
-        if not target_lat:
-            target_lat, target_lon = self.get_coords_from_query(question)
+
+        # Si no hay GPS real, buscamos en el texto
+        if target_lat is None or target_lon is None:
+            found_lat, found_lon = self.get_coords_from_query(question)
+            if found_lat and found_lon:
+                target_lat, target_lon = found_lat, found_lon
 
         # 3. Reconstruir índice SOLO si cambió ubicación GPS del usuario
-        if target_lat and target_lon and (user_lat is not None and user_lon is not None):
-            if target_lat != self.current_user_lat or target_lon != self.current_user_lon:
-                logger.info("📍 Ubicación del usuario cambió - reconstruyendo índice")
+        if target_lat and target_lon:
+            # Verificamos si la ubicación ha cambiado significativamente
+            loc_changed = False
+            if self.current_user_lat is None or self.current_user_lon is None:
+                loc_changed = True
+            elif (target_lat != self.current_user_lat) or (target_lon != self.current_user_lon):
+                loc_changed = True
+
+            if loc_changed:
+                logger.info(f"📍 Nueva referencia detectada: {target_lat}, {target_lon} - Recalculando distancias...")
                 self.build_index(target_lat, target_lon)
                 self.current_user_lat = target_lat
                 self.current_user_lon = target_lon
