@@ -74,11 +74,8 @@ const ChatWidget = () => {
             const data = await response.json();
 
             if (data.success) {
-                // FORZAR SALTOS DE LÍNEA ANTES DE CADA BULLET (agresivo)
-                let formattedAnswer = data.answer
-                    .replace(/•/g, '\n•')  // Forzar salto antes de cada bullet
-                    .replace(/^\n+/, '')    // Eliminar saltos al inicio
-                    .replace(/\n{3,}/g, '\n\n'); // Max 2 saltos consecutivos
+                // OPCIÓN 1: Agregar espacios alrededor de bullets para legibilidad
+                let formattedAnswer = data.answer.replace(/•/g, ' • ');
 
                 setChatHistory((prev) => [
                     ...prev,
