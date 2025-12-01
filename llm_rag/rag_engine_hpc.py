@@ -387,38 +387,3 @@ Pregunta: {question}<|im_end|>
         """Reinicia el historial conversacional"""
         self.chat_history = []
         logger.info("🔄 Historial de conversación reiniciado")
-
-
-# ========================================
-# PRUEBAS EN CONSOLA (OPCIONAL)
-# ========================================
-if __name__ == "__main__":
-    print("="*70)
-    print("🦉 EL BÚHO TRAGÓN - MODO PRODUCCIÓN")
-    print("="*70)
-
-    rag = BuhoRAG()
-    rag.load_data()
-    rag.build_index()
-
-    print("\n✅ Sistema listo. Escribe 'salir' para terminar.\n")
-
-    while True:
-        try:
-            user_input = input("🗣️  Tú: ")
-            if user_input.lower() in ['salir', 'exit', 'quit']:
-                break
-
-            if not user_input.strip():
-                continue
-
-            print("🦉 Pensando...")
-            result = rag.query(user_input)
-            print(f"🦉 Buhito: {result['answer']}\n")
-
-        except KeyboardInterrupt:
-            print("\n👋 ¡Hasta pronto!")
-            break
-        except Exception as e:
-            logger.error(f"Error: {e}")
-            print(f"❌ Error: {e}\n")

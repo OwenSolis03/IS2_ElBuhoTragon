@@ -9,7 +9,7 @@ const ChatWidget = () => {
     const [chatHistory, setChatHistory] = useState([
         {
             type: "bot",
-            text: "¡Hola! Soy el Búho Tragón 🦉. ¿Qué se te antoja hoy? Puedo ayudarte a encontrar comida en el campus."
+            text: "¡Hola! Soy el Buhito 🦉. ¿Qué se te antoja hoy? Puedo ayudarte a encontrar comida en el campus."
         }
     ]);
 

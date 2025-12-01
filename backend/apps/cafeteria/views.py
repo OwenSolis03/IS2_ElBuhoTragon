@@ -189,7 +189,7 @@ class MenusPorTiendita(generics.ListAPIView):
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../llm_rag'))
 
 try:
-    from rag_engine_hpc import BuhoRAG
+    from rag_engine_hpc.py import BuhoRAG
     RAG_AVAILABLE = True
 except ImportError as e:
     logger.warning(f"⚠️ RAG no disponible: {e}")
