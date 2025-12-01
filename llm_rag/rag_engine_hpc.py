@@ -258,7 +258,12 @@ class BuhoRAG:
             tid = tienda.get('id_tiendita')
             store_menus = menus_by_store.get(tid, [])
 
-            lines = [f"CAFETERÍA: {tienda.get('nombre', 'Desconocida')}"]
+            # --- CORRECCIÓN DE NOMBRE ---
+            nombre_raw = tienda.get('nombre', 'Desconocida')
+            # Separa CamelCase si viene pegado (ej: CafeteriaMatematicas -> Cafeteria Matematicas)
+            nombre_limpio = re.sub(r'([a-z])([A-Z])', r'\1 \2', nombre_raw)
+
+            lines = [f"CAFETERÍA: {nombre_limpio}"]
             lines.append(f"UBICACIÓN: {tienda.get('direccion', '')}, {tienda.get('facultad_nombre', '')}")
 
             if 'distancia_temp' in tienda:
@@ -377,13 +382,15 @@ Pregunta del usuario: {question}
 
         outputs = self.llm_pipeline(
             prompt,
-            max_new_tokens=256,
+            max_new_tokens=200,    # Un poco más de longitud
             return_full_text=False,
-            temperature=0.1,
-            top_p=0.95,
+            temperature=0.1,       # Baja temperatura para ser preciso
+            top_p=0.9,
             do_sample=True,
             pad_token_id=self.tokenizer.eos_token_id,
+            # CRÍTICO: Bajamos penalización a 1.05 (1.2 rompe palabras en español)
             repetition_penalty=1.05,
+            # CRÍTICO: ELIMINAMOS no_repeat_ngram_size (esto causaba el $5. oo)
         )
 
         answer = outputs[0]['generated_text'].strip()
