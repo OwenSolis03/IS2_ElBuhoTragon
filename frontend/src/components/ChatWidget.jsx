@@ -109,7 +109,7 @@ const ChatWidget = () => {
                                 <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-[#141b2d] rounded-full"></span>
                             </div>
                             <div>
-                                <h3 className="font-bold text-white text-sm">Búho Tragón IA</h3>
+                                <h3 className="font-bold text-white text-sm">El Buhito</h3>
                                 <p className="text-xs text-green-400">En línea</p>
                             </div>
                         </div>
