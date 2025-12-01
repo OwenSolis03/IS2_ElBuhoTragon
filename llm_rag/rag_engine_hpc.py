@@ -1,6 +1,6 @@
 """
 🦉 El Búho Tragón - Sistema RAG para Chatbot Web
-Versión: 2.1 (Producción - ROCm Optimizado)
+Versión: 2.2 (Producción - ROCm Optimizado & Context Aware)
 Optimizado para: AMD GPU (ROCm), Respuestas rápidas, contexto conversacional
 """
 
@@ -32,7 +32,7 @@ class BuhoRAG:
     Características:
     - Búsqueda semántica con FAISS
     - Conciencia geográfica (proximidad)
-    - Memoria conversacional
+    - Memoria conversacional ampliada
     - Filtrado por presupuesto
     - Respuestas naturales y concisas
     - Optimizado para AMD GPU (ROCm)
@@ -214,19 +214,21 @@ class BuhoRAG:
 
         return R * c
 
-    def get_coords_from_query(self, query: str) -> Tuple[Optional[float], Optional[float]]:
-        """Extrae coordenadas de referencias geográficas en la consulta"""
+    def get_coords_from_query(self, query: str) -> Tuple[Optional[float], Optional[float], Optional[str]]:
+        """Extrae coordenadas Y EL NOMBRE del lugar de la consulta"""
         query_lower = query.lower()
 
+        # Filtros de ciudades externas
         if any(x in query_lower for x in ['caborca', 'navojoa', 'nogales', 'cajeme', 'santa ana']):
-            return None, None
+            return None, None, None
 
         for place, coords in self.known_locations.items():
             if place in query_lower:
                 logger.info(f"📍 Ubicación detectada: '{place}' -> {coords}")
-                return coords
+                # DEVOLVEMOS: Latitud, Longitud, Nombre del lugar
+                return coords[0], coords[1], place
 
-        return None, None
+        return None, None, None
 
     def build_index(self, ref_lat: Optional[float] = None, ref_lon: Optional[float] = None):
         """Construye el índice FAISS con documentos enriquecidos"""
@@ -258,9 +260,9 @@ class BuhoRAG:
             tid = tienda.get('id_tiendita')
             store_menus = menus_by_store.get(tid, [])
 
-            # --- CORRECCIÓN DE NOMBRE ---
+            # --- LIMPIEZA DE NOMBRE ---
             nombre_raw = tienda.get('nombre', 'Desconocida')
-            # Separa CamelCase si viene pegado (ej: CafeteriaMatematicas -> Cafeteria Matematicas)
+            # Separa CamelCase (ej: CafeteriaMatematicas -> Cafeteria Matematicas)
             nombre_limpio = re.sub(r'([a-z])([A-Z])', r'\1 \2', nombre_raw)
 
             lines = [f"CAFETERÍA: {nombre_limpio}"]
@@ -289,8 +291,10 @@ class BuhoRAG:
                         precio = float(m['precio'])
                         categoria = m.get('categoria', '')
                         cat_tag = f"[{categoria}] " if categoria else ""
-                        nombre_limpio = m['nombre'].strip().replace("\n", " ")
-                        lines.append(f"- {nombre_limpio} (${precio:.0f} MXN)")
+                        # Limpieza del nombre del platillo
+                        platillo_nombre = m['nombre'].strip().replace("\n", " ")
+                        # Formato limpio sin .00 si es entero
+                        lines.append(f"- {cat_tag}{platillo_nombre}: ${precio:.0f} MXN")
                     except:
                         pass
 
@@ -325,16 +329,17 @@ class BuhoRAG:
 
         # 2. Detectar ubicación en la consulta
         target_lat, target_lon = user_lat, user_lon
+        location_name = "Ubicación del usuario (GPS)" if user_lat else None
 
-        # Si no hay GPS real, buscamos en el texto
+        # Si no viene GPS real, buscamos en el texto
         if target_lat is None or target_lon is None:
-            found_lat, found_lon = self.get_coords_from_query(question)
+            found_lat, found_lon, found_name = self.get_coords_from_query(question)
             if found_lat and found_lon:
                 target_lat, target_lon = found_lat, found_lon
+                location_name = found_name.upper() # Ej: "MATEMATICAS"
 
-        # 3. Reconstruir índice SOLO si cambió ubicación GPS del usuario
+        # 3. Reconstruir índice SOLO si hay ubicación válida y cambió
         if target_lat and target_lon:
-            # Verificamos si la ubicación ha cambiado significativamente
             loc_changed = False
             if self.current_user_lat is None or self.current_user_lon is None:
                 loc_changed = True
@@ -342,7 +347,7 @@ class BuhoRAG:
                 loc_changed = True
 
             if loc_changed:
-                logger.info(f"📍 Nueva referencia detectada: {target_lat}, {target_lon} - Recalculando distancias...")
+                logger.info(f"📍 Nueva referencia detectada ({location_name}): {target_lat}, {target_lon} - Recalculando distancias...")
                 self.build_index(target_lat, target_lon)
                 self.current_user_lat = target_lat
                 self.current_user_lon = target_lon
@@ -357,35 +362,47 @@ class BuhoRAG:
         context_docs = self._retrieve_context(question, k=10)
         context_str = "\n\n".join(context_docs)
 
-        # 6. Historial conversacional
+        # 6. Historial conversacional (AMPLIADO)
         history_str = ""
         for q, a in self.chat_history[-6:]:
             history_str += f"Usuario: {q}\nBúho: {a}\n---\n"
 
-        # 7. Instrucción de presupuesto
+        # 7. Preparar contexto para el LLM
         budget_instruction = ""
         if budget_val:
             budget_instruction = f"\nIMPORTANTE: El usuario tiene ${budget_val} pesos. Solo menciona platillos que pueda comprar."
 
-        # 8. Construir prompt
-        prompt = f"""<|im_start|>system
-Eres "El Búho Tragón", asistente de cafeterías UNISON.
-Tu memoria es limitada, así que apóyate en el contexto visual.
+        # --- INYECCIÓN SEMÁNTICA DE UBICACIÓN ---
+        location_context = ""
+        if location_name:
+            location_context = f"\nIMPORTANTE: El usuario está en: {location_name}. Las distancias en el menú ('A X metros') se calcularon DESDE {location_name}."
 
-REGLAS DE ORO:
-1. Si el usuario pregunta "¿Y más barato?" o "¿Y en otro lado?", REFIÉRETE AL PLATILLO del que estaban hablando antes (ej: si hablaban de Pizza, busca precios de Pizza).
-2. Solo si el usuario cambia explícitamente de tema, busca otros platillos.
-3. Sé breve y directo.
-{budget_instruction}
+        # 8. Construir prompt AVANZADO
+        prompt = f"""<|im_start|>system
+Eres "El Búho Tragón", experto en el campus UNISON.
+
+CONTEXTO ACTUAL:
+1. {budget_instruction if budget_val else "Sin límite de presupuesto."}
+2. {location_context if location_name else "Ubicación del usuario desconocida."}
+
+SI TE PREGUNTAN "QUÉ TAN LEJOS":
+- Mira el campo "DISTANCIA" en los menús de abajo.
+- Ese campo indica la distancia exacta desde {location_name if location_name else "donde está el usuario"}.
+- Responde con el dato numérico exacto (ej: "Está a 200 metros").
+
+REGLAS DE CONVERSACIÓN:
+1. Si el usuario pregunta "¿Y más barato?" o "¿Y en otro lado?", REFIÉRETE AL PLATILLO del que estaban hablando antes.
+2. Sé natural y directo. No inventes datos.
+
 <|im_end|>
 <|im_start|>user
-HISTORIAL DE CONVERSACIÓN:
+HISTORIAL:
 {history_str}
 
-INFORMACIÓN NUEVA ENCONTRADA (Contexto RAG):
+INFORMACIÓN DISPONIBLE (Menús y Distancias):
 {context_str}
 
-Pregunta actual: {question}
+Pregunta: {question}
 <|im_end|>
 <|im_start|>assistant
 """
@@ -395,15 +412,14 @@ Pregunta actual: {question}
 
         outputs = self.llm_pipeline(
             prompt,
-            max_new_tokens=200,    # Un poco más de longitud
+            max_new_tokens=250,
             return_full_text=False,
-            temperature=0.1,       # Baja temperatura para ser preciso
+            temperature=0.1,
             top_p=0.9,
             do_sample=True,
             pad_token_id=self.tokenizer.eos_token_id,
-            # CRÍTICO: Bajamos penalización a 1.05 (1.2 rompe palabras en español)
-            repetition_penalty=1.05,
-            # CRÍTICO: ELIMINAMOS no_repeat_ngram_size (esto causaba el $5. oo)
+            repetition_penalty=1.05,  # Valor corregido para español
+            # ELIMINADO: no_repeat_ngram_size
         )
 
         answer = outputs[0]['generated_text'].strip()
