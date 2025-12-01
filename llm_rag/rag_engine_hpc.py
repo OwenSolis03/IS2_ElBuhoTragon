@@ -284,7 +284,8 @@ class BuhoRAG:
                         precio = float(m['precio'])
                         categoria = m.get('categoria', '')
                         cat_tag = f"[{categoria}] " if categoria else ""
-                        lines.append(f" - {cat_tag}{m['nombre']}: ${precio:.2f}")
+                        nombre_limpio = m['nombre'].strip().replace("\n", " ")
+                        lines.append(f"- {nombre_limpio} (${precio:.0f} MXN)")
                     except:
                         pass
 
@@ -352,48 +353,37 @@ class BuhoRAG:
 
         # 8. Construir prompt
         prompt = f"""<|im_start|>system
-Eres El Buhito, asistente de cafeterías UNISON.
+Eres "El Búho Tragón", un asistente útil de la Universidad de Sonora.
+Tu objetivo es responder preguntas sobre menús de cafeterías basándote EXCLUSIVAMENTE en el contexto proporcionado.
 
-CONVERSACIÓN PREVIA:
-{history_str if history_str else "(Primera interacción)"}
-
-INSTRUCCIONES CRÍTICAS:
-1. SOLO usa información que esté LITERALMENTE en MENÚS DISPONIBLES abajo.
-2. Si un platillo NO está en el menú, NO existe. No lo menciones.
-3. COPIA nombres y precios EXACTAMENTE como aparecen.
-4. NO inventes ingredientes, no combines platillos, no supongas nada.{budget_instruction}
-5. Responde en máximo 2 oraciones cortas.
-
-EJEMPLO CORRECTO:
-Usuario: ¿Hay pizza?
-Búho: Sí, en la Cafetería de Exactas tienen Pizza Hawaiana a $45.00.
-
-EJEMPLO INCORRECTO:
-Usuario: ¿Hay pizza?
-Búho: Sí, hay pizza con queso extra ← INVENTÓ ingredientes
-
+REGLAS:
+1. Usa lenguaje natural y fluido en español.
+2. Si mencionas precios, usa el formato estándar (ej: $50.00).
+3. No menciones "Contexto" o "Documentos" en tu respuesta, integra la información naturalmente.
+4. Si la respuesta no está en el contexto, di "No tengo esa información en los menús actuales".
+{budget_instruction}
+<|im_end|>
 <|im_start|>user
-MENÚS DISPONIBLES:
+Información de las cafeterías (Contexto):
 {context_str}
 
-Pregunta: {question}<|im_end|>
+Pregunta del usuario: {question}
+<|im_end|>
 <|im_start|>assistant
-Respuesta:"""
+"""
 
         # 9. Generar respuesta
         logger.info("🤖 Generando respuesta...")
 
         outputs = self.llm_pipeline(
             prompt,
-            max_new_tokens=100,
+            max_new_tokens=256,
             return_full_text=False,
-            temperature=0.05,
+            temperature=0.1,
             top_p=0.95,
-            top_k=30,
             do_sample=True,
             pad_token_id=self.tokenizer.eos_token_id,
-            repetition_penalty=1.2,
-            no_repeat_ngram_size=4,
+            repetition_penalty=1.05,
         )
 
         answer = outputs[0]['generated_text'].strip()
