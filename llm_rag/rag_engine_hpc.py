@@ -56,7 +56,7 @@ class BuhoRAG:
         self.embedding_model = None
         self.llm_pipeline = None
         self.tokenizer = None
-        self.device = None  # Se detectará automáticamente
+        self.device = None
 
         # Cache de ubicación
         self.current_user_lat = None
@@ -133,7 +133,6 @@ class BuhoRAG:
             return "cuda:0", torch.float16
         else:
             logger.warning("⚠️ No se detectó GPU - usando CPU (ADVERTENCIA: MUY LENTO para LLM)")
-            logger.warning("⚠️ Para ROCm, asegúrate de tener PyTorch instalado con: pip install torch --index-url https://download.pytorch.org/whl/rocm6.1")
             return "cpu", torch.float32
 
     def load_data(self):
@@ -154,28 +153,26 @@ class BuhoRAG:
         if self.device is None:
             self.device, self.dtype = self._detect_device()
 
-        # 1. Modelo de embeddings (CPU es suficiente y más estable)
+        # 1. Modelo de embeddings
         if self.embedding_model is None:
             logger.info("📥 Cargando modelo de embeddings...")
             self.embedding_model = SentenceTransformer(
                 'sentence-transformers/all-MiniLM-L6-v2',
-                device='cpu'  # Embeddings pequeños, CPU es OK
+                device='cpu'
             )
             logger.info("✅ Modelo de embeddings listo (CPU)")
 
-        # 2. LLM (GPU crítico aquí)
+        # 2. LLM
         if self.llm_pipeline is None:
             logger.info("📥 Cargando LLM Qwen 14B (esto puede tardar 1-2 minutos)...")
             model_id = "Qwen/Qwen2.5-14B-Instruct"
 
-            # Cargar tokenizer
+            logger.info(f"🔧 Configuración: device={self.device}, dtype={self.dtype}")
+
             self.tokenizer = AutoTokenizer.from_pretrained(
                 model_id,
                 trust_remote_code=True
             )
-
-            # Cargar modelo con configuración óptima para ROCm
-            logger.info(f"🔧 Configuración: device={self.device}, dtype={self.dtype}")
 
             model = AutoModelForCausalLM.from_pretrained(
                 model_id,
@@ -183,22 +180,18 @@ class BuhoRAG:
                 device_map=self.device,
                 trust_remote_code=True,
                 low_cpu_mem_usage=True,
-                # Optimizaciones ROCm
-                attn_implementation="eager",  # Más compatible con ROCm
+                attn_implementation="eager",
             )
 
-            # Crear pipeline
             self.llm_pipeline = pipeline(
                 "text-generation",
                 model=model,
                 tokenizer=self.tokenizer,
-                device=0 if self.device == "cuda:0" else -1,  # 0=GPU, -1=CPU
                 torch_dtype=self.dtype,
             )
 
             logger.info(f"✅ LLM cargado en: {model.device}")
 
-            # Mostrar estadísticas de memoria si es GPU
             if self.device == "cuda:0":
                 allocated = torch.cuda.memory_allocated(0) / 1e9
                 reserved = torch.cuda.memory_reserved(0) / 1e9
@@ -210,7 +203,7 @@ class BuhoRAG:
         if not all([lat1, lon1, lat2, lon2]):
             return 99999
 
-        R = 6371000  # Radio de la Tierra en metros
+        R = 6371000
         lat1, lon1, lat2, lon2 = map(radians, [float(lat1), float(lon1), float(lat2), float(lon2)])
 
         dlat = lat2 - lat1
@@ -225,11 +218,9 @@ class BuhoRAG:
         """Extrae coordenadas de referencias geográficas en la consulta"""
         query_lower = query.lower()
 
-        # Ignorar campus externos
         if any(x in query_lower for x in ['caborca', 'navojoa', 'nogales', 'cajeme', 'santa ana']):
             return None, None
 
-        # Buscar coincidencias
         for place, coords in self.known_locations.items():
             if place in query_lower:
                 logger.info(f"📍 Ubicación detectada: '{place}' -> {coords}")
@@ -246,7 +237,6 @@ class BuhoRAG:
 
         self.documents = []
 
-        # Agrupar menús por cafetería
         menus_by_store = {}
         for menu in self.data.get('menus', []):
             tid = menu.get('id_tiendita')
@@ -256,7 +246,6 @@ class BuhoRAG:
 
         tienditas = self.data.get('tienditas', [])
 
-        # Ordenar por proximidad si hay coordenadas
         if ref_lat and ref_lon:
             for t in tienditas:
                 dist = self.calculate_distance(ref_lat, ref_lon, t.get('latitud'), t.get('longitud'))
@@ -265,7 +254,6 @@ class BuhoRAG:
             tienditas.sort(key=lambda x: x.get('distancia_temp', 9999999))
             logger.info("📍 Cafeterías ordenadas por proximidad")
 
-        # Crear documentos enriquecidos
         for tienda in tienditas:
             tid = tienda.get('id_tiendita')
             store_menus = menus_by_store.get(tid, [])
@@ -273,7 +261,6 @@ class BuhoRAG:
             lines = [f"CAFETERÍA: {tienda.get('nombre', 'Desconocida')}"]
             lines.append(f"UBICACIÓN: {tienda.get('direccion', '')}, {tienda.get('facultad_nombre', '')}")
 
-            # Info de proximidad semántica
             if 'distancia_temp' in tienda:
                 dist = tienda['distancia_temp']
                 if dist < 60:
@@ -283,18 +270,16 @@ class BuhoRAG:
                 elif dist < 1500:
                     lines.append(f"DISTANCIA: A {dist:.0f} metros")
 
-            # Horarios
             if tienda.get('hora_apertura'):
                 ha = str(tienda['hora_apertura'])[:5]
                 hc = str(tienda['hora_cierre'])[:5]
                 lines.append(f"HORARIO: {ha} - {hc}")
 
-            # Menú
             lines.append("\nMENÚ:")
             if not store_menus:
                 lines.append("(Sin información de menú)")
             else:
-                for m in store_menus[:50]:  # Límite para no saturar
+                for m in store_menus[:50]:
                     try:
                         precio = float(m['precio'])
                         categoria = m.get('categoria', '')
@@ -308,7 +293,6 @@ class BuhoRAG:
 
         logger.info(f"📝 Creados {len(self.documents)} documentos")
 
-        # Crear índice FAISS
         embeddings = self.embedding_model.encode(self.documents, show_progress_bar=False)
         self.faiss_index = faiss.IndexFlatL2(embeddings.shape[1])
         self.faiss_index.add(np.array(embeddings).astype('float32'))
@@ -326,17 +310,7 @@ class BuhoRAG:
         return [self.documents[i] for i in I[0]]
 
     def query(self, question: str, user_lat=None, user_lon=None) -> Dict:
-        """
-        Procesa una consulta y devuelve una respuesta inteligente.
-
-        Args:
-            question: Pregunta del usuario
-            user_lat: Latitud del usuario (opcional)
-            user_lon: Longitud del usuario (opcional)
-
-        Returns:
-            Dict con 'answer' y 'context'
-        """
+        """Procesa una consulta y devuelve una respuesta inteligente"""
         logger.info(f"💬 Consulta: {question[:50]}...")
 
         # 1. Detectar presupuesto
@@ -348,73 +322,83 @@ class BuhoRAG:
         if not target_lat:
             target_lat, target_lon = self.get_coords_from_query(question)
 
-        # 3. Reconstruir índice si cambió la ubicación
-        if target_lat and target_lon:
-            if (target_lat != self.current_user_lat or target_lon != self.current_user_lon):
+        # 3. Reconstruir índice SOLO si cambió ubicación GPS del usuario
+        if target_lat and target_lon and (user_lat is not None and user_lon is not None):
+            if target_lat != self.current_user_lat or target_lon != self.current_user_lon:
+                logger.info("📍 Ubicación del usuario cambió - reconstruyendo índice")
                 self.build_index(target_lat, target_lon)
                 self.current_user_lat = target_lat
                 self.current_user_lon = target_lon
-        elif not self.faiss_index:
+
+        if not self.faiss_index:
             self.build_index()
 
         # 4. Cargar modelos
         self._load_models()
 
-        # 5. Recuperar contexto relevante
+        # 5. Recuperar contexto
         context_docs = self._retrieve_context(question, k=10)
         context_str = "\n\n".join(context_docs)
 
-        # 6. Construir historial conversacional
+        # 6. Historial conversacional
         history_str = ""
-        for q, a in self.chat_history[-2:]:  # Últimas 2 interacciones
+        for q, a in self.chat_history[-2:]:
             history_str += f"Usuario: {q}\nBúho: {a}\n---\n"
 
         # 7. Instrucción de presupuesto
         budget_instruction = ""
         if budget_val:
-            budget_instruction = f"\n⚠️ IMPORTANTE: El usuario tiene ${budget_val} pesos. Solo menciona platillos que pueda comprar."
+            budget_instruction = f"\nIMPORTANTE: El usuario tiene ${budget_val} pesos. Solo menciona platillos que pueda comprar."
 
-        # 8. Construir prompt optimizado
+        # 8. Construir prompt
         prompt = f"""<|im_start|>system
-Eres El Buhito, asistente experto en cafeterías UNISON (Campus Hermosillo).
+Eres El Buhito, asistente de cafeterías UNISON.
 
-CONTEXTO PREVIO:
+CONVERSACIÓN PREVIA:
 {history_str if history_str else "(Primera interacción)"}
 
-REGLAS ESTRICTAS:
-1. Usa SOLO la información provista abajo.{budget_instruction}
-2. Si mencionas "ESTÁ EN TU MISMA ZONA", explica que la cafetería está muy cerca del usuario.
-3. Copia nombres de platillos EXACTAMENTE como aparecen.
-4. Siempre menciona el nombre de la cafetería junto al precio.
-5. Sé breve y natural (máximo 3-4 oraciones).
-6. Si preguntan por algo que no existe, di "No encontré eso, ¿te interesa otra cosa?".
-7. Si la pregunta no es sobre comida, responde amablemente que solo ayudas con cafeterías.
+INSTRUCCIONES CRÍTICAS:
+1. SOLO usa información que esté LITERALMENTE en MENÚS DISPONIBLES abajo.
+2. Si un platillo NO está en el menú, NO existe. No lo menciones.
+3. COPIA nombres y precios EXACTAMENTE como aparecen.
+4. NO inventes ingredientes, no combines platillos, no supongas nada.{budget_instruction}
+5. Responde en máximo 2 oraciones cortas.
+
+EJEMPLO CORRECTO:
+Usuario: ¿Hay pizza?
+Búho: Sí, en la Cafetería de Exactas tienen Pizza Hawaiana a $45.00.
+
+EJEMPLO INCORRECTO:
+Usuario: ¿Hay pizza?
+Búho: Sí, hay pizza con queso extra ← INVENTÓ ingredientes
 
 <|im_start|>user
-INFORMACIÓN:
+MENÚS DISPONIBLES:
 {context_str}
 
 Pregunta: {question}<|im_end|>
 <|im_start|>assistant
-"""
+Respuesta:"""
 
-        # 9. Generar respuesta con configuración optimizada
+        # 9. Generar respuesta
         logger.info("🤖 Generando respuesta...")
 
         outputs = self.llm_pipeline(
             prompt,
-            max_new_tokens=200,
+            max_new_tokens=100,
             return_full_text=False,
-            temperature=0.3,
-            top_p=0.85,
+            temperature=0.05,
+            top_p=0.95,
+            top_k=30,
             do_sample=True,
             pad_token_id=self.tokenizer.eos_token_id,
-            repetition_penalty=1.1,  # Evita repeticiones
+            repetition_penalty=1.2,
+            no_repeat_ngram_size=4,
         )
 
         answer = outputs[0]['generated_text'].strip()
 
-        # 10. Limpieza de respuesta
+        # 10. Limpieza
         for tag in ["<|im_end|>", "<|im_start|>", "assistant", "user", "system"]:
             answer = answer.replace(tag, "")
 
@@ -422,14 +406,13 @@ Pregunta: {question}<|im_end|>
         answer = re.sub(r'\[[\d,\s]+\]', '', answer)
         answer = re.sub(r'\s+', ' ', answer).strip()
 
-        # Limitar longitud
         sentences = answer.split('.')
         if len(sentences) > 4:
             answer = '. '.join(sentences[:4]) + '.'
 
         # 11. Guardar en memoria
         self.chat_history.append((question, answer))
-        if len(self.chat_history) > 10:  # Límite de memoria
+        if len(self.chat_history) > 10:
             self.chat_history = self.chat_history[-10:]
 
         logger.info(f"✅ Respuesta generada ({len(answer)} caracteres)")
