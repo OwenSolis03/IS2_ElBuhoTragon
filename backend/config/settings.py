@@ -11,12 +11,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-import pymysql 
 import os
 from dotenv import load_dotenv
 from datetime import timedelta 
 
-pymysql.install_as_MySQLdb()
 # load variables from .env
 load_dotenv()
 
@@ -48,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'apps.cafeteria',
+    'django_filters',
 ]
 REST_FRAMEWORK = {
 
@@ -132,15 +131,10 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": os.getenv("DB_NAME", "mydatabase"),
-        "USER": os.getenv("DB_USER", "mydatabaseuser"),
-        "PASSWORD": os.getenv("DB_PASSWORD", "mypassword"),
-        "HOST": os.getenv("DB_HOST", "127.0.0.1"),
-        "PORT": os.getenv("DB_PORT", "3306"),  # Cambia 5432 por 3306
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "el_buho_tragon.db",  # Crea el archivo en la raíz del proyecto
     }
 }
-
 API_URL = os.getenv("API_URL", "http://127.0.0.1:8000")
 
 # Password validation

@@ -19,21 +19,23 @@ from apps.cafeteria.views import UserRegisterView, login_view
 from django.urls import include, path
 from rest_framework import routers
 from django.views.generic import RedirectView
-from apps.cafeteria.views import TienditasViewSet, MenusViewSet, FacultadesViewSet, UsuariosViewSet
+from apps.cafeteria.views import TienditasViewSet, MenusViewSet, FacultadesViewSet, UsuariosViewSet, ResenaViewSet
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from apps.cafeteria.views import UserRegisterView
+from apps.cafeteria.views import chatbot_query
 
 router = routers.DefaultRouter()
 router.register(r'Tienditas', TienditasViewSet)
 router.register(r'Menus', MenusViewSet)
 router.register(r'Facultades', FacultadesViewSet)
 router.register(r'Usuarios', UsuariosViewSet)
+router.register(r'Resenas', ResenaViewSet)
 
 urlpatterns = [
   #  path('api/', include('apps.cafeteria.urls')),
     path('admin/', admin.site.urls),  
-    path('', RedirectView.as_view(url='/cafeteria/', permanent=False)),  
-    
+    path('', RedirectView.as_view(url='/cafeteria/', permanent=False)),
+    path('api/chatbot/', chatbot_query, name='chatbot'),
     #Endpoins de Autenticacion
     path('api/', include(router.urls)),  
     path('api/login/', login_view, name='login'),

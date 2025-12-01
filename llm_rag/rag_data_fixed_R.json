@@ -1,0 +1,4068 @@
+{
+  "menus": [
+    {
+      "id_menu": 3,
+      "nombre": "Torta de Pierna",
+      "descripcion": "Torta de pierna con lomo de puerco, philadelphia, tomate, aguacate, mayonesa y mantequilla.",
+      "precio": "70.00",
+      "id_tiendita": 14,
+      "categoria": ""
+    },
+    {
+      "id_menu": 4,
+      "nombre": "Torta de Pollo",
+      "descripcion": "Torta de pollo con aguacate, lechuga, philadelphia y tomate. El pollo puede tener una salsa a elegir (Chipotle, BBQ, Bá?falo, Mango Habanero y Teriyaki).",
+      "precio": "60.00",
+      "id_tiendita": 14,
+      "categoria": ""
+    },
+    {
+      "id_menu": 5,
+      "nombre": "Torta de Jamá?n",
+      "descripcion": "Torta de jamon virginia con philadelphia, lechuga, tomate y aguacate. Con aderezo a elegir (Chipotle, Jalapeá?o, Mixta o Mayonesa).",
+      "precio": "50.00",
+      "id_tiendita": 14,
+      "categoria": ""
+    },
+    {
+      "id_menu": 6,
+      "nombre": "Torta Cubana",
+      "descripcion": "Torta de pierna lomo de puerco con jamá?n, queso amarillo cheddar, philadelphia, tomate, aguacate, mayonesa y mantequilla.",
+      "precio": "85.00",
+      "id_tiendita": 14,
+      "categoria": ""
+    },
+    {
+      "id_menu": 7,
+      "nombre": "Torta Italiana",
+      "descripcion": "Torta con carne de lasaá?a, salsa ragu, champiá?ones, pepperoni, philadelphia y media crema.",
+      "precio": "60.00",
+      "id_tiendita": 14,
+      "categoria": ""
+    },
+    {
+      "id_menu": 8,
+      "nombre": "Torta Mexicana",
+      "descripcion": "Torta con frijoles preparados tipo fiesta, chorizo,  philadelphia y rajas de jalapeá?o.",
+      "precio": "50.00",
+      "id_tiendita": 14,
+      "categoria": ""
+    },
+    {
+      "id_menu": 17,
+      "nombre": "Huevos Revueltos",
+      "descripcion": "Un plato de huevos revueltos.",
+      "precio": "70.00",
+      "id_tiendita": 7,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 18,
+      "nombre": "Yogurt con fruta",
+      "descripcion": "",
+      "precio": "55.00",
+      "id_tiendita": 7,
+      "categoria": "Fit / Saludable"
+    },
+    {
+      "id_menu": 19,
+      "nombre": "Chilaquiles (Rojos/Verdes)",
+      "descripcion": "Un plato de chilaquiles de la salsa de tu preferencia.",
+      "precio": "70.00",
+      "id_tiendita": 7,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 20,
+      "nombre": "Sandwich de Atun",
+      "descripcion": "",
+      "precio": "50.00",
+      "id_tiendita": 7,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 21,
+      "nombre": "Sandwich de Pate",
+      "descripcion": "",
+      "precio": "50.00",
+      "id_tiendita": 7,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 22,
+      "nombre": "Sandwich de Jamon",
+      "descripcion": "",
+      "precio": "40.00",
+      "id_tiendita": 7,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 23,
+      "nombre": "Baguette Italiano",
+      "descripcion": "",
+      "precio": "55.00",
+      "id_tiendita": 7,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 24,
+      "nombre": "Pan Pizza",
+      "descripcion": "Pan con queso, salsa de tomate y pepperoni.",
+      "precio": "50.00",
+      "id_tiendita": 7,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 25,
+      "nombre": "Mollete",
+      "descripcion": "Pan con queso y alguna carne fráa (chorizo, jamon o tocino).",
+      "precio": "50.00",
+      "id_tiendita": 7,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 26,
+      "nombre": "Orden de Burritos",
+      "descripcion": "Una orden de burritos de machaca, barbacoa, carne con chile o cochinita pibil.",
+      "precio": "55.00",
+      "id_tiendita": 7,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 27,
+      "nombre": "Tacos Dorados",
+      "descripcion": "Una orden de tacos dorados.",
+      "precio": "25.00",
+      "id_tiendita": 7,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 28,
+      "nombre": "Gorditas",
+      "descripcion": "",
+      "precio": "25.00",
+      "id_tiendita": 7,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 29,
+      "nombre": "Chimichanga",
+      "descripcion": "",
+      "precio": "25.00",
+      "id_tiendita": 7,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 30,
+      "nombre": "Comida del Dia",
+      "descripcion": "La comida del dáa conformada por tortillas, una racion de proteina y 2 guarniciones.",
+      "precio": "70.00",
+      "id_tiendita": 7,
+      "categoria": "Comida Corrida"
+    },
+    {
+      "id_menu": 31,
+      "nombre": "Papa Boneless",
+      "descripcion": "Pollo empanizado baá?ado en salsa de su preferencia junto a una porcion de papas fritas.",
+      "precio": "85.00",
+      "id_tiendita": 7,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 32,
+      "nombre": "Hamburguesa",
+      "descripcion": "",
+      "precio": "95.00",
+      "id_tiendita": 7,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 33,
+      "nombre": "Papas a la francesa",
+      "descripcion": "Una orden de papas a la francesa.",
+      "precio": "50.00",
+      "id_tiendita": 7,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 34,
+      "nombre": "Banderilla",
+      "descripcion": "Una salchicha cubierta de masa en un palo.",
+      "precio": "25.00",
+      "id_tiendita": 7,
+      "categoria": "Snacks"
+    },
+    {
+      "id_menu": 35,
+      "nombre": "Ensalada",
+      "descripcion": "Ensalada de diversos vegetales acompaá?ada de alguna proteána (Pollo a la plancha, Boneless, Jamá?n o Atá?n).",
+      "precio": "100.00",
+      "id_tiendita": 7,
+      "categoria": "Fit / Saludable"
+    },
+    {
+      "id_menu": 36,
+      "nombre": "Tortas",
+      "descripcion": "Una torta que puede contener diversas proteánas (Barbacoa, Cochinita Pibil o Pierna).",
+      "precio": "80.00",
+      "id_tiendita": 7,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 37,
+      "nombre": "Torta del Chavo",
+      "descripcion": "Una torta de jamá?n con algunos vegetales.",
+      "precio": "55.00",
+      "id_tiendita": 7,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 38,
+      "nombre": "Tamales",
+      "descripcion": "Comida hecha de masa de maiz que puede ser de elote o de carne.",
+      "precio": "30.00",
+      "id_tiendita": 7,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 39,
+      "nombre": "Refrescos",
+      "descripcion": "600 ml",
+      "precio": "25.00",
+      "id_tiendita": 14,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 40,
+      "nombre": "Aguas Frescas",
+      "descripcion": "500 ml",
+      "precio": "25.00",
+      "id_tiendita": 14,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 41,
+      "nombre": "Te's Artesanales",
+      "descripcion": "600 ml",
+      "precio": "25.00",
+      "id_tiendita": 14,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 42,
+      "nombre": "Uvola",
+      "descripcion": "500 ml",
+      "precio": "25.00",
+      "id_tiendita": 14,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 43,
+      "nombre": "Waffle",
+      "descripcion": "",
+      "precio": "45.00",
+      "id_tiendita": 3,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 44,
+      "nombre": "Huevo al gusto",
+      "descripcion": "Una orden de huevos al gusto.",
+      "precio": "65.00",
+      "id_tiendita": 3,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 45,
+      "nombre": "Omelette al gusto",
+      "descripcion": "Huevos en forma de omelette al gusto.",
+      "precio": "75.00",
+      "id_tiendita": 3,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 46,
+      "nombre": "Chilaquiles con frijoles",
+      "descripcion": "Chilaquiles en salsa verde o roja con frijoles.",
+      "precio": "70.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 47,
+      "nombre": "Chilaquiles con huevo",
+      "descripcion": "Chilaquiles en salsa verde o roja con huevos.",
+      "precio": "85.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 48,
+      "nombre": "Chilaquiles con pollo",
+      "descripcion": "Chilaquiles en salsa verde o roja con pollo.",
+      "precio": "100.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 49,
+      "nombre": "Taco",
+      "descripcion": "Tacos de cabeza, chicharrá?n o barbacoa.",
+      "precio": "25.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 50,
+      "nombre": "Avena",
+      "descripcion": "Un plato de avena simple sin mas.",
+      "precio": "35.00",
+      "id_tiendita": 3,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 51,
+      "nombre": "Avena con platano",
+      "descripcion": "Un plato de avena con pedazos de platano.",
+      "precio": "45.00",
+      "id_tiendita": 3,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 52,
+      "nombre": "Yogurt con fruta Chico",
+      "descripcion": "",
+      "precio": "40.00",
+      "id_tiendita": 3,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 53,
+      "nombre": "Yogurt con fruta Grande",
+      "descripcion": "",
+      "precio": "60.00",
+      "id_tiendita": 3,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 54,
+      "nombre": "Licuado (1 Ingrediente)",
+      "descripcion": "Un licuado de frutas de un solo ingrediente (fresa, platano o papaya).",
+      "precio": "40.00",
+      "id_tiendita": 3,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 55,
+      "nombre": "Licuado (2 Ingredientes)",
+      "descripcion": "Un licuado de frutas de dos ingredientes (fresa, platano o papaya).",
+      "precio": "50.00",
+      "id_tiendita": 3,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 56,
+      "nombre": "Tamal",
+      "descripcion": "Un platillo hecho a base de masa de maáz de elote o carne.",
+      "precio": "25.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 57,
+      "nombre": "Tamal con frijoles",
+      "descripcion": "Comida á? Un platillo hecho a base de masa de maáz de elote o carne acompaá?ado de una porcion de frijoles.",
+      "precio": "30.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 58,
+      "nombre": "Sandwich de Desayuno",
+      "descripcion": "Un sándwich conformado por huevo, jamá?n, queso y papas hash brown.",
+      "precio": "75.00",
+      "id_tiendita": 3,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 59,
+      "nombre": "Papa Boneless (Papas a la francesa)",
+      "descripcion": "Una porcion de pollo empanizado con la salsa de su preferencia con una porciá?n de papas a la francesa.",
+      "precio": "80.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 60,
+      "nombre": "Papa Boneless (Papas a la francesa) con queso",
+      "descripcion": "Una porcion de pollo empanizado con la salsa de su preferencia con una porciá?n de papas a la francesa con queso.",
+      "precio": "90.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 61,
+      "nombre": "Papa Boneless (Papas Sazonadas)",
+      "descripcion": "Comida á? Una porcion de pollo empanizado con la salsa de su preferencia con una porciá?n de papas sazonadas.",
+      "precio": "95.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 62,
+      "nombre": "Papa Boneless (Papas Sazonadas) con queso",
+      "descripcion": "Una porcion de pollo empanizado con la salsa de su preferencia con una porciá?n de papas sazonadas con queso.",
+      "precio": "110.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 63,
+      "nombre": "Orden de boneless con ensalada",
+      "descripcion": "Porcion grande de boneless acompaá?ado con una ensalada de verduras diversas.",
+      "precio": "115.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 64,
+      "nombre": "Orden de boneless con papas",
+      "descripcion": "Porcion grande de boneless acompaá?ado con una porcion de papas.",
+      "precio": "125.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 65,
+      "nombre": "Palomitas de pollo con papas y ensalada",
+      "descripcion": "Un plato de palomitas de pollo acompaá?ado con una porciá?n de papas y ensalada.",
+      "precio": "50.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 66,
+      "nombre": "Orden de burritos",
+      "descripcion": "Una orden de 3 burritos.",
+      "precio": "40.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 67,
+      "nombre": "Orden de burritos combinados",
+      "descripcion": "Una orden de 3 burritos combinados.",
+      "precio": "50.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 68,
+      "nombre": "Burro de frijol",
+      "descripcion": "",
+      "precio": "45.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 69,
+      "nombre": "Burro de guiso",
+      "descripcion": "Un burro de barbacoa o carne con chile.",
+      "precio": "65.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 70,
+      "nombre": "Burro de asada",
+      "descripcion": "",
+      "precio": "120.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 71,
+      "nombre": "Burro percheron original",
+      "descripcion": "Un burro percheron clasico.",
+      "precio": "120.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 72,
+      "nombre": "Burro percheron con tocino y chile verde",
+      "descripcion": "Un burro percheron clasico que adicionalmente cuenta con tocino y chile verde.",
+      "precio": "130.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 73,
+      "nombre": "Wrap",
+      "descripcion": "Un wrap de pollo o carnes fráas hecho a base de una tortilla de harina, queso, pimiento, lechuga, tomate, pepino, aguacate y aderezos.",
+      "precio": "100.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 74,
+      "nombre": "Orden de papas a la francesa",
+      "descripcion": "",
+      "precio": "45.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 75,
+      "nombre": "Orden de papas a la francesa con queso",
+      "descripcion": "",
+      "precio": "65.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 76,
+      "nombre": "Orden de papas sazonadas",
+      "descripcion": "",
+      "precio": "65.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 77,
+      "nombre": "Orden de papas sazonadas con queso",
+      "descripcion": "",
+      "precio": "75.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 78,
+      "nombre": "Salchipapas",
+      "descripcion": "Porciá?n de papas a la francesa con pedazos de salchichas.",
+      "precio": "65.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 79,
+      "nombre": "Salchipapas con queso",
+      "descripcion": "Porciá?n de papas a la francesa con pedazos de salchichas con queso.",
+      "precio": "75.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 80,
+      "nombre": "Salchipapas sazonadas",
+      "descripcion": "Porciá?n de papas sazonadas con pedazos de salchichas.",
+      "precio": "75.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 81,
+      "nombre": "Salchipapas sazonadas con queso",
+      "descripcion": "Porciá?n de papas sazonadas con pedazos de salchichas con queso.",
+      "precio": "85.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 82,
+      "nombre": "Papas Frys",
+      "descripcion": "Una porciá?n de papas a la francesa con tocino, asada, salsa bandera y crema.",
+      "precio": "60.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 83,
+      "nombre": "Papas Frys con queso",
+      "descripcion": "Una porciá?n de papas a la francesa con tocino, asada, salsa bandera, crema y queso.",
+      "precio": "80.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 84,
+      "nombre": "Tostada de pollo",
+      "descripcion": "",
+      "precio": "30.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 85,
+      "nombre": "Tostada de papa",
+      "descripcion": "",
+      "precio": "25.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 86,
+      "nombre": "Orden de tacos dorados de papa",
+      "descripcion": "Una orden de 3 tacos dorados de papa.",
+      "precio": "50.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 87,
+      "nombre": "Orden de tacos dorados de pollo",
+      "descripcion": "Una orden de 3 tacos dorados de pollo.",
+      "precio": "65.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 88,
+      "nombre": "Chimichanga",
+      "descripcion": "",
+      "precio": "75.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 89,
+      "nombre": "Orden de milanesa",
+      "descripcion": "",
+      "precio": "100.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 90,
+      "nombre": "Orden de pollo a la plancha",
+      "descripcion": "",
+      "precio": "100.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 91,
+      "nombre": "Sopa casera",
+      "descripcion": "",
+      "precio": "30.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 92,
+      "nombre": "Taco Salad",
+      "descripcion": "Taco de tortilla de harina con arroz, frijol, ensalada, crema, aderezo y carne o pollo.",
+      "precio": "100.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 93,
+      "nombre": "Ensalada de pollo o boneless",
+      "descripcion": "Una ensalada de diversos vegetales acompaá?ada de pollo o boneless.",
+      "precio": "115.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 94,
+      "nombre": "Ensalada Chipilona",
+      "descripcion": "Una ensalada de diversos vegetales acompaá?ada de pollo y boneless.",
+      "precio": "130.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 95,
+      "nombre": "Hamburguesa de res/pollo",
+      "descripcion": "Una hamburguesa de res o pollo acompaá?ada de una porcion de papas fritas.",
+      "precio": "85.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 96,
+      "nombre": "Hamburguesa de boneless",
+      "descripcion": "Una hamburguesa de boneless acompaá?ada de una porcion de papas fritas.",
+      "precio": "100.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 97,
+      "nombre": "Torta de jamon",
+      "descripcion": "Una torta de jamon acompaá?ada de una porcion de papas fritas o ensalada.",
+      "precio": "60.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 98,
+      "nombre": "Torta de pierna o barbacoa",
+      "descripcion": "Una torta de pierna o barbacoa acompaá?ada de una porcion de papas fritas o ensalada.",
+      "precio": "70.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 99,
+      "nombre": "Torta cubana",
+      "descripcion": "Una torta cubana acompaá?ada de una porcion de papas fritas o ensalada.",
+      "precio": "80.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 100,
+      "nombre": "Torta de pollo o boneless",
+      "descripcion": "Una torta de pollo o boneless acompaá?ada de una porciá?n de papas fritas o ensalada.",
+      "precio": "80.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 101,
+      "nombre": "Torta de asada",
+      "descripcion": "Una torta de asada acompaá?ada de una porciá?n de papas fritas o ensalada.",
+      "precio": "85.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 102,
+      "nombre": "Sándwich de jamá?n",
+      "descripcion": "Un sándwich de jamá?n acompaá?ado de una porciá?n de papas fritas o ensalada.",
+      "precio": "45.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 103,
+      "nombre": "Sándwich de pollo",
+      "descripcion": "Un sándwich de pollo acompaá?ado de una porciá?n de papas fritas o ensalada.",
+      "precio": "55.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 104,
+      "nombre": "Sándwich de atun",
+      "descripcion": "Un sándwich de atun acompaá?ado de una porciá?n de papas fritas o ensalada.",
+      "precio": "50.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 105,
+      "nombre": "Club Sándwich",
+      "descripcion": "Un club sándwich acompaá?ado de una porciá?n de papas fritas o ensalada.",
+      "precio": "85.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 106,
+      "nombre": "Croissant de jamon con queso",
+      "descripcion": "Un croissant de jamá?n con queso acompaá?ado de una porciá?n de papas fritas o ensalada.",
+      "precio": "60.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 107,
+      "nombre": "Panini de jamá?n",
+      "descripcion": "Un panini de jamá?n acompaá?ado de una porciá?n de papas fritas o ensalada.",
+      "precio": "70.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 108,
+      "nombre": "Panini de pollo o boneless",
+      "descripcion": "Un panini de pollo o boneless acompaá?ado de una porciá?n de papas fritas o ensalada.",
+      "precio": "85.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 109,
+      "nombre": "Panini Italiano",
+      "descripcion": "Un panini de italiano acompaá?ado de una porciá?n de papas fritas o ensalada.",
+      "precio": "85.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 110,
+      "nombre": "Panini Sonora",
+      "descripcion": "Un panini sonora acompaá?ado de una porciá?n de papas fritas o ensalada.",
+      "precio": "100.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 111,
+      "nombre": "Quesadilla sencilla",
+      "descripcion": "Una quesadilla sencilla acompaá?ada de una porciá?n de papas fritas o ensalada.",
+      "precio": "40.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 112,
+      "nombre": "Sincronizada",
+      "descripcion": "Una quesadilla sincronizada acompaá?ada de una porciá?n de papas fritas o ensalada.",
+      "precio": "45.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 113,
+      "nombre": "Quesadilla de carne con chile o barbacoa",
+      "descripcion": "Una quesadilla de carne con chile o barbacoa acompaá?ada de una porciá?n de papas fritas o ensalada.",
+      "precio": "60.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 114,
+      "nombre": "Quesadilla de asada o boneless",
+      "descripcion": "Una quesadilla de asada o boneless acompaá?ada de una porciá?n de papas fritas o ensalada.",
+      "precio": "70.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 115,
+      "nombre": "Mollete/Pan Pizza (1 ingrediente)",
+      "descripcion": "Un mollete o pan pizza de 1 ingrediente (jamá?n, chorizo, tocino, pepperoni, salchicha, champiáá??n o salami) acompaá?ado de una porciá?n de papas fritas o ensalada.",
+      "precio": "45.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 116,
+      "nombre": "Mollete/Pan Pizza (2 ingrediente)",
+      "descripcion": "Un mollete o pan pizza de 2 ingredientes (jamá?n, chorizo, tocino, pepperoni, salchicha, champiáá??n o salami) acompaá?ado de una porciá?n de papas fritas o ensalada.",
+      "precio": "50.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 117,
+      "nombre": "Mollete/Pan Pizza Full",
+      "descripcion": "Un mollete o pan pizza conformado por jamá?n, chorizo, tocino y pepperoni, acompaá?ado de una porciá?n de papas fritas o ensalada.",
+      "precio": "60.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 118,
+      "nombre": "Mollete/Pan PIzza de boneless o asada",
+      "descripcion": "Un mollete o pan pizza de boneless o asada, acompaá?ado de una porciá?n de papas fritas o ensalada.",
+      "precio": "60.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 119,
+      "nombre": "Pizza de 2 ingredientes",
+      "descripcion": "Una pizza de 2 ingredientes acompaá?ada de una porciá?n de papas fritas o ensalada.",
+      "precio": "90.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 120,
+      "nombre": "Onigiri de pollo o res",
+      "descripcion": "Un onigiri de pollo o res.",
+      "precio": "60.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 121,
+      "nombre": "Onigiri de pollo o res con papas",
+      "descripcion": "Un onigiri de pollo o res acompaá?ado de una porciá?n de papas fritas.",
+      "precio": "70.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 122,
+      "nombre": "Onigiri Combinado",
+      "descripcion": "Un onigiri de pollo y res.",
+      "precio": "65.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 123,
+      "nombre": "Onigiri Combinado con papas",
+      "descripcion": "Un onigiri de pollo y res acompaá?ado de una porciá?n de papas fritas.",
+      "precio": "75.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 124,
+      "nombre": "Onigiri de camaron",
+      "descripcion": "Un onigiri de camaron.",
+      "precio": "65.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 125,
+      "nombre": "Onigiri de camaron con papas",
+      "descripcion": "Un onigiri de camaron acompaá?ado de una porciá?n de papas fritas.",
+      "precio": "75.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 126,
+      "nombre": "Onigiri cielo, mar y tierra",
+      "descripcion": "Un onigiri cielo mar y tierra.",
+      "precio": "75.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 127,
+      "nombre": "Onigiri cielo, mar y tierra con papas",
+      "descripcion": "Un onigiri cielo, mar y tierra acompaá?ado de una porciá?n de papas fritas.",
+      "precio": "85.00",
+      "id_tiendita": 3,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 128,
+      "nombre": "Banderilla",
+      "descripcion": "Una banderilla.",
+      "precio": "30.00",
+      "id_tiendita": 3,
+      "categoria": "Snacks"
+    },
+    {
+      "id_menu": 129,
+      "nombre": "Banderilla con papas",
+      "descripcion": "Una banderilla con papas.",
+      "precio": "40.00",
+      "id_tiendita": 3,
+      "categoria": "Snacks"
+    },
+    {
+      "id_menu": 130,
+      "nombre": "Huevo Omelette",
+      "descripcion": "Huevos en forma de omelette.",
+      "precio": "55.00",
+      "id_tiendita": 5,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 131,
+      "nombre": "Hot Cakes",
+      "descripcion": "Una orden de hot cakes.",
+      "precio": "50.00",
+      "id_tiendita": 5,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 132,
+      "nombre": "Banderillas",
+      "descripcion": "",
+      "precio": "40.00",
+      "id_tiendita": 5,
+      "categoria": "Snacks"
+    },
+    {
+      "id_menu": 133,
+      "nombre": "Palomitas de pollo",
+      "descripcion": "Una porciá?n de palomitas de pollo.",
+      "precio": "55.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 134,
+      "nombre": "Chimichanga",
+      "descripcion": "",
+      "precio": "60.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 135,
+      "nombre": "Chilaquiles",
+      "descripcion": "Porciá?n de chilaquiles en la salsa de su preferencia.",
+      "precio": "60.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 136,
+      "nombre": "Tacos dorados",
+      "descripcion": "Una orden de tacos dorados.",
+      "precio": "55.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 137,
+      "nombre": "Tostadas",
+      "descripcion": "",
+      "precio": "60.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 138,
+      "nombre": "Mollete",
+      "descripcion": "",
+      "precio": "50.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 139,
+      "nombre": "Torta de jamá?n",
+      "descripcion": "",
+      "precio": "40.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 140,
+      "nombre": "Torta de pierna",
+      "descripcion": "",
+      "precio": "55.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 141,
+      "nombre": "Torta de barbacoa",
+      "descripcion": "",
+      "precio": "60.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 142,
+      "nombre": "Pechuga a la plancha",
+      "descripcion": "",
+      "precio": "65.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 143,
+      "nombre": "Paquete de burritos",
+      "descripcion": "Un paquete de burritos de machaca o carne con chile.",
+      "precio": "50.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 144,
+      "nombre": "Pizza Pan",
+      "descripcion": "",
+      "precio": "50.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 145,
+      "nombre": "Maruchan",
+      "descripcion": "",
+      "precio": "30.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 146,
+      "nombre": "Quesadilla sincronizada",
+      "descripcion": "",
+      "precio": "45.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 147,
+      "nombre": "Quesadilla carne o boneless",
+      "descripcion": "",
+      "precio": "60.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 148,
+      "nombre": "Sándwich de jamá?n",
+      "descripcion": "",
+      "precio": "35.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 149,
+      "nombre": "Sándwich de pollo",
+      "descripcion": "",
+      "precio": "55.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 150,
+      "nombre": "Ensalada de pollo (Chica)",
+      "descripcion": "Una ensalada chica de diversos vegetales con pollo.",
+      "precio": "85.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 151,
+      "nombre": "Ensalada de pollo (Mediana)",
+      "descripcion": "Una ensalada mediana de diversos vegetales con pollo.",
+      "precio": "95.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 152,
+      "nombre": "Ensalada de boneless (Chica)",
+      "descripcion": "Una ensalada chica de diversos vegetales con boneless.",
+      "precio": "105.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 153,
+      "nombre": "Ensalada de boneless (Mediana)",
+      "descripcion": "Una ensalada mediana de diversos vegetales con boneless.",
+      "precio": "115.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 154,
+      "nombre": "Orden de boneless",
+      "descripcion": "Una orden de pollo empanizado con salsa de su preferencia.",
+      "precio": "100.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 155,
+      "nombre": "Papa boneless",
+      "descripcion": "Una porciá?n de papas a la francesa acompaá?ados de pollo empanizado con salsa de su preferencia.",
+      "precio": "75.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 156,
+      "nombre": "Hamburguesa",
+      "descripcion": "Una hamburguesa estándar cuya carne puede ser de res, pollo o boneless.",
+      "precio": "85.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 157,
+      "nombre": "Orden de papas a la francesa",
+      "descripcion": "",
+      "precio": "40.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 158,
+      "nombre": "Orden de papas sazonadas",
+      "descripcion": "",
+      "precio": "50.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 159,
+      "nombre": "Salchipapas",
+      "descripcion": "Una orden de papas a la francesa con pedazos de salchicha.",
+      "precio": "60.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 160,
+      "nombre": "Unigiris",
+      "descripcion": "Onigiris de camaron, res o pollo.",
+      "precio": "75.00",
+      "id_tiendita": 5,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 161,
+      "nombre": "Huevo",
+      "descripcion": "Porcion de huevos revueltos.",
+      "precio": "40.00",
+      "id_tiendita": 2,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 162,
+      "nombre": "Omelette",
+      "descripcion": "Un omelette tradicional.",
+      "precio": "40.00",
+      "id_tiendita": 2,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 163,
+      "nombre": "Mini hot cakes",
+      "descripcion": "Una porciá?n de varias piezas de mini hot cakes.",
+      "precio": "50.00",
+      "id_tiendita": 2,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 164,
+      "nombre": "Banderilla",
+      "descripcion": "",
+      "precio": "30.00",
+      "id_tiendita": 2,
+      "categoria": "Snacks"
+    },
+    {
+      "id_menu": 165,
+      "nombre": "Chilaquiles con huevo",
+      "descripcion": "Una orden de chilaquiles en salsa de su preferencia acompaá?ada de huevo.",
+      "precio": "70.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 166,
+      "nombre": "Chilaquiles con pollo",
+      "descripcion": "Una orden de chilaquiles en salsa de su preferencia acompaá?ada de piezas de pollo.",
+      "precio": "80.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 167,
+      "nombre": "Palomitas de pollo",
+      "descripcion": "",
+      "precio": "50.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 168,
+      "nombre": "Chimichangas",
+      "descripcion": "",
+      "precio": "60.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 169,
+      "nombre": "Tacos dorados",
+      "descripcion": "",
+      "precio": "60.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 170,
+      "nombre": "Pollo a la plancha",
+      "descripcion": "",
+      "precio": "70.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 171,
+      "nombre": "Tostadas",
+      "descripcion": "",
+      "precio": "70.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 172,
+      "nombre": "Burritos con carne con chile",
+      "descripcion": "",
+      "precio": "60.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 173,
+      "nombre": "Torta de jamá?n",
+      "descripcion": "",
+      "precio": "30.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 174,
+      "nombre": "Torta de pierna",
+      "descripcion": "",
+      "precio": "60.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 175,
+      "nombre": "Torta de cabeza",
+      "descripcion": "",
+      "precio": "60.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 176,
+      "nombre": "Torta de barbacoa",
+      "descripcion": "",
+      "precio": "60.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 177,
+      "nombre": "Molletes",
+      "descripcion": "",
+      "precio": "45.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 178,
+      "nombre": "Pizza Pan",
+      "descripcion": "",
+      "precio": "45.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 179,
+      "nombre": "Maruchan",
+      "descripcion": "",
+      "precio": "30.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 180,
+      "nombre": "Orden de boneless",
+      "descripcion": "Una orden de pollo empanizado con salsa de su preferencia.",
+      "precio": "100.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 181,
+      "nombre": "Quesadilla Sincronizada",
+      "descripcion": "Una quesadilla con jamá?n.",
+      "precio": "30.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 182,
+      "nombre": "Quesadilla boneless",
+      "descripcion": "Una quesadilla con pollo empanizado con salsa.",
+      "precio": "60.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 183,
+      "nombre": "Quesadilla con Carne asada",
+      "descripcion": "Una quesadilla con carne asada.",
+      "precio": "60.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 184,
+      "nombre": "Quesadilla de Carne con chile",
+      "descripcion": "Una quesadilla de carne con chile.",
+      "precio": "50.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 185,
+      "nombre": "Sándwich de Jamá?n",
+      "descripcion": "",
+      "precio": "25.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 186,
+      "nombre": "Sándwich de pollo",
+      "descripcion": "",
+      "precio": "50.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 187,
+      "nombre": "Ensalada de pollo (Chica)",
+      "descripcion": "Una ensalada chica de diversos vegetales con pedazos de pollo.",
+      "precio": "70.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 188,
+      "nombre": "Ensalada de pollo (Mediana)",
+      "descripcion": "Una ensalada mediana de diversos vegetales con pedazos de pollo.",
+      "precio": "90.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 189,
+      "nombre": "Ensalada Boneless (Chica)",
+      "descripcion": "Una ensalada chica de diversos vegetales con pedazos de pollo empanizado de la salsa de su preferencia.",
+      "precio": "100.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 190,
+      "nombre": "Ensalada Boneless (Mediana)",
+      "descripcion": "Una ensalada mediana de diversos vegetales con pedazos de pollo empanizado de la salsa de su preferencia.",
+      "precio": "120.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 191,
+      "nombre": "Alitas",
+      "descripcion": "Una porcion de alitas de pollo.",
+      "precio": "80.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 192,
+      "nombre": "Momia",
+      "descripcion": "",
+      "precio": "35.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 193,
+      "nombre": "Onigiri",
+      "descripcion": "Onigiris de distintos sabores.",
+      "precio": "80.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 194,
+      "nombre": "Hamburguesa sencilla/pollo",
+      "descripcion": "Una hamburguesa de carne de res o de pollo.",
+      "precio": "80.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 195,
+      "nombre": "Hamburguesa de boneless",
+      "descripcion": "Una hamburguesa de boneless.",
+      "precio": "100.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 196,
+      "nombre": "Papas a la francesa",
+      "descripcion": "Una orden de papas a la francesa.",
+      "precio": "40.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 197,
+      "nombre": "Papas sazonadas",
+      "descripcion": "Una orden de papas sazonadas.",
+      "precio": "50.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 198,
+      "nombre": "Salchipapas",
+      "descripcion": "Una porciá?n de papas a la francesa con pedazos de salchicha.",
+      "precio": "70.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 199,
+      "nombre": "Papa boneless",
+      "descripcion": "Una orden de papas a la francesa con pollo empanizando en salsa de su preferencia.",
+      "precio": "80.00",
+      "id_tiendita": 2,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 200,
+      "nombre": "Huevos al gusto",
+      "descripcion": "",
+      "precio": "70.00",
+      "id_tiendita": 1,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 201,
+      "nombre": "Omelete",
+      "descripcion": "",
+      "precio": "70.00",
+      "id_tiendita": 1,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 202,
+      "nombre": "Chimichangas de carne",
+      "descripcion": "Dos chimichangas de carne.",
+      "precio": "65.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 203,
+      "nombre": "Chimichangas de frijoles",
+      "descripcion": "Dos chimichangas de frijoles.",
+      "precio": "45.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 204,
+      "nombre": "Burritos",
+      "descripcion": "Un burrito relleno de algun tipo de carne (carne con chile, barbacoa, papas con machaca, o pierna).",
+      "precio": "20.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 205,
+      "nombre": "Burritos de frijoles",
+      "descripcion": "Un burrito de frijoles.",
+      "precio": "15.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 206,
+      "nombre": "Burro de papa con machaca",
+      "descripcion": "Un burro grande de papas con machaca.",
+      "precio": "80.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 207,
+      "nombre": "Burro de carne",
+      "descripcion": "Un burro grande relleno de algun tipo de carne (barbacoa, carne con chile o pierna).",
+      "precio": "90.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 208,
+      "nombre": "Quesadilla Sencilla",
+      "descripcion": "Una quesadilla sencilla simple.",
+      "precio": "30.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 209,
+      "nombre": "Quesadilla Sincronizada",
+      "descripcion": "Una quesadilla con jamá?n.",
+      "precio": "35.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 210,
+      "nombre": "Quesadilla Embarazada",
+      "descripcion": "",
+      "precio": "60.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 211,
+      "nombre": "Sándwich de jamá?n",
+      "descripcion": "",
+      "precio": "60.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 212,
+      "nombre": "Sándwich de atá?n",
+      "descripcion": "",
+      "precio": "70.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 213,
+      "nombre": "Sándwich de huevo",
+      "descripcion": "",
+      "precio": "60.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 214,
+      "nombre": "Sándwich de pollo",
+      "descripcion": "",
+      "precio": "70.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 215,
+      "nombre": "Sándwich de boneless",
+      "descripcion": "",
+      "precio": "70.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 216,
+      "nombre": "Torta de jamá?n",
+      "descripcion": "Una torta de jamá?n acompaá?ada de una porciá?n de papas.",
+      "precio": "80.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 217,
+      "nombre": "Tortas de carnes",
+      "descripcion": "Una torta de algun tipo de carne (barbacoa, pierna o pollo) acompaá?ada de una porciá?n de papas.",
+      "precio": "85.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 218,
+      "nombre": "Torta cubana",
+      "descripcion": "Una torta cubana acompaá?ada de una porciá?n de papas.",
+      "precio": "85.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 219,
+      "nombre": "Hamburguesa",
+      "descripcion": "Una hamburguesa comá?n acompaá?ada de una porciá?n de papas.",
+      "precio": "75.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 220,
+      "nombre": "Hamburguesa con pollo",
+      "descripcion": "Una hamburguesa con pollo acompaá?ada de una porciá?n de papas.",
+      "precio": "85.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 221,
+      "nombre": "Tamales",
+      "descripcion": "",
+      "precio": "25.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 222,
+      "nombre": "Banderilla",
+      "descripcion": "",
+      "precio": "25.00",
+      "id_tiendita": 1,
+      "categoria": "Snacks"
+    },
+    {
+      "id_menu": 223,
+      "nombre": "Onigiris",
+      "descripcion": "Onigiris de diferentes sabores.",
+      "precio": "65.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 224,
+      "nombre": "Tacos dorados",
+      "descripcion": "Una orden de tacos dorados.",
+      "precio": "55.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 225,
+      "nombre": "Mollete Sencillo",
+      "descripcion": "Un mollete sencillo de un solo ingrediente.",
+      "precio": "30.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 226,
+      "nombre": "Mollete Full con papas",
+      "descripcion": "Un mollete de má?ltiples ingredientes acompaá?ada de una porciá?n de papas.",
+      "precio": "60.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 227,
+      "nombre": "Pizza Pan",
+      "descripcion": "Un pizza pan simple.",
+      "precio": "30.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 228,
+      "nombre": "Ensalada de Pollo/Boneless",
+      "descripcion": "Una ensalada de diversos vegetales acompaá?ada de pollo simple o boneless.",
+      "precio": "100.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 229,
+      "nombre": "Orden de papas con queso",
+      "descripcion": "Una orden de papas a la francesa con queso.",
+      "precio": "60.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 230,
+      "nombre": "Orden de papa boneless.",
+      "descripcion": "Una orden de papas a la francesa con pedazos de pollo empanizados con salsa.",
+      "precio": "80.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 231,
+      "nombre": "Orden de boneless",
+      "descripcion": "Una orden de pollo empanizado con salsa.",
+      "precio": "100.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 232,
+      "nombre": "Agua",
+      "descripcion": "Agua natural de 1 lt",
+      "precio": "15.00",
+      "id_tiendita": 1,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 233,
+      "nombre": "Coca-cola",
+      "descripcion": "Coca cola regular o light de 600 ml",
+      "precio": "27.00",
+      "id_tiendita": 1,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 234,
+      "nombre": "Soda de sabor",
+      "descripcion": "Refrescos de distintos sabores de 600 ml.",
+      "precio": "25.00",
+      "id_tiendita": 1,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 235,
+      "nombre": "Jugo Jumex",
+      "descripcion": "Jugo jumex de lata o de vidrio.",
+      "precio": "25.00",
+      "id_tiendita": 1,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 236,
+      "nombre": "Aguas frescas",
+      "descripcion": "Aguas frescas de distintos sabores.",
+      "precio": "25.00",
+      "id_tiendita": 1,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 237,
+      "nombre": "Licuados",
+      "descripcion": "Licuados de distintos sabores como fresa, platano, chocomilk, y papaya.",
+      "precio": "50.00",
+      "id_tiendita": 1,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 238,
+      "nombre": "Cafá",
+      "descripcion": "Cafá regular.",
+      "precio": "25.00",
+      "id_tiendita": 1,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 239,
+      "nombre": "Chocolate Caliente",
+      "descripcion": "",
+      "precio": "35.00",
+      "id_tiendita": 1,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 240,
+      "nombre": "Papas con machaca",
+      "descripcion": "Una orden en plato de papas con machaca.",
+      "precio": "90.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 241,
+      "nombre": "Carne con chile",
+      "descripcion": "Una orden en plato de carne con chile.",
+      "precio": "100.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 242,
+      "nombre": "Barbacoa",
+      "descripcion": "Una orden en plato de barbacoa.",
+      "precio": "100.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 243,
+      "nombre": "PIerna",
+      "descripcion": "Una orden en plato de pierna.",
+      "precio": "100.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 244,
+      "nombre": "Chilaquiles",
+      "descripcion": "Una orden de chilaquiles en la salsa de su preferencia con pollo o carne.",
+      "precio": "100.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 245,
+      "nombre": "Quesaboneless",
+      "descripcion": "",
+      "precio": "70.00",
+      "id_tiendita": 1,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 246,
+      "nombre": "Yogurt con fruta",
+      "descripcion": "",
+      "precio": "60.00",
+      "id_tiendita": 1,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 247,
+      "nombre": "Tapioca",
+      "descripcion": "",
+      "precio": "30.00",
+      "id_tiendita": 1,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 248,
+      "nombre": "Pastel Helado",
+      "descripcion": "",
+      "precio": "40.00",
+      "id_tiendita": 1,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 249,
+      "nombre": "Waffles",
+      "descripcion": "",
+      "precio": "40.00",
+      "id_tiendita": 1,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 250,
+      "nombre": "Pastel de galleta",
+      "descripcion": "",
+      "precio": "37.00",
+      "id_tiendita": 1,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 251,
+      "nombre": "Desayuno del dia",
+      "descripcion": "El desayuno del dia.",
+      "precio": "70.00",
+      "id_tiendita": 15,
+      "categoria": "Comida Corrida"
+    },
+    {
+      "id_menu": 252,
+      "nombre": "Huevos al gusto",
+      "descripcion": "",
+      "precio": "65.00",
+      "id_tiendita": 15,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 253,
+      "nombre": "Omelette",
+      "descripcion": "",
+      "precio": "65.00",
+      "id_tiendita": 15,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 254,
+      "nombre": "Avena/Crema",
+      "descripcion": "Una porcion de avena o crema.",
+      "precio": "30.00",
+      "id_tiendita": 15,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 255,
+      "nombre": "Licuados/Frappes",
+      "descripcion": "Licuados y frappes de distintos sabores.",
+      "precio": "40.00",
+      "id_tiendita": 15,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 256,
+      "nombre": "Hot Cake",
+      "descripcion": "Una orden de hot cakes.",
+      "precio": "70.00",
+      "id_tiendita": 15,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 257,
+      "nombre": "Pan Frances",
+      "descripcion": "",
+      "precio": "65.00",
+      "id_tiendita": 15,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 258,
+      "nombre": "Enchiladas",
+      "descripcion": "",
+      "precio": "80.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 259,
+      "nombre": "Chilaquiles con queso",
+      "descripcion": "Una orden de chilaquiles con queso.",
+      "precio": "70.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 260,
+      "nombre": "Chilaquiles con huevo/pollo",
+      "descripcion": "Una orden de chilaquiles con huevo o pollo.",
+      "precio": "85.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 261,
+      "nombre": "Mollete/PIzza Pan",
+      "descripcion": "Un mollete o pizza pan sencillos.",
+      "precio": "50.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 262,
+      "nombre": "Mollete/PIzza Pan con papas",
+      "descripcion": "Un mollete o pizza pan con papas a la francesa.",
+      "precio": "60.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 263,
+      "nombre": "Sincronizada",
+      "descripcion": "Una quesadilla con jamá?n.",
+      "precio": "50.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 264,
+      "nombre": "Torta del chavo",
+      "descripcion": "Una torta de jamá?n simple.",
+      "precio": "55.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 265,
+      "nombre": "Torta del chavo con papas",
+      "descripcion": "Una torta de jamá?n con papas a la francesa.",
+      "precio": "65.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 266,
+      "nombre": "Sándwiches",
+      "descripcion": "Sándwiches de distintos tipos.",
+      "precio": "45.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 267,
+      "nombre": "Tacos de barbacoa",
+      "descripcion": "2 tacos de barbacoa y 1 taco de frijol.",
+      "precio": "60.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 268,
+      "nombre": "Burritos",
+      "descripcion": "Burritos de diferentes rellenos.",
+      "precio": "50.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 269,
+      "nombre": "Pizza pita",
+      "descripcion": "Una pizza personal en pan pita.",
+      "precio": "65.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 270,
+      "nombre": "Comida del dáa",
+      "descripcion": "La comida del dáa.",
+      "precio": "80.00",
+      "id_tiendita": 15,
+      "categoria": "Comida Corrida"
+    },
+    {
+      "id_menu": 271,
+      "nombre": "Charola fit",
+      "descripcion": "",
+      "precio": "85.00",
+      "id_tiendita": 15,
+      "categoria": "Fit / Saludable"
+    },
+    {
+      "id_menu": 272,
+      "nombre": "Box oriental",
+      "descripcion": "",
+      "precio": "85.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 273,
+      "nombre": "Sushi",
+      "descripcion": "",
+      "precio": "90.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 274,
+      "nombre": "Hamburguesa",
+      "descripcion": "Una hamburguesa sencilla.",
+      "precio": "90.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 275,
+      "nombre": "Hamburguesa doble",
+      "descripcion": "Una hamburguesa con doble carne.",
+      "precio": "110.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 276,
+      "nombre": "Hamburguesa de pollo",
+      "descripcion": "Una hamburguesa de pollo.",
+      "precio": "95.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 277,
+      "nombre": "Hamburguesa de boneless",
+      "descripcion": "Una hamburguesa de boneless.",
+      "precio": "110.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 278,
+      "nombre": "Panini de pollo",
+      "descripcion": "",
+      "precio": "95.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 279,
+      "nombre": "Panini de boneless",
+      "descripcion": "",
+      "precio": "110.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 280,
+      "nombre": "Baguette de jamá?n",
+      "descripcion": "",
+      "precio": "75.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 281,
+      "nombre": "Baguette de pollo",
+      "descripcion": "",
+      "precio": "85.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 282,
+      "nombre": "Baguette de boneless",
+      "descripcion": "",
+      "precio": "110.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 283,
+      "nombre": "Boneless",
+      "descripcion": "Una orden de pollo empanizado con salsa de su preferencia.",
+      "precio": "85.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 284,
+      "nombre": "Papa boneless",
+      "descripcion": "Una orden de papas a la francesa con pedazos de pollo empanizado con salsa.",
+      "precio": "95.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 285,
+      "nombre": "Torta de Carne",
+      "descripcion": "Una torta de pierna o barbacoa.",
+      "precio": "85.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 286,
+      "nombre": "Quesadilla con carne",
+      "descripcion": "Una quesadilla con barbacoa o pierna.",
+      "precio": "70.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 287,
+      "nombre": "Club Sándwich",
+      "descripcion": "",
+      "precio": "65.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 288,
+      "nombre": "Nachos con carne",
+      "descripcion": "Una orden de totopos con carne y otros ingredientes.",
+      "precio": "75.00",
+      "id_tiendita": 15,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 289,
+      "nombre": "Huevos al gusto",
+      "descripcion": "",
+      "precio": "70.00",
+      "id_tiendita": 10,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 290,
+      "nombre": "Omelete",
+      "descripcion": "",
+      "precio": "70.00",
+      "id_tiendita": 10,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 291,
+      "nombre": "Chimichangas de carne",
+      "descripcion": "Dos chimichangas de carne.",
+      "precio": "65.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 292,
+      "nombre": "Chimichangas de frijoles",
+      "descripcion": "Dos chimichangas de frijoles.",
+      "precio": "45.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 293,
+      "nombre": "Burritos",
+      "descripcion": "Un burrito relleno de algun tipo de carne (carne con chile, barbacoa, papas con machaca, o pierna).",
+      "precio": "20.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 294,
+      "nombre": "Burritos de frijoles",
+      "descripcion": "Un burrito de frijoles.",
+      "precio": "15.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 295,
+      "nombre": "Burro de papa con machaca",
+      "descripcion": "Un burro grande de papas con machaca.",
+      "precio": "80.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 296,
+      "nombre": "Burro de carne",
+      "descripcion": "Un burro grande relleno de algun tipo de carne (barbacoa, carne con chile o pierna).",
+      "precio": "90.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 297,
+      "nombre": "Quesadilla Sencilla",
+      "descripcion": "Una quesadilla sencilla simple.",
+      "precio": "30.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 298,
+      "nombre": "Quesadilla Sincronizada",
+      "descripcion": "Una quesadilla con jamá?n.",
+      "precio": "35.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 299,
+      "nombre": "Quesadilla Embarazada",
+      "descripcion": "",
+      "precio": "60.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 300,
+      "nombre": "Sándwich de jamá?n",
+      "descripcion": "",
+      "precio": "60.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 301,
+      "nombre": "Sándwich de atá?n",
+      "descripcion": "",
+      "precio": "70.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 302,
+      "nombre": "Sándwich de huevo",
+      "descripcion": "",
+      "precio": "60.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 303,
+      "nombre": "Sándwich de pollo",
+      "descripcion": "",
+      "precio": "70.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 304,
+      "nombre": "Sándwich de boneless",
+      "descripcion": "",
+      "precio": "70.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 305,
+      "nombre": "Torta de jamá?n",
+      "descripcion": "Una torta de jamá?n acompaá?ada de una porciá?n de papas.",
+      "precio": "80.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 306,
+      "nombre": "Tortas de carnes",
+      "descripcion": "Una torta de algun tipo de carne (barbacoa, pierna o pollo) acompaá?ada de una porciá?n de papas.",
+      "precio": "85.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 307,
+      "nombre": "Torta cubana",
+      "descripcion": "Una torta cubana acompaá?ada de una porciá?n de papas.",
+      "precio": "85.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 308,
+      "nombre": "Hamburguesa",
+      "descripcion": "Una hamburguesa comá?n acompaá?ada de una porciá?n de papas.",
+      "precio": "75.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 309,
+      "nombre": "Hamburguesa con pollo",
+      "descripcion": "Una hamburguesa con pollo acompaá?ada de una porciá?n de papas.",
+      "precio": "85.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 310,
+      "nombre": "Tamales",
+      "descripcion": "",
+      "precio": "25.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 311,
+      "nombre": "Banderilla",
+      "descripcion": "",
+      "precio": "25.00",
+      "id_tiendita": 10,
+      "categoria": "Snacks"
+    },
+    {
+      "id_menu": 312,
+      "nombre": "Onigiris",
+      "descripcion": "Onigiris de diferentes sabores.",
+      "precio": "65.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 313,
+      "nombre": "Tacos dorados",
+      "descripcion": "Una orden de tacos dorados.",
+      "precio": "55.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 314,
+      "nombre": "Mollete Sencillo",
+      "descripcion": "Un mollete sencillo de un solo ingrediente.",
+      "precio": "30.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 315,
+      "nombre": "Mollete Full con papas",
+      "descripcion": "Un mollete de má?ltiples ingredientes acompaá?ada de una porciá?n de papas.",
+      "precio": "60.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 316,
+      "nombre": "Pizza Pan",
+      "descripcion": "Un pizza pan simple.",
+      "precio": "30.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 317,
+      "nombre": "Ensalada de Pollo/Boneless",
+      "descripcion": "Una ensalada de diversos vegetales acompaá?ada de pollo simple o boneless.",
+      "precio": "100.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 318,
+      "nombre": "Orden de papas con queso",
+      "descripcion": "Una orden de papas a la francesa con queso.",
+      "precio": "60.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 319,
+      "nombre": "Orden de papa boneless.",
+      "descripcion": "Una orden de papas a la francesa con pedazos de pollo empanizados con salsa.",
+      "precio": "80.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 320,
+      "nombre": "Orden de boneless",
+      "descripcion": "Una orden de pollo empanizado con salsa.",
+      "precio": "100.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 321,
+      "nombre": "Agua",
+      "descripcion": "Agua natural de 1 lt",
+      "precio": "15.00",
+      "id_tiendita": 10,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 322,
+      "nombre": "Coca-cola",
+      "descripcion": "Coca cola regular o light de 600 ml",
+      "precio": "27.00",
+      "id_tiendita": 10,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 323,
+      "nombre": "Soda de sabor",
+      "descripcion": "Refrescos de distintos sabores de 600 ml.",
+      "precio": "25.00",
+      "id_tiendita": 10,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 324,
+      "nombre": "Jugo Jumex",
+      "descripcion": "Jugo jumex de lata o de vidrio.",
+      "precio": "25.00",
+      "id_tiendita": 10,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 325,
+      "nombre": "Aguas frescas",
+      "descripcion": "Aguas frescas de distintos sabores.",
+      "precio": "25.00",
+      "id_tiendita": 10,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 326,
+      "nombre": "Licuados",
+      "descripcion": "Licuados de distintos sabores como fresa, platano, chocomilk, y papaya.",
+      "precio": "50.00",
+      "id_tiendita": 10,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 327,
+      "nombre": "Cafá",
+      "descripcion": "Cafá regular.",
+      "precio": "25.00",
+      "id_tiendita": 10,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 328,
+      "nombre": "Chocolate Caliente",
+      "descripcion": "",
+      "precio": "35.00",
+      "id_tiendita": 10,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 329,
+      "nombre": "Papas con machaca",
+      "descripcion": "Una orden en plato de papas con machaca.",
+      "precio": "90.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 330,
+      "nombre": "Carne con chile",
+      "descripcion": "Una orden en plato de carne con chile.",
+      "precio": "100.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 331,
+      "nombre": "Barbacoa",
+      "descripcion": "Una orden en plato de barbacoa.",
+      "precio": "100.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 332,
+      "nombre": "Pierna",
+      "descripcion": "Una orden en plato de pierna.",
+      "precio": "100.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 333,
+      "nombre": "Chilaquiles",
+      "descripcion": "Una orden de chilaquiles en la salsa de su preferencia con pollo o carne.",
+      "precio": "100.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 334,
+      "nombre": "Quesaboneless",
+      "descripcion": "",
+      "precio": "70.00",
+      "id_tiendita": 10,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 335,
+      "nombre": "Yogurt con fruta",
+      "descripcion": "",
+      "precio": "60.00",
+      "id_tiendita": 10,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 336,
+      "nombre": "Tapioca",
+      "descripcion": "",
+      "precio": "30.00",
+      "id_tiendita": 10,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 337,
+      "nombre": "Pastel Helado",
+      "descripcion": "",
+      "precio": "40.00",
+      "id_tiendita": 10,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 338,
+      "nombre": "Waffles",
+      "descripcion": "",
+      "precio": "40.00",
+      "id_tiendita": 10,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 339,
+      "nombre": "Pastel de galleta",
+      "descripcion": "",
+      "precio": "37.00",
+      "id_tiendita": 10,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 340,
+      "nombre": "Sabritas con queso",
+      "descripcion": "Unas Sabritas con queso amarillo por encima.",
+      "precio": "30.00",
+      "id_tiendita": 8,
+      "categoria": "Snacks"
+    },
+    {
+      "id_menu": 341,
+      "nombre": "Calzonne",
+      "descripcion": "Una empanada con queso chihuahua, salsa de tomate, pepperoni y queso mozzarella.",
+      "precio": "45.00",
+      "id_tiendita": 8,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 342,
+      "nombre": "Orange Chicken",
+      "descripcion": "Una porcion de pollo a la naranja.",
+      "precio": "75.00",
+      "id_tiendita": 8,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 343,
+      "nombre": "Chicken Bake",
+      "descripcion": "Un chicken bake conformado por queso mozzarella, tocino, pollo y aderezo chipotle.",
+      "precio": "45.00",
+      "id_tiendita": 8,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 344,
+      "nombre": "Onigiris",
+      "descripcion": "Onigiris de distintos sabores como tocino, pollo bbq, pollo bá?falo y pollo chipotle.",
+      "precio": "60.00",
+      "id_tiendita": 8,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 345,
+      "nombre": "Rebanada de Pizza",
+      "descripcion": "Una rebanada de pizza de queso simple o pepperoni.",
+      "precio": "30.00",
+      "id_tiendita": 8,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 346,
+      "nombre": "Dumplings",
+      "descripcion": "Una orden de dumplings hechos al vapor rellenos de carne y vegetales, con zanahoria y cebollin por encima.",
+      "precio": "60.00",
+      "id_tiendita": 8,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 347,
+      "nombre": "Burritos",
+      "descripcion": "Una orden de burritos de distintos rellenos.",
+      "precio": "45.00",
+      "id_tiendita": 8,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 348,
+      "nombre": "Chicken Waffle",
+      "descripcion": "Un sandwich de pollo con tocino y aderezos, con 2 waffles como panes.",
+      "precio": "80.00",
+      "id_tiendita": 8,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 349,
+      "nombre": "Torta Cubana",
+      "descripcion": "Una torta de pan de telera de pierna con jamá?n, queso americano y lechuga.",
+      "precio": "70.00",
+      "id_tiendita": 8,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 350,
+      "nombre": "Sabritas con queso",
+      "descripcion": "Unas sabritas con queso amarillo encima.",
+      "precio": "30.00",
+      "id_tiendita": 13,
+      "categoria": "Snacks"
+    },
+    {
+      "id_menu": 351,
+      "nombre": "Rebanadas de pastel",
+      "descripcion": "Una rebanda de carlota de limá?n, pastel de chocolate,  pay de limá?n o chocoflan.",
+      "precio": "40.00",
+      "id_tiendita": 13,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 352,
+      "nombre": "Muffin",
+      "descripcion": "",
+      "precio": "25.00",
+      "id_tiendita": 13,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 353,
+      "nombre": "Pan dulce",
+      "descripcion": "Panes dulces de distintos tipos.",
+      "precio": "20.00",
+      "id_tiendita": 13,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 354,
+      "nombre": "Donas",
+      "descripcion": "Donas de distintos sabores.",
+      "precio": "15.00",
+      "id_tiendita": 13,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 355,
+      "nombre": "Cafá",
+      "descripcion": "",
+      "precio": "20.00",
+      "id_tiendita": 13,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 356,
+      "nombre": "Maruchan",
+      "descripcion": "",
+      "precio": "25.00",
+      "id_tiendita": 13,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 357,
+      "nombre": "Pepihuates",
+      "descripcion": "Cacahuates japoneses con pepino y otras salsas por encima.",
+      "precio": "20.00",
+      "id_tiendita": 13,
+      "categoria": "Snacks"
+    },
+    {
+      "id_menu": 358,
+      "nombre": "Cacahuates",
+      "descripcion": "Cacahuates japoneses simples.",
+      "precio": "15.00",
+      "id_tiendita": 13,
+      "categoria": "Snacks"
+    },
+    {
+      "id_menu": 359,
+      "nombre": "Chocolates",
+      "descripcion": "",
+      "precio": "25.00",
+      "id_tiendita": 13,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 360,
+      "nombre": "Paletas",
+      "descripcion": "",
+      "precio": "5.00",
+      "id_tiendita": 13,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 361,
+      "nombre": "Zumba Goma",
+      "descripcion": "",
+      "precio": "5.00",
+      "id_tiendita": 13,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 362,
+      "nombre": "Burritos de papa con machaca o chorizo",
+      "descripcion": "Una orden de 3 burritos de papa con machaca o chorizo.",
+      "precio": "35.00",
+      "id_tiendita": 13,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 363,
+      "nombre": "Sándwich de jamá?n",
+      "descripcion": "Un sándwich de jamá?n con verduras simple.",
+      "precio": "30.00",
+      "id_tiendita": 13,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 364,
+      "nombre": "Sándwich de tender",
+      "descripcion": "Un sándwich de pollo tender con aderezos.",
+      "precio": "45.00",
+      "id_tiendita": 13,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 365,
+      "nombre": "Hamburguesa Tender",
+      "descripcion": "Una hamburguesa con pollo tender.",
+      "precio": "60.00",
+      "id_tiendita": 13,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 366,
+      "nombre": "Torta de jamá?n",
+      "descripcion": "Una torta de jamá?n con verduras y mayonesa.",
+      "precio": "35.00",
+      "id_tiendita": 13,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 367,
+      "nombre": "Sabritas",
+      "descripcion": "Sabritas diversas.",
+      "precio": "20.00",
+      "id_tiendita": 13,
+      "categoria": "Snacks"
+    },
+    {
+      "id_menu": 368,
+      "nombre": "Fritos Azteca",
+      "descripcion": "",
+      "precio": "25.00",
+      "id_tiendita": 13,
+      "categoria": "Snacks"
+    },
+    {
+      "id_menu": 369,
+      "nombre": "Churrumais",
+      "descripcion": "",
+      "precio": "15.00",
+      "id_tiendita": 13,
+      "categoria": "Snacks"
+    },
+    {
+      "id_menu": 370,
+      "nombre": "Fritos",
+      "descripcion": "",
+      "precio": "15.00",
+      "id_tiendita": 13,
+      "categoria": "Snacks"
+    },
+    {
+      "id_menu": 371,
+      "nombre": "Galleta de costco",
+      "descripcion": "",
+      "precio": "12.00",
+      "id_tiendita": 13,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 372,
+      "nombre": "Barritas/Cremax/Chips Ahoy",
+      "descripcion": "",
+      "precio": "15.00",
+      "id_tiendita": 13,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 374,
+      "nombre": "Canelitas/Polvorones",
+      "descripcion": "",
+      "precio": "18.00",
+      "id_tiendita": 13,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 375,
+      "nombre": "Galletas Diversas",
+      "descripcion": "Florentinas, Principes, Triki Trakes, Oreo, Emperador y Arcoiris.",
+      "precio": "20.00",
+      "id_tiendita": 13,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 376,
+      "nombre": "Huevo",
+      "descripcion": "Orden de huevos al gusto.",
+      "precio": "35.00",
+      "id_tiendita": 11,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 377,
+      "nombre": "Omelette",
+      "descripcion": "Relleno de jamá?n/queso u otro ingrediente básico.",
+      "precio": "45.00",
+      "id_tiendita": 11,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 378,
+      "nombre": "Hot Cakes",
+      "descripcion": "Tres piezas con miel y mantequilla.",
+      "precio": "40.00",
+      "id_tiendita": 11,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 379,
+      "nombre": "Banderilla",
+      "descripcion": "Salchicha empanizada.",
+      "precio": "20.00",
+      "id_tiendita": 11,
+      "categoria": "Snacks"
+    },
+    {
+      "id_menu": 380,
+      "nombre": "Chilaquiles",
+      "descripcion": "Rojos o verdes con crema y queso.",
+      "precio": "45.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 381,
+      "nombre": "Paquete de burritos",
+      "descripcion": "Una orden de burritos de machaca, carne con chile, chorizo, asada o adobada.",
+      "precio": "50.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 382,
+      "nombre": "Torta de carne",
+      "descripcion": "Una torta de algá?n tipo de carne (cochinita pibil, pierna o barbacoa).",
+      "precio": "65.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 383,
+      "nombre": "Sándwich de jamá?n",
+      "descripcion": "Un sándwich de jamá?n simple.",
+      "precio": "30.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 384,
+      "nombre": "Sándwich de pollo",
+      "descripcion": "Un sándwich de pollo.",
+      "precio": "45.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 385,
+      "nombre": "Tamal",
+      "descripcion": "Tamales de carne o elote.",
+      "precio": "25.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 386,
+      "nombre": "Pizza Pan",
+      "descripcion": "Pan con queso, salsa de tomate y pepperoni.",
+      "precio": "50.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 387,
+      "nombre": "Molletes",
+      "descripcion": "Pan con queso y algá?n tipo de carne fráa como tocino, chorizo, jamá?n o chicharron.",
+      "precio": "50.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 388,
+      "nombre": "Tostadas",
+      "descripcion": "Una tostada simple con algá?n tipo de proteána arriba.",
+      "precio": "30.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 389,
+      "nombre": "Chimichangas",
+      "descripcion": "",
+      "precio": "35.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 390,
+      "nombre": "Tacos dorados",
+      "descripcion": "Una orden de tacos dorados.",
+      "precio": "30.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 391,
+      "nombre": "Ensalada sencilla",
+      "descripcion": "Una ensalada hecha de diversos vegetales y algunos aderezos.",
+      "precio": "50.00",
+      "id_tiendita": 11,
+      "categoria": "Fit / Saludable"
+    },
+    {
+      "id_menu": 392,
+      "nombre": "Orden de boneless",
+      "descripcion": "Una orden de pollo empanizado con salsa.",
+      "precio": "60.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 393,
+      "nombre": "Pollo a la plancha",
+      "descripcion": "",
+      "precio": "55.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 394,
+      "nombre": "Palomitas de pollo",
+      "descripcion": "",
+      "precio": "40.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 395,
+      "nombre": "Papas a la francesa",
+      "descripcion": "Una orden de papas a la francesa.",
+      "precio": "40.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 396,
+      "nombre": "Papas sazonadas",
+      "descripcion": "Una orden de papas sazonadas.",
+      "precio": "50.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 397,
+      "nombre": "Salchipapas",
+      "descripcion": "Una orden de papas a la francesa con pedazos de salchicha.",
+      "precio": "60.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 398,
+      "nombre": "Hamburguesa de Res",
+      "descripcion": "Una hamburguesa clásica con carne de res.",
+      "precio": "50.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 399,
+      "nombre": "Hamburguesa de Milanesa",
+      "descripcion": "Una hamburguesa con una milanesa de pollo o res como carne.",
+      "precio": "60.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 400,
+      "nombre": "Maruchan",
+      "descripcion": "",
+      "precio": "30.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 401,
+      "nombre": "Quesadilla sencilla",
+      "descripcion": "Una quesadilla sencilla normal.",
+      "precio": "20.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 402,
+      "nombre": "Quesadilla boneless",
+      "descripcion": "Una quesadilla con boneless en su interior.",
+      "precio": "45.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 403,
+      "nombre": "Quesadilla con carne",
+      "descripcion": "Una quesadilla con algun tipo de carne dentro.",
+      "precio": "35.00",
+      "id_tiendita": 11,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 404,
+      "nombre": "Cafá",
+      "descripcion": "",
+      "precio": "25.00",
+      "id_tiendita": 11,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 405,
+      "nombre": "Tostitos Preparados",
+      "descripcion": "Unos tostitos preparados ya sea con verdura, queso o carne",
+      "precio": "35.00",
+      "id_tiendita": 11,
+      "categoria": "Snacks"
+    },
+    {
+      "id_menu": 406,
+      "nombre": "Huevo al gusto",
+      "descripcion": "Una orden de huevos al gusto acompaá?ados de chorizo, machaca, verdura, jamon o salchicha.",
+      "precio": "45.00",
+      "id_tiendita": 9,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 407,
+      "nombre": "Avena",
+      "descripcion": "Un plato de avena simple.",
+      "precio": "30.00",
+      "id_tiendita": 9,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 408,
+      "nombre": "Yogurt con fruta",
+      "descripcion": "",
+      "precio": "40.00",
+      "id_tiendita": 9,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 409,
+      "nombre": "Hot Cakes",
+      "descripcion": "Orden de 3 piezas con mantequilla y miel.",
+      "precio": "45.00",
+      "id_tiendita": 9,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 410,
+      "nombre": "Tamal",
+      "descripcion": "Tamales de elote o carne.",
+      "precio": "30.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 411,
+      "nombre": "Mollete",
+      "descripcion": "Un mollete sencillo con algá?n topping como lo puede ser pepperoni, jamá?n, chorizo o salchicha.",
+      "precio": "55.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 412,
+      "nombre": "Quesadilla sincronizada",
+      "descripcion": "Una quesadilla con jamá?n.",
+      "precio": "30.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 413,
+      "nombre": "Quesadilla con carne",
+      "descripcion": "Una quesadilla con carne asada, carne con chile o barbacoa.",
+      "precio": "45.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 414,
+      "nombre": "Sándwiches",
+      "descripcion": "Sandwiches de atun, jamon o pollo",
+      "precio": "40.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 415,
+      "nombre": "Paquete de burritos",
+      "descripcion": "Un paquete de burritos de carne con chile, barbacoa, papas con machaca, deshebrada o frijoles.",
+      "precio": "50.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 416,
+      "nombre": "Sandwichon",
+      "descripcion": "",
+      "precio": "40.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 417,
+      "nombre": "Baguette de pollo",
+      "descripcion": "Baguette con pollo a la plancha, queso y verduras.",
+      "precio": "60.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 418,
+      "nombre": "Pizza Pan",
+      "descripcion": "Pan con salsa, queso y algun topping como jamon o pepperoni.",
+      "precio": "50.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 419,
+      "nombre": "Orden de boneless",
+      "descripcion": "Una orden de boneless con salsa de su preferencia.",
+      "precio": "60.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 420,
+      "nombre": "Chilaquiles",
+      "descripcion": "Una orden de chilaquiles en la salsa de su preferencia con otros complementos.",
+      "precio": "55.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 421,
+      "nombre": "Chimichangas",
+      "descripcion": "Una orden de chimichangas.",
+      "precio": "40.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 422,
+      "nombre": "Tacos dorados",
+      "descripcion": "Una orden de tacos dorados.",
+      "precio": "35.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 423,
+      "nombre": "Ensalada pollo a la plancha",
+      "descripcion": "Una ensalada de diversos vegetales con pollo a la plancha.",
+      "precio": "50.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 424,
+      "nombre": "Ensalada Boneless",
+      "descripcion": "Una ensalada de diversos vegetales con boneless en la salsa de su preferencia.",
+      "precio": "70.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 425,
+      "nombre": "Burro de carne asada",
+      "descripcion": "",
+      "precio": "75.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 426,
+      "nombre": "Torta de jamon",
+      "descripcion": "Una torta de jamá?n tradicional.",
+      "precio": "40.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 427,
+      "nombre": "Torta de carne",
+      "descripcion": "Una torta de algun tipo de carne como barbacoa o pierna",
+      "precio": "60.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 428,
+      "nombre": "Hamburguesas de res",
+      "descripcion": "Una hamburguesa estándar con carne de res.",
+      "precio": "55.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 429,
+      "nombre": "Hamburguesa de pollo",
+      "descripcion": "Una hamburguesa con pollo a la plancha.",
+      "precio": "60.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 430,
+      "nombre": "Hamburguesa de boneless",
+      "descripcion": "Una hamburguesa con boneless.",
+      "precio": "70.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 431,
+      "nombre": "Banderilla",
+      "descripcion": "Salchicha empanizada.",
+      "precio": "30.00",
+      "id_tiendita": 9,
+      "categoria": "Snacks"
+    },
+    {
+      "id_menu": 432,
+      "nombre": "Orden de papas",
+      "descripcion": "Una orden de papas a la francesa.",
+      "precio": "40.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 433,
+      "nombre": "Maruchan",
+      "descripcion": "",
+      "precio": "30.00",
+      "id_tiendita": 9,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 434,
+      "nombre": "Tostitos preparados",
+      "descripcion": "Tostitos con verdura, carne con queso o tostilocos.",
+      "precio": "45.00",
+      "id_tiendita": 9,
+      "categoria": "Snacks"
+    },
+    {
+      "id_menu": 435,
+      "nombre": "Pepihuates",
+      "descripcion": "Cacahuates con pepino y salsas diversas.",
+      "precio": "30.00",
+      "id_tiendita": 9,
+      "categoria": "Snacks"
+    },
+    {
+      "id_menu": 436,
+      "nombre": "Fresas con crema",
+      "descripcion": "Porciá?n de fresas con crema dulce.",
+      "precio": "45.00",
+      "id_tiendita": 9,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 437,
+      "nombre": "Huevo",
+      "descripcion": "Huevos al gusto con acompaá?amiento.",
+      "precio": "35.00",
+      "id_tiendita": 6,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 438,
+      "nombre": "Omelette",
+      "descripcion": "Relleno de jamá?n, queso o verduras.",
+      "precio": "45.00",
+      "id_tiendita": 6,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 439,
+      "nombre": "Hot Cakes",
+      "descripcion": "Orden de 3 hot cakes con miel y mantequilla.",
+      "precio": "40.00",
+      "id_tiendita": 6,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 440,
+      "nombre": "Banderilla",
+      "descripcion": "Salchicha empanizada.",
+      "precio": "20.00",
+      "id_tiendita": 6,
+      "categoria": "Snacks"
+    },
+    {
+      "id_menu": 441,
+      "nombre": "Chilaquiles",
+      "descripcion": "Una orden de chilaquiles de la salsa de tu preferencia con algunos toppings.",
+      "precio": "50.00",
+      "id_tiendita": 6,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 442,
+      "nombre": "Paquete de burritos",
+      "descripcion": "Una orden de burritos de machaca, carne con chile o chorizo.",
+      "precio": "60.00",
+      "id_tiendita": 6,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 443,
+      "nombre": "Torta de jamá?n",
+      "descripcion": "Una torta de jamá?n clásica.",
+      "precio": "40.00",
+      "id_tiendita": 6,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 444,
+      "nombre": "Torta de carne",
+      "descripcion": "Una torta de cochinita pibil o pierna.",
+      "precio": "60.00",
+      "id_tiendita": 6,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 445,
+      "nombre": "Sándwich de jamá?n",
+      "descripcion": "",
+      "precio": "30.00",
+      "id_tiendita": 6,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 446,
+      "nombre": "Sándwich de pollo",
+      "descripcion": "",
+      "precio": "40.00",
+      "id_tiendita": 6,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 447,
+      "nombre": "Tamales",
+      "descripcion": "Tamales de carne o elote.",
+      "precio": "25.00",
+      "id_tiendita": 6,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 448,
+      "nombre": "Molletes",
+      "descripcion": "Un mollete simple.",
+      "precio": "40.00",
+      "id_tiendita": 6,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 449,
+      "nombre": "Tostada",
+      "descripcion": "Una tostada de diferente tipo de carne y verduras.",
+      "precio": "25.00",
+      "id_tiendita": 6,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 450,
+      "nombre": "Chimichangas",
+      "descripcion": "Una orden de chimichangas.",
+      "precio": "40.00",
+      "id_tiendita": 6,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 451,
+      "nombre": "Ensalada sencilla",
+      "descripcion": "Una ensalada de diversos vegetales y con ciertos aderezos.",
+      "precio": "45.00",
+      "id_tiendita": 6,
+      "categoria": "Fit / Saludable"
+    },
+    {
+      "id_menu": 452,
+      "nombre": "Orden de boneless",
+      "descripcion": "Una orden de pollo empanizado con salsa de su preferencia.",
+      "precio": "60.00",
+      "id_tiendita": 6,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 453,
+      "nombre": "Palomitas de pollo",
+      "descripcion": "",
+      "precio": "40.00",
+      "id_tiendita": 6,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 454,
+      "nombre": "Papas a la francesa",
+      "descripcion": "Una orden de papas a la francesa.",
+      "precio": "40.00",
+      "id_tiendita": 6,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 455,
+      "nombre": "Papas sazonadas",
+      "descripcion": "Una orden de papas sazonadas.",
+      "precio": "50.00",
+      "id_tiendita": 6,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 456,
+      "nombre": "Salchipapas",
+      "descripcion": "Una orden de papas a la francesa acompaá?ados con pedazos de salchicha.",
+      "precio": "55.00",
+      "id_tiendita": 6,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 457,
+      "nombre": "Quesadilla Sincronizada",
+      "descripcion": "Una quesadilla con jamá?n.",
+      "precio": "30.00",
+      "id_tiendita": 6,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 458,
+      "nombre": "Quesadilla boneless",
+      "descripcion": "Una quesadilla rellena de boneless.",
+      "precio": "45.00",
+      "id_tiendita": 6,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 459,
+      "nombre": "Quesadilla de carne",
+      "descripcion": "Una quesadilla rellena de algun tipo de carne.",
+      "precio": "40.00",
+      "id_tiendita": 6,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 460,
+      "nombre": "Tostitos preparados",
+      "descripcion": "Tostitos con verdura, queso o barbacoa.",
+      "precio": "45.00",
+      "id_tiendita": 6,
+      "categoria": "Snacks"
+    },
+    {
+      "id_menu": 461,
+      "nombre": "Huevos al gusto",
+      "descripcion": "Una orden de huevos al gusto que pueden ser con jamá?n, chorizo, divorciados o rancheros.",
+      "precio": "45.00",
+      "id_tiendita": 4,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 462,
+      "nombre": "Omelette",
+      "descripcion": "Huevos en forma de omelette rellenos de diversos ingredientes, ya sea, champiáá??n, machaca, jamá?n, espinaca y chorizo.",
+      "precio": "55.00",
+      "id_tiendita": 4,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 463,
+      "nombre": "Hot Cakes",
+      "descripcion": "Una orden de 3 hot cakes con fresas o platanos.",
+      "precio": "45.00",
+      "id_tiendita": 4,
+      "categoria": "Desayuno"
+    },
+    {
+      "id_menu": 464,
+      "nombre": "Licuados",
+      "descripcion": "Un licuado a base de leche de diferentes sabores como fresa, manzana, plátano y chocomilk con plátano.",
+      "precio": "40.00",
+      "id_tiendita": 4,
+      "categoria": "Bebidas"
+    },
+    {
+      "id_menu": 465,
+      "nombre": "Chilaquiles",
+      "descripcion": "Una orden de chilaquiles en salsa roja o verde.",
+      "precio": "60.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 466,
+      "nombre": "Enchiladas",
+      "descripcion": "Una orden de enchiladas en la salsa de su preferencia con huevo o pollo.",
+      "precio": "65.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 467,
+      "nombre": "Quesadilla sencilla",
+      "descripcion": "Una quesadilla sencilla.",
+      "precio": "30.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 468,
+      "nombre": "Quesadilla sincronizada",
+      "descripcion": "Una quesadilla con jamá?n.",
+      "precio": "35.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 469,
+      "nombre": "Quesadila con carne",
+      "descripcion": "Una quesadilla rellena de algun tipo de carne como pierna, carne con chile, barbacoa, adobada, boneless y asada.",
+      "precio": "50.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 470,
+      "nombre": "Yogurt con fruta",
+      "descripcion": "Una porciá?n de yogurt con fruta de temporada.",
+      "precio": "40.00",
+      "id_tiendita": 4,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 471,
+      "nombre": "Milanesa",
+      "descripcion": "Una milanesa de pollo o res acompaá?ada de papas a la francesa y ensalada.",
+      "precio": "70.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 472,
+      "nombre": "Taco de carne",
+      "descripcion": "Un taco de carne diversa, como carne con chile, barbacoa, adobada, asada, machaca, pollo y chicharrá?n.",
+      "precio": "30.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 473,
+      "nombre": "Tostada",
+      "descripcion": "Una tostada que contiene pollo o deshebrada.",
+      "precio": "30.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 474,
+      "nombre": "Tacos dorados",
+      "descripcion": "Una orden de tacos dorados de deshebrada o de pollo.",
+      "precio": "35.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 475,
+      "nombre": "Chimichangas de frijol",
+      "descripcion": "Una orden de 3 piezas de chimichangas de frijoles.",
+      "precio": "60.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 476,
+      "nombre": "Chimichangas de papas con machaca",
+      "descripcion": "Una orden de 3 piezas de chimichangas de papas con machaca.",
+      "precio": "70.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 477,
+      "nombre": "Burritos",
+      "descripcion": "Una orden de 3 burritos de su elecciá?n como carne con chile, adobada, papas con machaca, pierna, barbacoa, chicharrá?n con salsa o mixtos, además de un burrito de frijol.",
+      "precio": "50.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 478,
+      "nombre": "Burro",
+      "descripcion": "Un burro de carnes diversas como carne con chile, asada, adobada, pierna o barbacoa.",
+      "precio": "75.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 479,
+      "nombre": "Ensalada",
+      "descripcion": "Una ensalada de 5 ingredientes de su elecciá?n, entre los que están arándano, piá?a, jamá?n, zanahoria, col morada, queso fresco, champiáá??n, espinaca, durazno, pollo o aderezo ranch/chipotle.",
+      "precio": "85.00",
+      "id_tiendita": 4,
+      "categoria": "Fit / Saludable"
+    },
+    {
+      "id_menu": 480,
+      "nombre": "Salchipapas",
+      "descripcion": "Una porciá?n de papas a la francesa con pedazos de salchicha.",
+      "precio": "70.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 481,
+      "nombre": "Papa boneless",
+      "descripcion": "Una orden de papas a la francesa con pollo empanizando en salsa de su preferencia.",
+      "precio": "80.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 482,
+      "nombre": "Torta de Jamá?n",
+      "descripcion": "Una torta de jamá?n clásica.",
+      "precio": "40.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 483,
+      "nombre": "Torta de Carne",
+      "descripcion": "Una torta de carne, tal como barbacoa, pierna o carne con chile.",
+      "precio": "65.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 484,
+      "nombre": "Torta de boneless",
+      "descripcion": "Una torta de boneless.",
+      "precio": "70.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 485,
+      "nombre": "Torta de milanesa",
+      "descripcion": "Una torta de milanesa de res o pollo.",
+      "precio": "70.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 486,
+      "nombre": "Torta cubana",
+      "descripcion": "Una torta cubana.",
+      "precio": "85.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 487,
+      "nombre": "Torta de asada",
+      "descripcion": "Una torta de asada.",
+      "precio": "100.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 488,
+      "nombre": "Torta de adobada",
+      "descripcion": "Una torta de adobada.",
+      "precio": "75.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 489,
+      "nombre": "Ensalada boneless",
+      "descripcion": "Una ensalada de diversos vegetales con pedazos de pollo empanizado con salsa de su preferencia.",
+      "precio": "90.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 490,
+      "nombre": "Pizza Pan",
+      "descripcion": "Un pizza pan con algun topping arriba, como pepperoni, chorizo, salchicha, champiáá??n, tocino o jamá?n.",
+      "precio": "60.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 491,
+      "nombre": "Mollete",
+      "descripcion": "Un mollete con un toppping arriba, como pepperoni, chorizo, salchicha, champiáá??n, tocino o jamá?n.",
+      "precio": "50.00",
+      "id_tiendita": 4,
+      "categoria": "Comida"
+    },
+    {
+      "id_menu": 492,
+      "nombre": "Bolis",
+      "descripcion": "Bolis de distintos sabores.",
+      "precio": "15.00",
+      "id_tiendita": 4,
+      "categoria": "Postres"
+    },
+    {
+      "id_menu": 493,
+      "nombre": "Paletas",
+      "descripcion": "Paletas heladas de esquimal o bala.",
+      "precio": "25.00",
+      "id_tiendita": 4,
+      "categoria": "Postres"
+    }
+  ],
+  "tienditas": [
+    {
+      "id_tiendita": 1,
+      "nombre": "Cafeteráa Derecho",
+      "direccion": "Edificio 10I, área de Derecho",
+      "foro_url": null,
+      "id_facultad": 5,
+      "facultad_nombre": "Facultad Interdisciplinaria de Ciencias Sociales",
+      "latitud": "29.084595827347663",
+      "longitud": "-110.962472221243740",
+      "hora_apertura": "7:00:00",
+      "hora_cierre": "19:00:00"
+    },
+    {
+      "id_tiendita": 2,
+      "nombre": "Cafeteráa Trabajo Social",
+      "direccion": "Edificio 10C, Pasillo Central",
+      "foro_url": null,
+      "id_facultad": 5,
+      "facultad_nombre": "Facultad Interdisciplinaria de Ciencias Sociales",
+      "latitud": "29.085285238069943",
+      "longitud": "-110.963481215741550",
+      "hora_apertura": "7:00:00",
+      "hora_cierre": "19:00:00"
+    },
+    {
+      "id_tiendita": 3,
+      "nombre": "Cafeteráa Educaciá?n",
+      "direccion": "Edificio 5A, Planta Baja",
+      "foro_url": null,
+      "id_facultad": 5,
+      "facultad_nombre": "Facultad Interdisciplinaria de Ciencias Sociales",
+      "latitud": "29.084688028438850",
+      "longitud": "-110.965604698736300",
+      "hora_apertura": "7:00:00",
+      "hora_cierre": "19:00:00"
+    },
+    {
+      "id_tiendita": 4,
+      "nombre": "Cafeteráa Psicologia/Comunicaciá?n",
+      "direccion": "Frente al Edificio 10I (La Sazá?n de Lorens)",
+      "foro_url": null,
+      "id_facultad": 5,
+      "facultad_nombre": "Facultad Interdisciplinaria de Ciencias Sociales",
+      "latitud": "29.084766552010798",
+      "longitud": "-110.964234089913600",
+      "hora_apertura": "8:00:00",
+      "hora_cierre": "20:00:00"
+    },
+    {
+      "id_tiendita": 5,
+      "nombre": "Cafeteráa Historia / Sociologáa",
+      "direccion": "Edificio 9A, Calle del Conocimiento",
+      "foro_url": null,
+      "id_facultad": 5,
+      "facultad_nombre": "Facultad Interdisciplinaria de Ciencias Sociales",
+      "latitud": "29.085717114490280",
+      "longitud": "-110.964353604165550",
+      "hora_apertura": "7:00:00",
+      "hora_cierre": "19:00:00"
+    },
+    {
+      "id_tiendita": 6,
+      "nombre": "Cafeteráa Ingenieráa Quámica",
+      "direccion": "Al lado del Edificio 5I",
+      "foro_url": null,
+      "id_facultad": 4,
+      "facultad_nombre": "Facultad Interdisciplinaria de Ingenieráa",
+      "latitud": "29.081545745951210",
+      "longitud": "-110.963393107110900",
+      "hora_apertura": "7:00:00",
+      "hora_cierre": "18:00:00"
+    },
+    {
+      "id_tiendita": 7,
+      "nombre": "Cafeteráa Civil-Minas",
+      "direccion": "Frente al Edificio 5L",
+      "foro_url": null,
+      "id_facultad": 4,
+      "facultad_nombre": "Facultad Interdisciplinaria de Ingenieráa",
+      "latitud": "29.082471319100340",
+      "longitud": "-110.962891819289380",
+      "hora_apertura": "7:00:00",
+      "hora_cierre": "18:00:00"
+    },
+    {
+      "id_tiendita": 8,
+      "nombre": "Cafeteráa Medicina 1",
+      "direccion": "Frente a la biblioteca de Medicina",
+      "foro_url": null,
+      "id_facultad": 1,
+      "facultad_nombre": "Facultad Interdisciplinaria de Ciencias Biolá?gicas y de Salud",
+      "latitud": "29.081319927547522",
+      "longitud": "-110.969136697950900",
+      "hora_apertura": "7:00:00",
+      "hora_cierre": "19:00:00"
+    },
+    {
+      "id_tiendita": 9,
+      "nombre": "Cafeteráa Matemáticas",
+      "direccion": "Detrás del edificio 3K3",
+      "foro_url": null,
+      "id_facultad": 3,
+      "facultad_nombre": "Facultad Interdisciplinaria de Ciencias Exactas y Naturales",
+      "latitud": "29.081105024446800",
+      "longitud": "-110.960352492080130",
+      "hora_apertura": "8:00:00",
+      "hora_cierre": "18:00:00"
+    },
+    {
+      "id_tiendita": 10,
+      "nombre": "Cafeteráa Artes",
+      "direccion": "Centro de las Artes, Edificio 3O",
+      "foro_url": null,
+      "id_facultad": 6,
+      "facultad_nombre": "Facultad Interdisciplinaria de Humanidades y Artes",
+      "latitud": "29.081126751158820",
+      "longitud": "-110.959140827630630",
+      "hora_apertura": "7:00:00",
+      "hora_cierre": "17:00:00"
+    },
+    {
+      "id_tiendita": 11,
+      "nombre": "Cafeteráa Geologáa",
+      "direccion": "Al lado del edificio 3V",
+      "foro_url": null,
+      "id_facultad": 3,
+      "facultad_nombre": "Facultad Interdisciplinaria de Ciencias Exactas y Naturales",
+      "latitud": "29.082537621059360",
+      "longitud": "-110.960954586229050",
+      "hora_apertura": "7:00:00",
+      "hora_cierre": "18:00:00"
+    },
+    {
+      "id_tiendita": 13,
+      "nombre": "Cafeteráa Medicina 2",
+      "direccion": "área Sur de Medicina",
+      "foro_url": null,
+      "id_facultad": 1,
+      "facultad_nombre": "Facultad Interdisciplinaria de Ciencias Biolá?gicas y de Salud",
+      "latitud": "29.081319927547522",
+      "longitud": "-110.969136697950900",
+      "hora_apertura": "7:00:00",
+      "hora_cierre": "19:00:00"
+    },
+    {
+      "id_tiendita": 14,
+      "nombre": "Tortas de Calidad",
+      "direccion": null,
+      "foro_url": null,
+      "id_facultad": 4,
+      "facultad_nombre": "Facultad Interdisciplinaria de Ingenieráa",
+      "latitud": "29.081563586119046",
+      "longitud": "-110.962018089732000",
+      "hora_apertura": "8:00:00",
+      "hora_cierre": "17:00:00"
+    },
+    {
+      "id_tiendita": 15,
+      "nombre": "Comedor Universitario",
+      "direccion": "",
+      "foro_url": null,
+      "id_facultad": 2,
+      "facultad_nombre": "Facultad Interdisciplinaria de Ciencias Econá?micas y Administrativas",
+      "latitud": "29.083677959701700",
+      "longitud": "-110.962482312048500",
+      "hora_apertura": "7:30:00",
+      "hora_cierre": "19:00:00"
+    }
+  ],
+  "facultades": [
+    {
+      "id_facultad": 1,
+      "nombre": "Facultad Interdisciplinaria de Ciencias Biolá?gicas y de Salud",
+      "descripcion": "Agricultura y Ganaderáa, Ciencias Quámico-Biolá?gicas, Enfermeráa, Investigaciones Cientáficas y Tecnolá?gicas, Alimentos, Medicina, Deportes",
+      "localizacion": null
+    },
+    {
+      "id_facultad": 2,
+      "nombre": "Facultad Interdisciplinaria de Ciencias Econá?micas y Administrativas",
+      "descripcion": "Administraciá?n, Contabilidad, Economáa",
+      "localizacion": null
+    },
+    {
+      "id_facultad": 3,
+      "nombre": "Facultad Interdisciplinaria de Ciencias Exactas y Naturales",
+      "descripcion": "Fásica, Geologáa, Matemáticas, Investigaciá?n en Fásica",
+      "localizacion": null
+    },
+    {
+      "id_facultad": 4,
+      "nombre": "Facultad Interdisciplinaria de Ingenieráa",
+      "descripcion": "Ingenieráa Civil y Minas, Industrial, Quámica y Metalurgia, Polámeros y Materiales",
+      "localizacion": null
+    },
+    {
+      "id_facultad": 5,
+      "nombre": "Facultad Interdisciplinaria de Ciencias Sociales",
+      "descripcion": "Historia y Antropologáa, Derecho, Psicologáa y Comunicaciá?n, Sociologáa y Administraciá?n Pá?blica, Trabajo Social",
+      "localizacion": null
+    },
+    {
+      "id_facultad": 6,
+      "nombre": "Facultad Interdisciplinaria de Humanidades y Artes",
+      "descripcion": "Bellas Artes, Lenguas Extranjeras, Letras y Lingáá?stica, Arquitectura y Diseá?o",
+      "localizacion": null
+    }
+  ]
+}

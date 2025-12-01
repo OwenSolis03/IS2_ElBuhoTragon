@@ -1,8 +1,19 @@
 // src/pages/Home.jsx
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import CafeCard from "../components/CafeCard";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import ChatWidget from "../components/ChatWidget";
+import { FiSearch, FiChevronDown, FiFilter, FiX } from 'react-icons/fi';
+
+// --- ASSETS ---
+import BuhoChef from "../assets/chef.png";
+import BuhoZZZ from "../assets/zzz.png";
+import BuhoCartel from "../assets/cartel.png";
+import LogoDefault from "../assets/logo.png";
+
+// --- IMÁGENES ESTÁTICAS ---
 import Derecho1 from "/Derecho1Card.jpeg";
 import TrabajoSocial from "/TrabajoSocial1Card.jpeg";
 import Educacion from "/Eduacion1Card.jpeg";
@@ -16,408 +27,350 @@ import Geologia from "/Cafeteria-Geologia1Card.jpeg";
 import Matematicas from "/Matematicas1Card.png";
 import Artes from "/Artes1Card.png";
 
-const cafeterias = [
-  { name: "Cafetería Derecho", image: Derecho1, path: "/cafeterias/cafeteria-derecho" },
-  { name: "Cafetería Trabajo Social", image: TrabajoSocial, path: "/cafeterias/cafeteria-de-trabajo-social" },
-  { name: "Cafetería Educación", image: Educacion, path: "/cafeterias/cafeteria-educacion" },
-  { name: "Cafetería Historia/Sociologia", image: Historia, path: "/cafeterias/cafeteria-historia/sociologia" },
-  { name: "Cafetería Medicina", image: Medicina1, path: "/cafeterias/cafetería-medicina" },
-  { name: "Cafetería Medicina 2", image: Medicina2, path: "/cafeterias/cafetería-medicina-2" },
-  { name: "Cafetería Civil-Minas", image: CivilMinas, path: "/cafeterias/cafeteria-departemento-de-ingenieria-industrial/civil" },
-  { name: "Cafetería Ingeniería Química", image: IngenieriaQuimica, path: "/cafeterias/cafeteria-departemento-de-ingenieria-quimica" },
-  { name: "Cafetería Matematicas", image: Matematicas, path: "/cafeterias/cafetería-matemáticas"},
-  { name: "Cafeteria Geologia", image: Geologia, path: "/cafeterias/cafetería-geología"},
-  { name: "Cafeteria Artes", image: Artes, path: "/cafeterias/cafetería-artes"},
-];
-
 const Home = () => {
-  const [cafeteriaDestacada, setCafeteriaDestacada] = useState(cafeterias[0]);
-  const [hover, setHover] = useState(false);
-  const [autoplay, setAutoplay] = useState(true);
-  
-  const siguienteCafeteria = () => {
-    const index = cafeterias.indexOf(cafeteriaDestacada);
-    setCafeteriaDestacada(cafeterias[(index + 1) % cafeterias.length]);
-    setAutoplay(false); 
-  };
-  
-  const anteriorCafeteria = () => {
-    const index = cafeterias.indexOf(cafeteriaDestacada);
-    setCafeteriaDestacada(cafeterias[(index - 1 + cafeterias.length) % cafeterias.length]);
-    setAutoplay(false); 
-  };
-  
-  useEffect(() => {
-    let intervalo;
-    if (autoplay) {
-      intervalo = setInterval(() => {
-        const index = cafeterias.indexOf(cafeteriaDestacada);
-        setCafeteriaDestacada(cafeterias[(index + 1) % cafeterias.length]);
-      }, 5000); 
-    }
-    return () => clearInterval(intervalo);
-  }, [cafeteriaDestacada, autoplay]);
+  const [cafeterias, setCafeterias] = useState([]);
+  const [allMenus, setAllMenus] = useState([]);
+  const [filteredCafeterias, setFilteredCafeterias] = useState([]);
+  const [facultades, setFacultades] = useState([]);
 
- 
+  const [loading, setLoading] = useState(true);
+  const [cafeteriaDestacada, setCafeteriaDestacada] = useState(null);
+  const [autoplay, setAutoplay] = useState(true);
+
+  // --- FILTROS ---
+  const [filterFacultad, setFilterFacultad] = useState("");
+  const [filterComida, setFilterComida] = useState("");
+  const [filterPrecio, setFilterPrecio] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const categoriasOptions = [
+      "Desayuno", "Almuerzo", "Comida", "Comida Corrida", 
+      "Vegana / Vegetariana", "Fit / Saludable", "Bebidas", "Postres", "Snacks"
+  ];
+
+  const imagenesOriginales = {
+    1: Derecho1, 2: TrabajoSocial, 3: Educacion, 4: Derecho2,
+    5: Historia, 6: IngenieriaQuimica, 7: CivilMinas, 8: Medicina1,
+    9: Matematicas, 10: Artes, 11: Geologia, 13: Medicina2
+  };
+
   useEffect(() => {
- 
-    document.body.style.margin = '0';
-    document.body.style.padding = '0';
-    document.body.style.width = '100%';
-    document.body.style.overflowX = 'hidden';
-    
- 
-    document.documentElement.style.margin = '0';
-    document.documentElement.style.padding = '0';
-    document.documentElement.style.width = '100%';
-    
-    return () => {
- 
-      document.body.style.margin = '';
-      document.body.style.padding = '';
-      document.body.style.width = '';
-      document.body.style.overflowX = '';
-      document.documentElement.style.margin = '';
-      document.documentElement.style.padding = '';
-      document.documentElement.style.width = '';
+    const loadData = async () => {
+      try {
+        const [resCafes, resMenus, resFacus] = await Promise.all([
+            fetch("http://127.0.0.1:8000/api/Tienditas/"),
+            fetch("http://127.0.0.1:8000/api/Menus/"),
+            fetch("http://127.0.0.1:8000/api/Facultades/")
+        ]);
+        
+        const dataCafes = await resCafes.json();
+        const dataMenus = await resMenus.json();
+        const dataFacus = await resFacus.json();
+
+        setCafeterias(dataCafes);
+        setAllMenus(dataMenus);
+        setFacultades(dataFacus);
+        setFilteredCafeterias(dataCafes);
+        if (dataCafes.length > 0) setCafeteriaDestacada(dataCafes[0]);
+        setLoading(false);
+      } catch (e) { console.error(e); }
     };
+    loadData();
   }, []);
 
+  useEffect(() => {
+    let result = cafeterias;
+
+    if (filterFacultad) {
+        result = result.filter(c => c.id_facultad === parseInt(filterFacultad));
+    }
+
+    if (filterComida) {
+        const tiendasConComida = allMenus
+            .filter(m => m.categoria === filterComida)
+            .map(m => m.id_tiendita);
+        result = result.filter(c => tiendasConComida.includes(c.id_tiendita));
+    }
+
+    if (filterPrecio) {
+        const maxPrecio = parseFloat(filterPrecio);
+        const tiendasEnPresupuesto = allMenus
+            .filter(m => parseFloat(m.precio) <= maxPrecio)
+            .map(m => m.id_tiendita);
+        result = result.filter(c => tiendasEnPresupuesto.includes(c.id_tiendita));
+    }
+
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      result = result.filter(c => {
+        const matchNombre = c.nombre.toLowerCase().includes(term);
+        const matchMenu = allMenus.some(m => 
+          m.id_tiendita === c.id_tiendita && m.nombre.toLowerCase().includes(term)
+        );
+        return matchNombre || matchMenu;
+      });
+    }
+
+    setFilteredCafeterias(result);
+  }, [filterFacultad, filterComida, filterPrecio, searchTerm, cafeterias, allMenus]);
+
+  const getHorarioStatus = (list) => {
+    const ahora = new Date();
+    const minutosActuales = ahora.getHours() * 60 + ahora.getMinutes();
+    const abiertas = [];
+    const cerradas = [];
+
+    list.forEach(cafe => {
+      if (!cafe.hora_apertura || !cafe.hora_cierre) {
+        cerradas.push(cafe);
+        return;
+      }
+      const [apH, apM] = cafe.hora_apertura.split(':').map(Number);
+      const [ciH, ciM] = cafe.hora_cierre.split(':').map(Number);
+      const inicio = apH * 60 + apM;
+      const fin = ciH * 60 + ciM;
+
+      if (minutosActuales >= inicio && minutosActuales < fin) abiertas.push(cafe);
+      else cerradas.push(cafe);
+    });
+    return { abiertas, cerradas };
+  };
+
+  const { abiertas, cerradas } = getHorarioStatus(filteredCafeterias);
+
+  const getImageSource = (cafe) => {
+    if (imagenesOriginales[cafe.id_tiendita]) return imagenesOriginales[cafe.id_tiendita];
+    return cafe.imagen_url || LogoDefault;
+  };
 
   return (
-    <div style={{ 
-      margin: 0,
-      padding: 0,
-      width: "100vw", 
-      minHeight: "100vh", 
-      background: "linear-gradient(-45deg, #161b33, #1f2457, #2a3558)",
-      backgroundSize: "100% 100%", 
-      color: "white",
-      paddingTop: "3.2rem", 
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      position: "relative",
-      overflow: "hidden",
-      boxSizing: "border-box" 
-    }}>
-    <Header />
-    
-    {/* Hero Section */}
     <div style={{
-        width: "100%",
-        padding: "4rem 2rem 2rem",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        position: "relative",
-        boxSizing: "border-box" 
-      }}>
-        {/* Efecto de ruido sutil */}
-        <div style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc1IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiBmaWx0ZXI9InVybCgjYSkiIG9wYWNpdHk9IjAuMDUiLz48L3N2Zz4=')",
-          opacity: 0.4,
-          pointerEvents: "none",
-          zIndex: 0
-        }} />
+      minHeight: "100vh", width: "100vw", margin: 0, padding: 0,
+      display: "flex", flexDirection: "column",
+      backgroundColor: "#141b2d", color: "#e4e4e7", overflowX: "hidden"
+    }}>
+      <Header />
 
-        <h1 style={{
-          fontSize: "2.5rem",
-          fontWeight: "700",
-          marginBottom: "1.5rem",
-          textAlign: "center",
-          letterSpacing: "0.5px",
-          textShadow: "0 2px 10px rgba(0,0,0,0.3)",
-          position: "relative",
-          zIndex: 1
-        }}>
-          El Búho Tragón
-        </h1>
-        <p style={{
-          fontSize: "1.25rem",
-          maxWidth: "800px",
-          textAlign: "center",
-          marginBottom: "3rem",
-          color: "rgba(255,255,255,0.85)",
-          lineHeight: "1.6",
-          position: "relative",
-          zIndex: 1
-        }}>
-          Descubre las mejores cafeterías universitarias para disfrutar de comida deliciosa entre clases
-        </p>
-      </div>
+      <main style={{ flexGrow: 1, paddingTop: '7rem', width: '100%' }} className="px-4 sm:px-8 lg:px-16 pb-16">
+
+        {/* --- BUSCADOR --- */}
+        <div className="relative mb-10 max-w-2xl mx-auto">
+             <input
+                type="text"
+                placeholder="¿Qué se te antoja hoy? (ej. Boneless, Pizza...)"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-12 pr-4 py-4 bg-[#1e2538] border border-white/10 rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-yellow-500 shadow-xl transition-all"
+             />
+             <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-yellow-500" size={24} />
+        </div>
+
+        {/* --- FILTROS (DISEÑO CÁPSULA UNA FILA - SIN BARRA NEÓN) --- */}
+        <div className="flex justify-center w-full mb-16">
+            <div className="relative bg-[#1e2538] p-4 rounded-2xl border border-white/10 shadow-2xl inline-block max-w-full overflow-x-auto">
+                
+                <div className="flex flex-nowrap items-center justify-center gap-3 min-w-max">
+                    
+                    <div className="flex items-center gap-2 text-cyan-400 font-bold mr-2 hidden md:flex">
+                        <FiFilter /> <span className="uppercase tracking-wider text-xs">Filtros</span>
+                    </div>
+
+                    <div className="h-6 w-px bg-white/10 hidden md:block"></div>
+
+                    {/* SELECT: FACULTAD */}
+                    <div className="relative group">
+                        <select 
+                            className="px-3 py-2 pr-8 text-sm font-medium bg-[#141b2d] border border-white/20 rounded-lg text-gray-200 focus:outline-none focus:border-cyan-500 hover:bg-[#1a2236] cursor-pointer appearance-none min-w-[160px] transition-all"
+                            value={filterFacultad}
+                            onChange={(e) => setFilterFacultad(e.target.value)}
+                        >
+                            <option value="">Todas las Facultades</option>
+                            {facultades.map(f => <option key={f.id_facultad} value={f.id_facultad}>{f.nombre}</option>)}
+                        </select>
+                        <FiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-cyan-400 transition-colors" size={14} />
+                    </div>
+
+                    <div className="h-6 w-px bg-white/10 hidden md:block"></div>
+
+                    {/* SELECT: COMIDA */}
+                    <div className="relative group">
+                        <select 
+                            className="px-3 py-2 pr-8 text-sm font-medium bg-[#141b2d] border border-white/20 rounded-lg text-gray-200 focus:outline-none focus:border-cyan-500 hover:bg-[#1a2236] cursor-pointer appearance-none min-w-[150px] transition-all"
+                            value={filterComida}
+                            onChange={(e) => setFilterComida(e.target.value)}
+                        >
+                            <option value="">Cualquier Comida</option>
+                            {categoriasOptions.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                        <FiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-cyan-400 transition-colors" size={14} />
+                    </div>
+
+                    <div className="h-6 w-px bg-white/10 hidden md:block"></div>
+
+                    {/* INPUT: PRECIO */}
+                    <div className="relative group">
+                        <input 
+                            type="number"
+                            placeholder="Presupuesto"
+                            className="px-3 py-2 w-28 text-sm font-medium bg-[#141b2d] border border-white/20 rounded-lg text-gray-200 focus:outline-none focus:border-cyan-500 hover:bg-[#1a2236] transition-all placeholder-gray-500"
+                            value={filterPrecio}
+                            onChange={(e) => setFilterPrecio(e.target.value)}
+                        />
+                    </div>
+                    
+                    {/* BOTÓN LIMPIAR */}
+                    {(filterFacultad || filterComida || filterPrecio || searchTerm) && (
+                        <>
+                            <div className="h-6 w-px bg-white/10 hidden md:block"></div>
+                            <button 
+                                onClick={() => {
+                                setFilterFacultad(""); 
+                                setFilterComida(""); 
+                                setFilterPrecio("");
+                                setSearchTerm("");
+                                }}
+                                className="ml-1 p-2 text-red-400 hover:text-white hover:bg-red-500 rounded-lg transition-all border border-red-500/30"
+                                title="Limpiar filtros"
+                            >
+                                <FiX size={16} />
+                            </button>
+                        </>
+                    )}
+                </div>
+                {/* NOTA: SE ELIMINÓ LA BARRA NEÓN DE AQUÍ */}
+            </div>
+        </div>
+
+        {/* --- ESTADO DE CARGA O SIN RESULTADOS --- */}
+        {loading ? (
+             <div className="flex flex-col items-center justify-center py-20 animate-pulse">
+                <img src={BuhoZZZ} className="w-32 h-32 mb-4 opacity-50 drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]" alt="Cargando"/>
+                <p className="text-gray-400 text-xl">Despertando al búho...</p>
+             </div>
+        ) : (
+          <>
+            {/* CASO: 0 RESULTADOS */}
+            {abiertas.length === 0 && cerradas.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-10 animate-float">
+                    <div className="relative w-64 h-64 md:w-80 md:h-80">
+                        <img 
+                            src={BuhoCartel} 
+                            alt="No encontrado" 
+                            className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]"
+                        />
+                        <div className="absolute top-[55%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[60%] text-center rotate-1">
+                            <p className="text-[#3e2723] font-bold text-lg leading-tight font-serif mb-1">
+                                ¿"{searchTerm}"?
+                            </p>
+                            <p className="text-[#5d4037] text-sm font-medium font-serif">
+                                No encontré nada parecido hoy.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* --- SECCIÓN 1: ABIERTAS AHORA (BARRA VERDE NEÓN) --- */}
+            {abiertas.length > 0 && (
+                <div className="mb-16">
+                    <div className="relative flex items-center gap-6 mb-8 bg-[#1e2538]/40 backdrop-blur-md p-6 rounded-3xl border border-white/5 group overflow-hidden">
+                        
+                        <div className="relative transition-transform duration-300 transform group-hover:scale-110">
+                            <img 
+                                src={BuhoChef} 
+                                alt="Chef Búho" 
+                                className="relative h-24 w-24 object-contain -rotate-6 drop-shadow-[0_0_15px_rgba(234,179,8,0.4)]"
+                            />
+                        </div>
+                        
+                        <div>
+                            <div className="flex items-center gap-3">
+                                <span className="h-3 w-3 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_#22c55e]"></span>
+                                <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+                                    Abiertas ahora
+                                </h2>
+                            </div>
+                        </div>
+
+                        {/* --- BARRA VERDE NEÓN AQUÍ --- */}
+                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1/3 h-1.5 bg-green-500 shadow-[0_0_20px_rgba(34,197,94,0.8)] rounded-t-full"></div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 relative z-0">
+                        {abiertas.map((cafeteria) => (
+                            <CafeCard
+                              key={cafeteria.id_tiendita}
+                              name={cafeteria.nombre}
+                              image={getImageSource(cafeteria)}
+                              path={`/cafeterias/${cafeteria.id_tiendita}`}
+                              searchTerm={searchTerm}
+                              cafeteriaMenus={allMenus.filter(m => m.id_tiendita === cafeteria.id_tiendita)}
+                            />
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* --- SECCIÓN 2: CERRADAS AHORA (BARRA ROJA NEÓN) --- */}
+            {cerradas.length > 0 && (
+                <div className="mb-12 opacity-80 hover:opacity-100 transition-opacity duration-500">
+                    <div className="relative flex items-center gap-6 mb-8 bg-[#1e2538]/40 backdrop-blur-md p-6 rounded-3xl border border-white/5 group overflow-hidden">
+                        
+                        <div className="relative transition-transform duration-300 transform group-hover:scale-110">
+                            <img 
+                                src={BuhoZZZ} 
+                                alt="Búho Durmiendo" 
+                                className="h-20 w-20 object-contain rotate-3 grayscale-[20%] drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]" 
+                            />
+                        </div>
+                        
+                        <div>
+                            <div className="flex items-center gap-3">
+                                <span className="h-3 w-3 bg-red-500 rounded-full"></span>
+                                <h2 className="text-3xl font-bold text-gray-300 tracking-tight">
+                                    Cerradas ahora
+                                </h2>
+                            </div>
+                        </div>
+
+                        {/* --- BARRA ROJA NEÓN AQUÍ --- */}
+                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1/3 h-1.5 bg-red-500 shadow-[0_0_20px_rgba(239,68,68,0.8)] rounded-t-full"></div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 relative z-0">
+                        {cerradas.map((cafeteria) => (
+                            <div key={cafeteria.id_tiendita} className="relative filter grayscale-[40%] hover:grayscale-0 transition-all duration-300 group">
+                                <CafeCard
+                                  key={cafeteria.id_tiendita}
+                                  name={cafeteria.nombre}
+                                  image={getImageSource(cafeteria)}
+                                  path={`/cafeterias/${cafeteria.id_tiendita}`}
+                                  searchTerm={searchTerm}
+                                  cafeteriaMenus={allMenus.filter(m => m.id_tiendita === cafeteria.id_tiendita)}
+                                />
+                                <div className="absolute top-4 right-4 bg-red-900/90 text-red-200 text-xs font-bold px-3 py-1 rounded-full shadow-lg pointer-events-none border border-red-500/30">
+                                    CERRADO
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+          </>
+        )}
+
+      </main>
+
+      <Footer />
+      <ChatWidget />
       
-      {/* Cafetería destacada */}
-      <div 
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
-        style={{
-          backdropFilter: "blur(10px)",
-          backgroundColor: "rgba(0, 0, 0, 0.3)",
-          boxShadow: hover 
-		   ? "0 15px 30px rgba(0, 0, 0, 0.3), 0 0 30px rgba(67, 97, 238, 0.15)"
-		   : "0 8px 20px rgba(0, 0, 0, 0.2)",
-          borderRadius: "1rem",
-          marginLeft: "auto",
-          marginRight: "auto",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column",
-          padding: "2rem",
-          textAlign: "center",
-          width: "92%",
-          maxWidth: "900px",
-          position: "relative",
-          transition: "all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1)",
-          transform: hover ? "translateY(-6px)" : "translateY(0)",
-          border: "1px solid rgba(255, 255, 255, 0.08)",
-          zIndex: 2,
-          boxSizing: "border-box" 
-        }}
-    >
-    <h2 style={{ 
-      fontSize: "1.8rem", 
-      fontWeight: "600", 
-      marginBottom: "1.5rem",
-      color: "#fff",
-      display: "flex",
-      alignItems: "center",
-      gap: "0.5rem"
-    }}>
-      <span style={{ 
-        fontSize: "1.5rem", 
-        marginRight: "0.5rem", 
-        color: "#f3a952" 
-      }}>★</span> 
-      Cafetería Destacada
-    </h2>
-    
-    <div style={{ 
-      position: "relative", 
-      width: "100%", 
-      display: "flex", 
-      alignItems: "center", 
-      justifyContent: "center",
-      borderRadius: "1rem",
-      overflow: "hidden",
-      boxShadow: "0 8px 25px rgba(0, 0, 0, 0.25)",
-      boxSizing: "border-box" 
-    }}>
-      <button 
-        onClick={anteriorCafeteria} 
-        style={{
-          position: "absolute",
-          left: "1rem",
-          backgroundColor: "rgba(25, 28, 40, 0.7)",
-          border: "none",
-          borderRadius: "50%",
-          width: "46px",
-          height: "46px",
-          fontSize: "1.2rem",
-          color: "white",
-          cursor: "pointer",
-          backdropFilter: "blur(5px)",
-          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 10,
-          transition: "transform 0.2s ease, background-color 0.2s ease",
-          border: "1px solid rgba(255, 255, 255, 0.1)"
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "scale(1.1)";
-          e.currentTarget.style.backgroundColor = "rgba(30, 33, 48, 0.9)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "scale(1)";
-          e.currentTarget.style.backgroundColor = "rgba(25, 28, 40, 0.7)";
-        }}
-      >
-        ◀
-      </button>
-      
-      <div style={{
-        width: "100%",
-        height: "380px",
-        position: "relative",
-        overflow: "hidden",
-        borderRadius: "0.75rem"
-      }}>
-        <img
-          src={cafeteriaDestacada.image}
-          alt={cafeteriaDestacada.name}
-          style={{ 
-            width: "100%", 
-            height: "100%", 
-            objectFit: "cover",
-            transition: "transform 0.5s ease",
-            transform: hover ? "scale(1.04)" : "scale(1)"
-          }}
-        />
-        {/* Overlay gradiente */}
-        <div style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: "30%",
-          background: "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%)",
-          pointerEvents: "none"
-        }} />
-      </div>
-      
-      <button 
-        onClick={siguienteCafeteria} 
-        style={{
-          position: "absolute",
-          right: "1rem",
-          backgroundColor: "rgba(30, 32, 47, 0.6)",
-          border: "none",
-          borderRadius: "50%",
-          width: "46px",
-          height: "46px",
-          fontSize: "1.2rem",
-          color: "white",
-          cursor: "pointer",
-          backdropFilter: "blur(5px)",
-          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 10,
-          transition: "transform 0.2s ease, background-color 0.2s ease",
-          border: "1px solid rgba(255, 255, 255, 0.1)"
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "scale(1.1)";
-          e.currentTarget.style.backgroundColor = "rgba(30, 33, 48, 0.9)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "scale(1)";
-          e.currentTarget.style.backgroundColor = "rgba(25, 28, 40, 0.7)";
-        }}
-      >
-        ▶
-      </button>
-    </div>
-    
-    <div style={{
-      marginTop: "1.5rem",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      gap: "0.5rem"
-    }}>
-      <h3 style={{ 
-        fontSize: "1.5rem", 
-        fontWeight: "600",
-        color: "#ffffff"
-      }}>
-        {cafeteriaDestacada.name}
-      </h3>
-      <div style={{
-        display: "flex",
-        gap: "0.25rem",
-        marginTop: "0.25rem"
-      }}>
-        {cafeterias.map((_, index) => (
-          <div 
-            key={index}
-            style={{
-              width: "8px",
-              height: "8px",
-              borderRadius: "50%",
-              backgroundColor: cafeterias[index] === cafeteriaDestacada 
-			     ? "#4361ee" 
-			     : "rgba(255, 255, 255, 0.3)",
-              transition: "all 0.3s ease"
-            }}
-          />
-        ))}
-      </div>
-    </div>
-    </div>
-    
-    {/* Cards de cafeterías */}
-    <div style={{ 
-      padding: "4rem 2rem", 
-      width: "100%",
-      maxWidth: "1200px",
-      margin: "0 auto",
-      boxSizing: "border-box" 
-    }}>
-      <h2 style={{ 
-        fontSize: "1.8rem", 
-        fontWeight: "600", 
-        marginBottom: "2rem", 
-        textAlign: "center",
-        position: "relative",
-        display: "inline-block",
-        left: "50%",
-        transform: "translateX(-50%)"
-      }}>
-        <span style={{ position: "relative" }}>
-          Todas nuestras cafeterías
-          <span style={{ 
-            position: "absolute", 
-            bottom: "-6px", 
-            left: "25%", 
-            width: "50%", 
-            height: "3px", 
-            background: "#4361ee", 
-            borderRadius: "2px" 
-          }}></span>
-        </span>
-      </h2>
-      
-      <div style={{ 
-        display: "grid", 
-        gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", 
-        gap: "1.5rem", 
-        width: "100%",
-        justifyContent: "center"
-      }}>
-        {cafeterias.map((cafeteria, index) => (
-          <CafeCard
-            key={index}
-            name={cafeteria.name}
-            image={cafeteria.image}
-            background="rgba(30, 32, 47, 0.6)"
-	    path={cafeteria.path}
-          />
-        ))}
-      </div>
-    </div>
-    
-    <Footer />
-    
-    {/* Estilos CSS globales para la animación del fondo */}
-    <style jsx global>{`
-        @keyframes backgroundAnimation {
-          0% { background-position: 0% 50% }
-          50% { background-position: 100% 50% }
-          100% { background-position: 0% 50% }
+      <style jsx>{`
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
         }
-        
-        * {
-          box-sizing: border-box;
-          margin: 0;
-          padding: 0;
-        }
-        
-        html, body, #root, #__next {
-          width: 100%;
-          min-height: 100vh;
-          margin: 0;
-          padding: 0;
-          overflow-x: hidden;
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
         }
       `}</style>
     </div>

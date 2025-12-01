@@ -1,0 +1,25 @@
+# Production RAG System - Requirements
+# El Búho Tragón - UNISON
+
+# Core RAG
+faiss-cpu>=1.8.0
+sentence-transformers>=2.6.0
+
+# LLM (CPU-optimized)
+# Pinning transformers to avoid Phi-3 compatibility issues
+transformers>=4.40.0,<4.46.0
+torch>=2.1.0
+accelerate>=0.25.0
+
+# Tokenizers (helps with model loading)
+tokenizers>=0.15.0
+
+# Database
+pymysql==1.1.0
+
+# Utilities
+numpy>=1.24.3
+
+# Optional but recommended for better performance
+sentencepiece>=0.1.99  # For some tokenizers
+protobuf>=3.20.0       # For model configs
