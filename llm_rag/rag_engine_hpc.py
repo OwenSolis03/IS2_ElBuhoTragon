@@ -5,16 +5,17 @@ Optimizado para: AMD GPU (ROCm)
 """
 
 import json
-import numpy as np
-import faiss
-from sentence_transformers import SentenceTransformer
-from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
-from math import radians, sin, cos, sqrt, atan2
-from typing import List, Dict, Optional, Tuple
-import torch
+import logging
 import os
 import re
-import logging
+from math import radians, sin, cos, sqrt, atan2
+from typing import List, Dict, Optional, Tuple
+
+import faiss
+import numpy as np
+import torch
+from sentence_transformers import SentenceTransformer
+from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 
 # Configurar logging
 logging.basicConfig(
@@ -280,7 +281,11 @@ INSTRUCCIONES DE UBICACIÓN:
 {loc_ctx if location_name else "Ubicación desconocida."}
 Si preguntan "¿Qué tan lejos?", lee el campo "DISTANCIA" de la cafetería destino.
 "Servicio Social" = "Trabajo Social".
-"Mates" = "Matemáticas".
+
+INSTRUCCIONES DE FORMATO (ESTRICTO):
+1. NO uses negritas (asteriscos **). Escribe solo texto plano.
+2. Cuando menciones varias opciones (cafeterías o platillos), usa SIEMPRE una lista vertical con viñetas.
+3. Coloca cada opción en una línea nueva. NO escribas todo en un solo párrafo.
 
 INSTRUCCIONES DE RESPUESTA:
 1. Sé conciso y natural.
@@ -313,9 +318,19 @@ Pregunta: {question}
 
         answer = outputs[0]['generated_text'].strip()
 
-        # Limpieza final
+        # Limpieza de tags del modelo
         for tag in ["<|im_end|>", "<|im_start|>", "assistant", "user", "system"]:
             answer = answer.replace(tag, "")
+
+        # --- NUEVA LIMPIEZA DE FORMATO ---
+        # 1. Eliminar asteriscos de negritas
+        answer = answer.replace("**", "").replace("__", "")
+
+        # 2. Forzar saltos de línea si el modelo usó listas numeradas pegadas (ej: "1. Comida 2. Cena")
+        # Esto busca "numero. " y le pone un salto de línea antes
+        answer = re.sub(r'(\s)(\d+\.)', r'\n\2', answer)
+
+        # 3. Eliminar etiqueta de "Respuesta:" si la hubiera
         answer = re.sub(r'Respuesta:?\s*', '', answer, flags=re.IGNORECASE).strip()
 
         self.chat_history.append((question, answer))
