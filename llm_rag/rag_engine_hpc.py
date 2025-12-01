@@ -277,27 +277,35 @@ class BuhoRAG:
         prompt = f"""<|im_start|>system
 Eres "El Búho Tragón", asistente experto de UNISON.
 
-INSTRUCCIONES DE UBICACIÓN:
+UBICACIÓN:
 {loc_ctx if location_name else "Ubicación desconocida."}
-Si preguntan "¿Qué tan lejos?", lee el campo "DISTANCIA" de la cafetería destino.
 "Servicio Social" = "Trabajo Social".
 
-INSTRUCCIONES DE FORMATO (ESTRICTO):
-1. NO uses negritas (asteriscos **). Escribe solo texto plano.
-2. Cuando menciones varias opciones (cafeterías o platillos), usa SIEMPRE una lista vertical con viñetas.
-3. Coloca cada opción en una línea nueva. NO escribas todo en un solo párrafo.
+FORMATO OBLIGATORIO:
+- NO uses asteriscos ** ni negritas
+- Cuando listes cafeterías o platillos, SIEMPRE formato así:
 
-INSTRUCCIONES DE RESPUESTA:
-1. Sé conciso y natural.
-2. Si el usuario pide "algo más barato", busca en el menú precios menores a lo anterior.
-{f"3. PRESUPUESTO USUARIO: ${budget_val} pesos." if budget_val else ""}
+Ejemplo correcto:
+"Los molletes están en:
+
+• Cafeteria Artes: Mollete ($30)
+• Cafeteria Derecho: Mollete ($30)
+• Cafeteria Historia: Mollete ($50)"
+
+NUNCA escribas: "- Cafeteria X: ... - Cafeteria Y: ..."
+SIEMPRE usa salto de línea + bullet (•) antes de cada opción.
+
+REGLAS:
+1. Respuestas cortas y directas
+2. Si preguntan "más barato", busca precios menores
+{f"3. PRESUPUESTO: ${budget_val} pesos" if budget_val else ""}
 
 <|im_end|>
 <|im_start|>user
-HISTORIAL RECIENTE:
+HISTORIAL:
 {history_str}
 
-INFORMACIÓN DISPONIBLE:
+DATOS:
 {chr(10).join(context_docs)}
 
 Pregunta: {question}
