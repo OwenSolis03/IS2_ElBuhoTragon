@@ -354,13 +354,6 @@ cd ../backend
 python manage.py runserver 0.0.0.0:8000
 ```
 
-### Acceso remoto vía SSH Tunnel
-
-```bash
-ssh -L 8000:localhost:8000 usuario@yuca.acarus.uson.mx
-# Accede desde tu navegador en http://localhost:8000
-```
-
 ---
 
 ## 🤝 Contribuciones
