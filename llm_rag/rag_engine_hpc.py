@@ -14,8 +14,9 @@ from typing import List, Dict, Optional, Tuple
 import faiss
 import numpy as np
 import torch
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer, CrossEncoder
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+from thefuzz import fuzz, process
 
 # Configurar logging
 logging.basicConfig(
@@ -46,6 +47,7 @@ class BuhoRAG:
 
         # Modelos
         self.embedding_model = None
+        self.cross_encoder = None
         self.llm_pipeline = None
         self.tokenizer = None
         self.device = None
@@ -138,7 +140,11 @@ class BuhoRAG:
 
         if self.embedding_model is None:
             logger.info("📥 Cargando embeddings...")
-            self.embedding_model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2', device='cpu')
+            self.embedding_model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2', device='cpu')
+
+        if getattr(self, 'cross_encoder', None) is None:
+            logger.info("📥 Cargando modelo Cross-Encoder para Re-ranking...")
+            self.cross_encoder = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2', device='cpu')
 
         if self.llm_pipeline is None:
             logger.info("📥 Cargando LLM Qwen 14B...")
@@ -164,16 +170,35 @@ class BuhoRAG:
         if any(x in query_lower for x in ['caborca', 'navojoa', 'nogales', 'cajeme', 'santa ana']):
             return None, None, None
 
-        for place, coords in self.known_locations.items():
-            if place in query_lower:
-                logger.info(f"📍 Ubicación detectada: '{place}'")
-                return coords[0], coords[1], place
+        # Extracción de tokens y bigramas para el Fuzzy Matching
+        words = query_lower.replace('?', '').replace(',', '').replace('.', '').split()
+        bigrams = [' '.join(words[i:i+2]) for i in range(len(words)-1)]
+        tokens = words + bigrams
+
+        aliases = list(self.known_locations.keys())
+        best_score = 0
+        best_match = None
+
+        # Usar thefuzz para coincidencia aproximada (>85% confianza)
+        for token in tokens:
+            if len(token) < 4: continue # Ignorar palabras muy cortas
+            match, score = process.extractOne(token, aliases, scorer=fuzz.ratio)
+            if score > best_score:
+                best_score = score
+                best_match = match
+
+        if best_score > 85:
+            logger.info(f"📍 Ubicación detectada por fuzzy match: '{best_match}' (Confianza: {best_score}%)")
+            coords = self.known_locations[best_match]
+            return coords[0], coords[1], best_match
+
         return None, None, None
 
-    def build_index(self, ref_lat: Optional[float] = None, ref_lon: Optional[float] = None):
+    def build_index(self):
         if not self.data: self.load_data()
         self._load_models()
         self.documents = []
+        self.doc_metadata = []
 
         menus_by_store = {}
         for menu in self.data.get('menus', []):
@@ -183,55 +208,155 @@ class BuhoRAG:
 
         tienditas = self.data.get('tienditas', [])
 
-        if ref_lat and ref_lon:
-            for t in tienditas:
-                t['distancia_temp'] = self.calculate_distance(ref_lat, ref_lon, t.get('latitud'), t.get('longitud'))
-            tienditas.sort(key=lambda x: x.get('distancia_temp', 9999999))
-            logger.info("📍 Cafeterías reordenadas por distancia")
-
         for tienda in tienditas:
             tid = tienda.get('id_tiendita')
-            # Limpiar nombre (CamelCase -> Espacios)
             nombre_limpio = re.sub(r'([a-z])([A-Z])', r'\1 \2', tienda.get('nombre', 'Desconocida'))
 
-            lines = [f"CAFETERÍA: {nombre_limpio}"]
-            lines.append(f"UBICACIÓN: {tienda.get('direccion', '')}, {tienda.get('facultad_nombre', '')}")
-
-            if 'distancia_temp' in tienda:
-                dist = tienda['distancia_temp']
-                lines.append(f"DISTANCIA: {dist:.0f} metros") # Formato simple para el LLM
+            base_lines = [f"CAFETERÍA: {nombre_limpio}"]
+            base_lines.append(f"UBICACIÓN: {tienda.get('direccion', '')}, {tienda.get('facultad_nombre', '')}")
 
             if tienda.get('hora_apertura'):
-                lines.append(f"HORARIO: {str(tienda['hora_apertura'])[:5]} - {str(tienda['hora_cierre'])[:5]}")
+                base_lines.append(f"HORARIO: {str(tienda['hora_apertura'])[:5]} - {str(tienda['hora_cierre'])[:5]}")
 
-            lines.append("\nMENÚ:")
-            if menus_by_store.get(tid):
-                for m in menus_by_store[tid][:50]:
-                    try:
-                        precio = float(m['precio'])
-                        nombre_platillo = m['nombre'].strip().replace("\n", " ")
-                        lines.append(f"- {nombre_platillo} (${precio:.0f} MXN)")
-                    except: pass
-            else:
+            store_menus = menus_by_store.get(tid, [])
+
+            if not store_menus:
+                lines = list(base_lines)
+                lines.append("\nMENÚ:")
                 lines.append("(Sin menú disponible)")
+                self.documents.append("\n".join(lines))
+                self.doc_metadata.append({
+                    'id': tid,
+                    'name': nombre_limpio,
+                    'latitud': tienda.get('latitud'),
+                    'longitud': tienda.get('longitud')
+                })
+            else:
+                cats = {}
+                for m in store_menus:
+                    c = m.get('categoria', 'Varios')
+                    if c not in cats: cats[c] = []
+                    cats[c].append(m)
 
-            self.documents.append("\n".join(lines))
+                for cat, items in cats.items():
+                    lines = list(base_lines)
+                    lines.append(f"\nMENÚ ({cat.upper()}):")
+                    for m in items:
+                        try:
+                            precio = float(m['precio'])
+                            nombre_platillo = m['nombre'].strip().replace("\n", " ")
+                            lines.append(f"- {nombre_platillo} (${precio:.0f} MXN)")
+                        except: pass
+                    
+                    self.documents.append("\n".join(lines))
+                    self.doc_metadata.append({
+                        'id': tid,
+                        'name': nombre_limpio,
+                        'latitud': tienda.get('latitud'),
+                        'longitud': tienda.get('longitud')
+                    })
 
         embeddings = self.embedding_model.encode(self.documents, show_progress_bar=False)
         self.faiss_index = faiss.IndexFlatL2(embeddings.shape[1])
         self.faiss_index.add(np.array(embeddings).astype('float32'))
-        logger.info("✅ Índice FAISS actualizado")
+        logger.info("✅ Índice FAISS estático construido")
 
-    def _retrieve_context(self, query: str, k: int = 8) -> List[str]:
+    def _retrieve_context(self, query: str, user_lat: Optional[float] = None, user_lon: Optional[float] = None, k: int = 8) -> List[str]:
         q_emb = self.embedding_model.encode([query])
-        D, I = self.faiss_index.search(np.array(q_emb).astype('float32'), k)
-        return [self.documents[i] for i in I[0]]
+        
+        search_k = min(k * 5, self.faiss_index.ntotal) if self.faiss_index.ntotal > 0 else k
+        D, I = self.faiss_index.search(np.array(q_emb).astype('float32'), search_k)
+        
+        results = []
+        seen_cafeterias = {}
+
+        for idx in I[0]:
+            if len(results) >= k:
+                break
+                
+            if idx == -1: continue
+            
+            doc = self.documents[idx]
+            
+            if hasattr(self, 'doc_metadata'):
+                meta = self.doc_metadata[idx]
+                store_id = meta.get('id')
+                
+                if store_id:
+                    if seen_cafeterias.get(store_id, 0) >= 3:
+                        continue
+                    seen_cafeterias[store_id] = seen_cafeterias.get(store_id, 0) + 1
+                
+                lat2, lon2 = meta.get('latitud'), meta.get('longitud')
+                if user_lat and user_lon and lat2 and lon2:
+                    dist = self.calculate_distance(user_lat, user_lon, lat2, lon2)
+                    
+                    if dist > 2500:
+                        continue
+                        
+                    lines = doc.split('\n')
+                    lines.insert(2, f"DISTANCIA: {dist:.0f} metros")
+                    doc = '\n'.join(lines)
+                    
+            results.append(doc)
+            
+        if not results:
+            return []
+
+        # Re-ranking con CrossEncoder
+        cross_inp = [[query, doc] for doc in results]
+        scores = self.cross_encoder.predict(cross_inp)
+        
+        doc_score_pairs = list(zip(results, scores))
+        doc_score_pairs.sort(key=lambda x: x[1], reverse=True)
+        
+        return [doc for doc, score in doc_score_pairs[:k]]
+
+    def _reformulate_query(self, question: str) -> str:
+        if not self.chat_history:
+            return question
+
+        history_str = ""
+        for q, a in self.chat_history[-3:]:
+            history_str += f"Usuario: {q}\nBúho: {a}\n"
+
+        prompt = f"""<|im_start|>system
+Eres un asistente que reescribe la última pregunta del usuario para que sea entendible por sí sola, usando el historial del chat.
+Si la pregunta actual ya es clara e independiente, devuélvela exactamente igual. Responde ÚNICAMENTE con la pregunta reformulada, sin dar explicaciones ni comentarios extra.
+<|im_end|>
+<|im_start|>user
+Historial:
+{history_str}
+Pregunta actual: {question}
+<|im_end|>
+<|im_start|>assistant
+"""
+        outputs = self.llm_pipeline(
+            prompt,
+            max_new_tokens=60,
+            return_full_text=False,
+            temperature=0.1,
+            top_p=0.9,
+            do_sample=False,
+            pad_token_id=self.tokenizer.eos_token_id
+        )
+        reformulated = outputs[0]['generated_text'].strip()
+        
+        for tag in ["<|im_end|>", "<|im_start|>", "assistant", "user", "system"]:
+            reformulated = reformulated.replace(tag, "")
+            
+        reformulated = reformulated.strip()
+        logger.info(f"🔄 Reformulada: '{question}' -> '{reformulated}'")
+        return reformulated if reformulated else question
 
     def query(self, question: str, user_lat=None, user_lon=None) -> Dict:
         logger.info(f"💬 Consulta: {question[:50]}...")
 
+        self._load_models()
+        search_query = self._reformulate_query(question)
+
         # 1. Detectar Presupuesto
-        budget_match = re.search(r'(\d+)\s*(pesos|mxn|\$)', question.lower())
+        budget_match = re.search(r'(\d+)\s*(pesos|mxn|\$)', search_query.lower())
         budget_val = float(budget_match.group(1)) if budget_match else None
 
         # 2. Gestionar Ubicación (GPS vs Texto)
@@ -240,29 +365,22 @@ class BuhoRAG:
 
         if not target_lat:
             # Buscar en texto con alias
-            found_lat, found_lon, found_name = self.get_coords_from_query(question)
+            found_lat, found_lon, found_name = self.get_coords_from_query(search_query)
             if found_lat:
                 target_lat, target_lon = found_lat, found_lon
                 location_name = found_name.upper() # Ej: "SERVICIO SOCIAL"
 
-        # 3. Actualizar Índice si es necesario
-        if not self.faiss_index: self.build_index()
+        # 3. Construir Índice (Solo una vez)
+        if not self.faiss_index: 
+            self.build_index()
 
         if target_lat and target_lon:
-            # Reconstruir solo si nos movimos significativamente o es la primera vez con ubicación
-            should_rebuild = False
-            if self.current_user_lat is None: should_rebuild = True
-            elif target_lat != self.current_user_lat or target_lon != self.current_user_lon: should_rebuild = True
-
-            if should_rebuild:
-                logger.info(f"📍 Moviendo referencia a: {location_name}")
-                self.build_index(target_lat, target_lon)
-                self.current_user_lat = target_lat
-                self.current_user_lon = target_lon
+            self.current_user_lat = target_lat
+            self.current_user_lon = target_lon
+            logger.info(f"📍 Usando referencia de: {location_name}")
 
         # 4. Generar Respuesta
-        self._load_models()
-        context_docs = self._retrieve_context(question, k=10)
+        context_docs = self._retrieve_context(search_query, target_lat, target_lon, k=10)
 
         # Historial de 6 turnos
         history_str = ""

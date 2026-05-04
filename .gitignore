@@ -1,63 +1,27 @@
-# -*- mode: gitignore; -*-
+# === IS2_ElBuhoTragon Optimized Ignore ===
+# Temporales y editores
+.idea/
+.vscode/
+*.iml
+**/.cache/
+*.swp
+*.bak
+.agent/
+.claude/
+.gemini/
 
-# Ignorar archivos temporales de emacs
-\#*\#
-.\#*
-
-# Ignorar archivos org-mode
-.Org*
-.org* 
-
-# Ignorar archivos comprimidos, ejecutables y de estilo
-.zip
-.exe
-
-# Ignorar directorio de entorno virtual de Python
-Ingenieria-de-Software-2025-1/
-
-# Ignorar archivos de base de datos
-db.sqlite3*
-
-# Archivos de logs
-backend/*.log
-
-# Ignorar directorio de caché de Python
-backend/__pycache__/
-
-# Ignorar caché de Python
-__pycache__/
+# Python
+**/__pycache__/
 *.pyc
-
-# Ignorar archivos de entorno
+*.pyo
+db.sqlite3
 backend/.env
 frontend/.env
+Ingenieria-de-Software-2025-1/
 
-# Archivos y directorios generados por IDEs como WebStorm / VSCode
-**/.idea/
-**/.vscode/
-*.iml
-
-# Archivos de caché
-**/.cache/
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-# Módulos de Node.js (ignorar node_modules en cualquier subcarpeta)
+# Node / Frontend
 **/node_modules/
-=======
-# Modulo de node 
-node_modules/
+package-lock.json
 
-# Modulos de node 
-frontend/node_modules/
->>>>>>> f6168005f38a45fac435da9c0110e126fcc9e6ef
-=======
-# Módulos de Node.js (ignorar node_modules en cualquier subcarpeta)
-**/node_modules/
->>>>>>> 899807cebdd2adec4892ba9c47b23284770cbbb5
-
-# Archivos de temporales y backups
-*.swp
-*.swo
-*.bak
-
+# GitNexus (Evitar bucles recursivos)
+.gitnexus/

@@ -199,10 +199,10 @@ class MenusPorTiendita(generics.ListAPIView):
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../../llm_rag'))
 
 try:
-    from rag_engine_hpc import BuhoRAG
+    from rag_engine import BuhoRAG
     RAG_AVAILABLE = True
 except ImportError as e:
-    logger.warning(f"⚠️ RAG no disponible: {e}")
+    logger.warning(f"[WARN] RAG no disponible: {e}")
     RAG_AVAILABLE = False
     BuhoRAG = None
 
@@ -221,11 +221,11 @@ def get_rag_instance():
         raise RuntimeError("RAG engine no está disponible")
 
     if _rag_instance is None:
-        logger.info("🦉 Inicializando RAG por primera vez...")
+        logger.info("[Buho] Inicializando RAG por primera vez...")
         _rag_instance = BuhoRAG()
         _rag_instance.load_data()
         _rag_instance.build_index()
-        logger.info("✅ RAG inicializado correctamente")
+        logger.info("[OK] RAG inicializado correctamente")
 
     return _rag_instance
 
@@ -270,18 +270,18 @@ def chatbot_query(request):
             rag.reset_conversation()
             return Response({
                 'success': True,
-                'answer': '🔄 Conversación reiniciada. ¿En qué puedo ayudarte ahora?',
+                'answer': 'Conversacion reiniciada. En que puedo ayudarte ahora?',
                 'metadata': {'command': 'reset'}
             })
 
         # Procesar consulta normal
-        logger.info(f"💬 Consulta chatbot: {message[:50]}...")
+        logger.info(f"[Chat] Consulta chatbot: {message[:50]}...")
         rag = get_rag_instance()
         result = rag.query(message, user_lat=user_lat, user_lon=user_lon)
 
         # FIX: Verificar que los saltos de línea están presentes
         answer_text = result['answer']
-        logger.info(f"📝 Respuesta con {answer_text.count(chr(10))} saltos de línea")
+        logger.info(f"[Chat] Respuesta con {answer_text.count(chr(10))} saltos de linea")
 
         return Response({
             'success': True,
@@ -295,17 +295,17 @@ def chatbot_query(request):
         }, status=status.HTTP_200_OK)
 
     except RuntimeError as e:
-        logger.error(f"❌ Error de configuración RAG: {e}")
+        logger.error(f"[ERROR] Error de configuracion RAG: {e}")
         return Response({
             'success': False,
             'error': 'El servicio de chatbot no está configurado correctamente'
         }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
     except Exception as e:
-        logger.error(f"❌ Error inesperado en chatbot: {e}", exc_info=True)
+        logger.error(f"[ERROR] Error inesperado en chatbot: {e}", exc_info=True)
         return Response({
             'success': False,
-            'error': 'Ups, algo salió mal. ¿Puedes intentar de nuevo? 🦉'
+            'error': 'Ups, algo salio mal. Puedes intentar de nuevo?'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
