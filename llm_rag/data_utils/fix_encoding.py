@@ -46,13 +46,13 @@ def clean_dict(obj):
         return obj
 
 def main():
-    print("🧹 Limpiando JSON...")
+    print("Limpiando JSON...")
 
     # Leer archivo original
     with open('rag_data_fixed_R.json', 'r', encoding='utf-8') as f:
         data = json.load(f)
 
-    print(f"✅ Leído: {len(data.get('menus', []))} menus, "
+    print(f"Leído: {len(data.get('menus', []))} menus, "
           f"{len(data.get('tienditas', []))} tienditas, "
           f"{len(data.get('facultades', []))} facultades")
 
@@ -63,10 +63,10 @@ def main():
     with open('rag_data_clean.json', 'w', encoding='utf-8') as f:
         json.dump(data_clean, f, ensure_ascii=False, indent=2)
 
-    print("✅ Guardado en: rag_data_clean.json")
+    print("Guardado en: rag_data_clean.json")
 
     # Mostrar ejemplos de cambios
-    print("\n📝 Ejemplos de cambios:")
+    print("\nEjemplos de cambios:")
     for i, menu in enumerate(data['menus'][:3]):
         if menu.get('nombre'):
             original = menu['nombre']

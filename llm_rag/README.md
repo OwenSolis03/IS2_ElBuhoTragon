@@ -7,11 +7,13 @@ Sistema de IA conversacional para consultas sobre cafeterías del campus UNISON.
 ```
 IS2_ElBuhoTragon/
 └── llm_rag/
-    ├── __init__.py
-    ├── rag_engine.py          # Motor RAG principal
+    ├── __init__.py            # Contiene el Singleton get_rag_engine()
+    ├── rag_engine_hpc.py      # Motor RAG principal (HPC)
+    ├── rag_utils.py           # Utilidades y geolocalización
     ├── rag_data_fixed.json    # Datos de cafeterías
+    ├── data_utils/            # Scripts auxiliares de datos
     ├── requirements.txt       # Dependencias
-    └── README.md             # Este archivo
+    └── README.md              # Este archivo
 ```
 
 ## 🚀 Quick Start
@@ -34,12 +36,11 @@ python rag_engine.py
 ### 3. Usar en Código
 
 ```python
-from llm_rag.rag_engine import BuhoRAG
+from llm_rag import get_rag_engine
 
-# Inicializar
-rag = BuhoRAG(data_path="rag_data_fixed.json")
-rag.load_data()
-rag.build_index()
+# Inicializar (usar Singleton)
+rag = get_rag_engine(data_path="rag_data_fixed.json")
+# get_rag_engine ya carga los datos e inicializa FAISS automáticamente
 
 # Consultar
 result = rag.query("¿Cuánto cuesta la Torta Cubana?")
@@ -53,7 +54,7 @@ Este sistema está optimizado para **minimizar alucinaciones**:
 1. **Temperatura baja (0.1)** - Reduce creatividad, aumenta precisión
 2. **Prompts estrictos** - Instrucciones claras de no inventar
 3. **Contexto explícito** - Marca claramente qué información usar
-4. **Modelo robusto** - Phi-3-mini entrenado para seguir instrucciones
+4. **Modelo robusto** - Qwen2.5-14B-Instruct entrenado para seguir instrucciones
 5. **Validación de contexto** - Solo responde con info disponible
 
 ## 📍 Uso con Ubicación del Usuario
@@ -74,7 +75,7 @@ result = rag.query(
 ### Opción 1: Singleton (Recomendado para Producción)
 
 ```python
-from llm_rag.rag_engine import get_rag_engine
+from llm_rag import get_rag_engine
 
 # En tu view
 def chat_endpoint(request):
@@ -86,7 +87,7 @@ def chat_endpoint(request):
 ### Opción 2: Instancia Manual
 
 ```python
-from llm_rag.rag_engine import BuhoRAG
+from llm_rag.rag_engine_hpc import BuhoRAG
 
 # Inicializar una vez al iniciar Django
 rag_engine = BuhoRAG()
@@ -115,7 +116,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # 3. Probar
-python rag_engine.py
+python rag_engine_hpc.py
 ```
 
 ### Desde tu Laptop (SSH Tunnel)
@@ -132,9 +133,9 @@ ssh -L 8000:localhost:8000 a223201053@turing.mat.uson.mx
 | Métrica | Valor |
 |---------|-------|
 | **Primera consulta** | ~10-30 segundos (carga modelos) |
-| **Consultas siguientes** | ~2-5 segundos |
-| **Memoria RAM requerida** | ~4-6 GB |
-| **Tamaño modelos** | ~2.5 GB (descarga única) |
+| **Consultas siguientes** | ~1-3 segundos |
+| **Hardware Requerido** | AMD Instinct MI210 (64GB VRAM) o equivalente |
+| **Tamaño modelos** | ~28 GB (Qwen-14B-Instruct float16) |
 
 ## 🐛 Troubleshooting
 
@@ -151,11 +152,11 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 ### Error: "Out of memory"
 
-**Solución:** Cambiar a modelo más ligero en `rag_engine.py`:
+**Solución:** Cambiar a modelo más ligero en `rag_engine_hpc.py` o aplicar cuantización en el pipeline:
 
 ```python
-# Línea 70, cambiar:
-model_id = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"  # Más ligero
+# Línea ~150, cambiar:
+model_id = "Qwen/Qwen2.5-3B-Instruct"  # Más ligero
 ```
 
 ### LLM sigue alucinando
@@ -167,7 +168,7 @@ model_id = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"  # Más ligero
 
 ### Primera consulta muy lenta
 
-**Solución:** Esto es normal. Los modelos se cargan en memoria. Usa el singleton `get_rag_engine()` para mantener modelos cargados.
+**Solución:** Esto es normal, los modelos se cargan en VRAM. Además, implementamos caché persistente de FAISS en disco. Usa el singleton `get_rag_engine()` para mantener los modelos precargados.
 
 ## 🔄 Actualizar Datos
 
@@ -208,7 +209,7 @@ Este sistema está listo para integrarse con tu chat widget del frontend. Cuando
 
 Para dudas sobre este sistema RAG:
 - Revisar este README
-- Ejecutar `python rag_engine.py` para testing
+- Ejecutar `python rag_engine_hpc.py` para testing
 - Verificar logs del servidor
 
 ## 🔐 Seguridad

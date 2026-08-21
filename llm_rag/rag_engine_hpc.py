@@ -1,5 +1,5 @@
 """
-🦉 El Búho Tragón - Sistema RAG para Chatbot Web
+El Búho Tragón - Sistema RAG para Chatbot Web
 Versión: 3.0 (Producción - Alias + Distancias + Contexto)
 Optimizado para: AMD GPU (ROCm)
 """
@@ -33,7 +33,7 @@ class BuhoRAG:
     """
 
     def __init__(self, data_path: str = None):
-        logger.info("🦉 Inicializando El Búho Tragón RAG System v3.0...")
+        logger.info("Inicializando El Búho Tragón RAG System v3.0...")
 
         if data_path is None:
             script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -56,29 +56,29 @@ class BuhoRAG:
         self.current_user_lat = None
         self.current_user_lon = None
 
-        logger.info("✅ RAG System inicializado correctamente")
+        logger.info("RAG System inicializado correctamente")
 
     def load_data(self):
         if not os.path.exists(self.data_path):
             raise FileNotFoundError(f"No se encontró {self.data_path}")
         with open(self.data_path, 'r', encoding='utf-8') as f:
             self.data = json.load(f)
-        logger.info(f"📂 Datos cargados: {len(self.data.get('tienditas', []))} cafeterías")
+        logger.info(f"Datos cargados: {len(self.data.get('tienditas', []))} cafeterías")
 
     def _load_models(self):
         if self.device is None:
             self.device, self.dtype = detect_device()
 
         if self.embedding_model is None:
-            logger.info("📥 Cargando embeddings...")
-            self.embedding_model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2', device='cpu')
+            logger.info("Cargando embeddings...")
+            self.embedding_model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2', device=self.device)
 
         if getattr(self, 'cross_encoder', None) is None:
-            logger.info("📥 Cargando modelo Cross-Encoder para Re-ranking...")
-            self.cross_encoder = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2', device='cpu')
+            logger.info("Cargando modelo Cross-Encoder para Re-ranking...")
+            self.cross_encoder = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2', device=self.device)
 
         if self.llm_pipeline is None:
-            logger.info("📥 Cargando LLM Qwen 14B...")
+            logger.info("Cargando LLM Qwen 14B...")
             model_id = "Qwen/Qwen2.5-14B-Instruct"
             self.tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
             model = AutoModelForCausalLM.from_pretrained(
@@ -86,11 +86,39 @@ class BuhoRAG:
                 low_cpu_mem_usage=True, attn_implementation="eager"
             )
             self.llm_pipeline = pipeline("text-generation", model=model, tokenizer=self.tokenizer, torch_dtype=self.dtype)
-            logger.info("✅ LLM cargado")
+            logger.info("LLM cargado")
 
     def build_index(self):
         if not self.data: self.load_data()
         self._load_models()
+        
+        # --- CACHÉ DE FAISS ---
+        import pickle
+        cache_dir = os.path.join(os.path.dirname(self.data_path), ".cache")
+        os.makedirs(cache_dir, exist_ok=True)
+        
+        # Usar la fecha de modificación del json como clave de validación
+        mtime = os.path.getmtime(self.data_path)
+        cache_key = f"{mtime}"
+        
+        index_path = os.path.join(cache_dir, "faiss.index")
+        meta_path = os.path.join(cache_dir, "docs_meta.pkl")
+        key_path = os.path.join(cache_dir, "cache.key")
+        
+        if os.path.exists(index_path) and os.path.exists(meta_path) and os.path.exists(key_path):
+            with open(key_path, "r") as f:
+                saved_key = f.read().strip()
+            if saved_key == cache_key:
+                logger.info("Cargando índice FAISS y documentos desde caché...")
+                self.faiss_index = faiss.read_index(index_path)
+                with open(meta_path, "rb") as f:
+                    cached_data = pickle.load(f)
+                    self.documents = cached_data["documents"]
+                    self.doc_metadata = cached_data["doc_metadata"]
+                return
+        
+        logger.info("Reconstruyendo índice FAISS desde cero...")
+        
         self.documents = []
         self.doc_metadata = []
 
@@ -153,7 +181,16 @@ class BuhoRAG:
         embeddings = self.embedding_model.encode(self.documents, show_progress_bar=False)
         self.faiss_index = faiss.IndexFlatL2(embeddings.shape[1])
         self.faiss_index.add(np.array(embeddings).astype('float32'))
-        logger.info("✅ Índice FAISS estático construido")
+        logger.info("Índice FAISS estático construido")
+        
+        # Guardar en caché
+        logger.info("Guardando índice en caché...")
+        faiss.write_index(self.faiss_index, index_path)
+        with open(meta_path, "wb") as f:
+            pickle.dump({"documents": self.documents, "doc_metadata": self.doc_metadata}, f)
+        with open(key_path, "w") as f:
+            f.write(cache_key)
+        logger.info("Caché guardado exitosamente")
 
     def _retrieve_context(self, query: str, user_lat: Optional[float] = None, user_lon: Optional[float] = None, k: int = 8) -> List[str]:
         q_emb = self.embedding_model.encode([query])
@@ -240,11 +277,11 @@ Pregunta actual: {question}
             reformulated = reformulated.replace(tag, "")
             
         reformulated = reformulated.strip()
-        logger.info(f"🔄 Reformulada: '{question}' -> '{reformulated}'")
+        logger.info(f"Reformulada: '{question}' -> '{reformulated}'")
         return reformulated if reformulated else question
 
     def query(self, question: str, user_lat=None, user_lon=None) -> Dict:
-        logger.info(f"💬 Consulta: {question[:50]}...")
+        logger.info(f"Consulta: {question[:50]}...")
 
         self._load_models()
         search_query = self._reformulate_query(question)
@@ -271,7 +308,7 @@ Pregunta actual: {question}
         if target_lat and target_lon:
             self.current_user_lat = target_lat
             self.current_user_lon = target_lon
-            logger.info(f"📍 Usando referencia de: {location_name}")
+            logger.info(f"Usando referencia de: {location_name}")
 
         # 4. Generar Respuesta
         context_docs = self._retrieve_context(search_query, target_lat, target_lon, k=10)
@@ -369,9 +406,9 @@ Pregunta: {question}
         self.chat_history.append((question, answer))
         if len(self.chat_history) > 10: self.chat_history = self.chat_history[-10:]
 
-        logger.info(f"✅ Respuesta: {answer[:50]}...")
+        logger.info(f"Respuesta: {answer[:50]}...")
         return {'answer': answer, 'context': context_docs}
 
     def reset_conversation(self):
         self.chat_history = []
-        logger.info("🔄 Reset")
+        logger.info("Reset")

@@ -6,7 +6,7 @@ from thefuzz import fuzz, process
 
 logger = logging.getLogger(__name__)
 
-# 📍 MAPA MENTAL DEL CAMPUS (Con Alias Estudiantiles)
+# MAPA MENTAL DEL CAMPUS (Con Alias Estudiantiles)
 KNOWN_LOCATIONS = {
     # Ciencias Exactas
     "exactas": (29.081527, -110.960999),
@@ -70,10 +70,10 @@ def detect_device() -> Tuple[str, torch.dtype]:
     if torch.cuda.is_available():
         device_name = torch.cuda.get_device_name(0)
         backend = "ROCm" if "AMD" in device_name or "Radeon" in device_name else "CUDA"
-        logger.info(f"🎮 GPU detectada: {device_name} ({backend})")
+        logger.info(f"GPU detectada: {device_name} ({backend})")
         return "cuda:0", torch.float16
     else:
-        logger.warning("⚠️ Usando CPU")
+        logger.warning("Usando CPU")
         return "cpu", torch.float32
 
 
@@ -108,7 +108,7 @@ def get_coords_from_query(query: str) -> Tuple[Optional[float], Optional[float],
             best_match = match
 
     if best_score > 85:
-        logger.info(f"📍 Ubicación detectada por fuzzy match: '{best_match}' (Confianza: {best_score}%)")
+        logger.info(f"Ubicación detectada por fuzzy match: '{best_match}' (Confianza: {best_score}%)")
         coords = KNOWN_LOCATIONS[best_match]
         return coords[0], coords[1], best_match
 
