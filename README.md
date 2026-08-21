@@ -66,11 +66,11 @@ Proyecto desarrollado para la materia de **Ingeniería de Software II**, enfocad
 - **Iconos:** React Icons
 
 ### 🧠 Inteligencia Artificial
-- **Arquitectura:** RAG (Retrieval-Augmented Generation)
-- **Embeddings:** sentence-transformers (`all-MiniLM-L6-v2`)
+- **Arquitectura:** RAG (Retrieval-Augmented Generation) con FAISS Cache
+- **Embeddings:** `paraphrase-multilingual-MiniLM-L12-v2` (Ejecución en VRAM)
 - **Vector Store:** FAISS (Facebook AI Similarity Search)
-- **LLM (local):** Qwen2.5-1.5B-Instruct (optimizado para CPU)
-- **LLM (HPC):** Qwen2.5-14B-Instruct (AMD GPU con ROCm)
+- **Re-ranking:** `ms-marco-MiniLM-L-6-v2` (CrossEncoder)
+- **LLM Principal:** Qwen2.5-14B-Instruct (AMD GPU con ROCm)
 - **Infraestructura HPC:** Clúster Yuca — ACARUS, Universidad de Sonora
 - **Librerías:** PyTorch, Transformers, HuggingFace
 
@@ -113,10 +113,12 @@ IS2_ElBuhoTragon/
 │   │   └── main.jsx            # Punto de entrada y rutas
 │   └── package.json
 │
-├── llm_rag/                    # Motor de Inteligencia Artificial
-│   ├── rag_engine.py           # Motor RAG (desarrollo local, CPU)
-│   ├── rag_engine_hpc.py       # Motor RAG de producción (ACARUS Yuca, AMD GPU/ROCm)
-│   ├── rag_data_fixed.json     # Datos vectorizados de cafeterías
+├── llm_rag/                    # Motor de Inteligencia Artificial (HPC)
+│   ├── __init__.py             # Singleton del motor (get_rag_engine)
+│   ├── rag_engine_hpc.py       # Motor RAG principal (ACARUS Yuca, AMD GPU/ROCm)
+│   ├── rag_utils.py            # Utilidades de geolocalización y cálculo de distancias
+│   ├── rag_data_fixed.json     # Datos pre-vectorizados de cafeterías
+│   ├── data_utils/             # Scripts para limpieza y conversión de JSONs crudos
 │   ├── requirements.txt        # Dependencias del módulo IA
 │   └── README.md               # Documentación detallada del RAG
 │
@@ -271,16 +273,13 @@ cd llm_rag
 # Instalar dependencias (requiere ~2-3 GB para modelos)
 pip install -r requirements.txt
 
-# Probar el sistema de forma independiente (desarrollo local)
-python rag_engine.py
-
-# En el clúster Yuca de ACARUS (producción)
+# Probar el sistema RAG de forma independiente
 python rag_engine_hpc.py
 ```
 
-> **Nota:** La primera ejecución descarga los modelos de HuggingFace. En local (~2.5 GB, modelo 1.5B); en ACARUS Yuca (~28 GB, modelo 14B). Las consultas subsecuentes son más rápidas (~2-5 seg).
+> **Nota:** La primera ejecución descarga los modelos de HuggingFace y genera el caché del FAISS index (~28 GB, modelo 14B). Las consultas subsecuentes son ultrarrápidas (~1-3 seg).
 
-> En producción se utiliza `rag_engine_hpc.py`, que ejecuta **Qwen2.5-14B-Instruct** sobre GPU AMD con ROCm en el clúster **Yuca** del Área de Cómputo de Alto Rendimiento de la Universidad de Sonora (**ACARUS**).
+> El RAG ejecuta **Qwen2.5-14B-Instruct** sobre la GPU AMD Instinct MI210 con ROCm en el clúster **Yuca** del Área de Cómputo de Alto Rendimiento de la Universidad de Sonora (**ACARUS**).
 
 Para más detalles, consulta la [documentación del módulo RAG](./llm_rag/README.md).
 
