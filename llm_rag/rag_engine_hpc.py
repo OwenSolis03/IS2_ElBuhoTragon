@@ -25,6 +25,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Incrementar al cambiar la lógica de construcción de documentos o el modelo
+# de embeddings, para invalidar cachés de FAISS generados con la versión anterior.
+CACHE_VERSION = "v2"
+
 
 class BuhoRAG:
     """
@@ -99,7 +103,7 @@ class BuhoRAG:
         
         # Usar la fecha de modificación del json como clave de validación
         mtime = os.path.getmtime(self.data_path)
-        cache_key = f"{mtime}"
+        cache_key = f"{CACHE_VERSION}:{mtime}"
         
         index_path = os.path.join(cache_dir, "faiss.index")
         meta_path = os.path.join(cache_dir, "docs_meta.pkl")
@@ -168,7 +172,8 @@ class BuhoRAG:
                             precio = float(m['precio'])
                             nombre_platillo = m['nombre'].strip().replace("\n", " ")
                             lines.append(f"- {nombre_platillo} (${precio:.0f} MXN)")
-                        except: pass
+                        except (TypeError, ValueError, KeyError) as e:
+                            logger.warning(f"Item de menu invalido en tiendita {tid}: {e}")
                     
                     self.documents.append("\n".join(lines))
                     self.doc_metadata.append({
@@ -219,7 +224,7 @@ class BuhoRAG:
                     seen_cafeterias[store_id] = seen_cafeterias.get(store_id, 0) + 1
                 
                 lat2, lon2 = meta.get('latitud'), meta.get('longitud')
-                if user_lat and user_lon and lat2 and lon2:
+                if user_lat is not None and user_lon is not None and lat2 is not None and lon2 is not None:
                     dist = calculate_distance(user_lat, user_lon, lat2, lon2)
                     
                     if dist > 2500:
@@ -243,12 +248,18 @@ class BuhoRAG:
         
         return [doc for doc, score in doc_score_pairs[:k]]
 
-    def _reformulate_query(self, question: str) -> str:
-        if not self.chat_history:
+    def _strip_special_tokens(self, text: str) -> str:
+        for tag in ["<|im_end|>", "<|im_start|>", "assistant", "user", "system"]:
+            text = text.replace(tag, "")
+        return text.strip()
+
+    def _reformulate_query(self, question: str, history: Optional[List[Tuple[str, str]]] = None) -> str:
+        effective_history = self.chat_history if history is None else history
+        if not effective_history:
             return question
 
         history_str = ""
-        for q, a in self.chat_history[-3:]:
+        for q, a in effective_history[-3:]:
             history_str += f"Usuario: {q}\nBúho: {a}\n"
 
         prompt = f"""<|im_start|>system
@@ -271,20 +282,24 @@ Pregunta actual: {question}
             do_sample=False,
             pad_token_id=self.tokenizer.eos_token_id
         )
-        reformulated = outputs[0]['generated_text'].strip()
-        
-        for tag in ["<|im_end|>", "<|im_start|>", "assistant", "user", "system"]:
-            reformulated = reformulated.replace(tag, "")
-            
-        reformulated = reformulated.strip()
+        reformulated = self._strip_special_tokens(outputs[0]['generated_text'])
         logger.info(f"Reformulada: '{question}' -> '{reformulated}'")
         return reformulated if reformulated else question
 
-    def query(self, question: str, user_lat=None, user_lon=None) -> Dict:
+    def query(self, question: str, user_lat=None, user_lon=None,
+              history: Optional[List[Tuple[str, str]]] = None) -> Dict:
+        """
+        Si se pasa `history` explícitamente, esta llamada es stateless respecto
+        al historial: se usa esa lista (propiedad del llamador, ej. una sesión
+        de usuario en el frontend) y NO se muta `self.chat_history` compartido.
+        Si `history` es None, se usa/actualiza `self.chat_history` de la instancia
+        (modo legado para uso standalone / un solo usuario, ej. warmup_rag).
+        """
         logger.info(f"Consulta: {question[:50]}...")
 
         self._load_models()
-        search_query = self._reformulate_query(question)
+        effective_history = self.chat_history if history is None else history
+        search_query = self._reformulate_query(question, history=effective_history)
 
         # 1. Detectar Presupuesto
         budget_match = re.search(r'(\d+)\s*(pesos|mxn|\$)', search_query.lower())
@@ -292,30 +307,32 @@ Pregunta actual: {question}
 
         # 2. Gestionar Ubicación (GPS vs Texto)
         target_lat, target_lon = user_lat, user_lon
-        location_name = "Ubicación GPS" if user_lat else None
+        location_name = "Ubicación GPS" if user_lat is not None else None
 
-        if not target_lat:
+        if target_lat is None:
             # Buscar en texto con alias
             found_lat, found_lon, found_name = get_coords_from_query(search_query)
-            if found_lat:
+            if found_lat is not None:
                 target_lat, target_lon = found_lat, found_lon
                 location_name = found_name.upper() # Ej: "SERVICIO SOCIAL"
 
         # 3. Construir Índice (Solo una vez)
-        if not self.faiss_index: 
+        if not self.faiss_index:
             self.build_index()
 
-        if target_lat and target_lon:
+        if target_lat is not None and target_lon is not None:
             self.current_user_lat = target_lat
             self.current_user_lon = target_lon
             logger.info(f"Usando referencia de: {location_name}")
 
         # 4. Generar Respuesta
         context_docs = self._retrieve_context(search_query, target_lat, target_lon, k=10)
+        context_block = chr(10).join(context_docs) if context_docs else \
+            "No se encontró información relevante en la base de datos para esta consulta."
 
         # Historial de 6 turnos
         history_str = ""
-        for q, a in self.chat_history[-6:]:
+        for q, a in effective_history[-6:]:
             history_str += f"Usuario: {q}\nBúho: {a}\n---\n"
 
         # Inyección de contexto
@@ -355,7 +372,7 @@ HISTORIAL:
 {history_str}
 
 DATOS:
-{chr(10).join(context_docs)}
+{context_block}
 
 Pregunta: {question}
 <|im_end|>
@@ -373,11 +390,7 @@ Pregunta: {question}
             pad_token_id=self.tokenizer.eos_token_id
         )
 
-        answer = outputs[0]['generated_text'].strip()
-
-        # Limpieza de tags del modelo
-        for tag in ["<|im_end|>", "<|im_start|>", "assistant", "user", "system"]:
-            answer = answer.replace(tag, "")
+        answer = self._strip_special_tokens(outputs[0]['generated_text'])
 
         # --- LIMPIEZA DE FORMATO DEFINITIVA ---
 
@@ -403,8 +416,11 @@ Pregunta: {question}
         # Limpieza final
         answer = re.sub(r'Respuesta:?\s*', '', answer, flags=re.IGNORECASE).strip()
 
-        self.chat_history.append((question, answer))
-        if len(self.chat_history) > 10: self.chat_history = self.chat_history[-10:]
+        if history is None:
+            # Modo legado (sin historial externo): mantenemos el estado en la instancia.
+            self.chat_history.append((question, answer))
+            if len(self.chat_history) > 10:
+                self.chat_history = self.chat_history[-10:]
 
         logger.info(f"Respuesta: {answer[:50]}...")
         return {'answer': answer, 'context': context_docs}

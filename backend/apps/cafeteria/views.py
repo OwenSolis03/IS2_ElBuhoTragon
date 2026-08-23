@@ -195,43 +195,50 @@ class MenusPorTiendita(generics.ListAPIView):
 # CHATBOT RAG (Mantenido intacto)
 # ========================================
 
-# Importar el motor RAG
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../../llm_rag'))
+# Importar el motor RAG (paquete llm_rag/ en la raíz del repo)
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../..'))
 
 try:
-    from rag_engine import BuhoRAG
+    from llm_rag import get_rag_engine
     RAG_AVAILABLE = True
 except ImportError as e:
     logger.warning(f"[WARN] RAG no disponible: {e}")
     RAG_AVAILABLE = False
-    BuhoRAG = None
+    get_rag_engine = None
 
-# Instancia global del RAG (Singleton)
-_rag_instance = None
+# Límites defensivos para el historial que envía el cliente (no confiar en input externo)
+MAX_HISTORY_TURNS = 6
+MAX_HISTORY_CHARS = 1000
+
+
+def _sanitize_history(raw):
+    """
+    Valida y acota el historial de conversación enviado por el cliente.
+    El historial vive en el frontend (stateless en el servidor) para evitar
+    que todas las conversaciones de todos los usuarios compartan el mismo
+    estado en memoria del proceso RAG.
+    """
+    if not isinstance(raw, list):
+        return []
+
+    sanitized = []
+    for item in raw[-MAX_HISTORY_TURNS:]:
+        if isinstance(item, (list, tuple)) and len(item) == 2:
+            q, a = item
+            if isinstance(q, str) and isinstance(a, str):
+                sanitized.append((q[:MAX_HISTORY_CHARS], a[:MAX_HISTORY_CHARS]))
+    return sanitized
 
 
 def get_rag_instance():
     """
-    Obtiene o crea la instancia del RAG (Lazy Loading)
-    Esto evita cargar el modelo hasta que sea necesario
+    Obtiene la instancia Singleton del RAG (Lazy Loading vía llm_rag.get_rag_engine).
     """
-    global _rag_instance
-
     if not RAG_AVAILABLE:
         raise RuntimeError("RAG engine no está disponible")
 
-    if _rag_instance is None:
-        logger.info("[Buho] Inicializando RAG por primera vez...")
-        _rag_instance = BuhoRAG()
-        _rag_instance.load_data()
-        _rag_instance.build_index()
-        logger.info("[OK] RAG inicializado correctamente")
+    return get_rag_engine()
 
-    return _rag_instance
-
-
-# Reemplaza SOLO esta función en tu views.py existente
-# (desde la línea 227 aproximadamente, donde empieza @api_view(['POST']))
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -264,10 +271,12 @@ def chatbot_query(request):
                 status=status.HTTP_503_SERVICE_UNAVAILABLE
             )
 
+        # El historial de conversación vive en el cliente y se reenvía en cada
+        # request: el RAG no guarda estado por usuario (ver _sanitize_history).
+        history = _sanitize_history(request.data.get('history'))
+
         # Comandos especiales
         if message.lower() in ['reset', 'reiniciar', 'borrar historial', 'limpiar']:
-            rag = get_rag_instance()
-            rag.reset_conversation()
             return Response({
                 'success': True,
                 'answer': 'Conversacion reiniciada. En que puedo ayudarte ahora?',
@@ -277,7 +286,7 @@ def chatbot_query(request):
         # Procesar consulta normal
         logger.info(f"[Chat] Consulta chatbot: {message[:50]}...")
         rag = get_rag_instance()
-        result = rag.query(message, user_lat=user_lat, user_lon=user_lon)
+        result = rag.query(message, user_lat=user_lat, user_lon=user_lon, history=history)
 
         # FIX: Verificar que los saltos de línea están presentes
         answer_text = result['answer']
@@ -290,7 +299,7 @@ def chatbot_query(request):
                 'budget_detected': result.get('budget_detected'),
                 'location_used': result.get('location_used'),
                 'context_docs': len(result.get('context', [])),
-                'conversation_length': len(rag.chat_history)
+                'conversation_length': len(history) + 1
             }
         }, status=status.HTTP_200_OK)
 

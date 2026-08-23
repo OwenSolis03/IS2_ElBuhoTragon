@@ -17,6 +17,19 @@ const ChatWidget = () => {
 
     const toggleChat = () => setIsOpen(!isOpen);
 
+    // El backend es stateless: reenviamos los últimos turnos como pares
+    // [pregunta, respuesta] para que el RAG pueda reformular preguntas de
+    // seguimiento sin guardar historial compartido entre usuarios.
+    const buildHistoryPairs = (history) => {
+        const pairs = [];
+        for (let i = 0; i < history.length - 1; i++) {
+            if (history[i].type === "user" && history[i + 1].type === "bot") {
+                pairs.push([history[i].text, history[i + 1].text]);
+            }
+        }
+        return pairs.slice(-6);
+    };
+
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
@@ -67,7 +80,8 @@ const ChatWidget = () => {
                 body: JSON.stringify({
                     message: userMessage,
                     lat: location?.lat,
-                    lon: location?.lon
+                    lon: location?.lon,
+                    history: buildHistoryPairs(chatHistory)
                 }),
             });
 
