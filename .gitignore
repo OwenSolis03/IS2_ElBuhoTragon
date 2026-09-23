@@ -24,3 +24,5 @@ package-lock.json
 
 # GitNexus (Evitar bucles recursivos)
 .gitnexus/
+# tgrep
+.tgrep*
