@@ -7,6 +7,7 @@ Incluye: Autenticación, CRUD de recursos, Chatbot RAG
 import sys
 import os
 import logging
+import threading
 
 # Django & DRF imports
 from django.http import HttpResponse
@@ -16,19 +17,29 @@ from rest_framework import viewsets, filters, generics, status
 from rest_framework.views import APIView
 from rest_framework.serializers import ModelSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 from rest_framework_simplejwt.tokens import RefreshToken
 from django_filters.rest_framework import DjangoFilterBackend
 
 # Modelos y Serializadores
+from .auth import (
+    TOKEN_APP_CLAIM,
+    TOKEN_APP_VALUE,
+    IsAppAdminOrReadOnly,
+    IsReviewOwnerOrAppAdmin,
+    IsSelfOrAppAdmin,
+)
 from .models import Tienditas, Facultades, Menus, Usuarios, Resenas
 from .serializers import (
     TienditasSerializer,
     FacultadesSerializer,
     MenusSerializer,
     UsuariosSerializer,
-    ResenaSerializer
+    ResenaSerializer,
+    validar_contrasena,
+    validar_nombre_usuario_unico,
 )
 
 # Configurar logging
@@ -39,8 +50,21 @@ logger = logging.getLogger(__name__)
 # AUTENTICACIÓN
 # ========================================
 
+class LoginRateThrottle(AnonRateThrottle):
+    """Limita la adivinación de contraseñas por IP."""
+    scope = 'login'
+    rate = '10/min'
+
+
+class RegisterRateThrottle(AnonRateThrottle):
+    """Cada registro crea una fila y calcula un hash PBKDF2: limitar por IP."""
+    scope = 'register'
+    rate = '20/hour'
+
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([LoginRateThrottle])
 def login_view(request):
     """
     Login personalizado con JWT
@@ -49,32 +73,30 @@ def login_view(request):
     username = request.data.get('username')
     password = request.data.get('password')
 
-    if not username or not password:
+    if not isinstance(username, str) or not isinstance(password, str) or not username or not password:
         return Response(
             {'success': False, 'error': 'Faltan credenciales'},
             status=status.HTTP_400_BAD_REQUEST
         )
 
     try:
-        user_exists = Usuarios.objects.filter(nombre_usuario=username).exists()
+        # nombre_usuario no es único en la BD histórica: se prueba cada coincidencia
+        # en vez de .get(), que fallaba con duplicados y bloqueaba el login.
+        candidatos = list(Usuarios.objects.filter(nombre_usuario=username))
+        user = next((u for u in candidatos if check_password(password, u.contrasena)), None)
 
-        if not user_exists:
+        if user is None:
+            if not candidatos:
+                make_password(password)  # mismo costo que un usuario existente (sin oráculo de tiempo)
+            # Mismo mensaje para usuario inexistente y contraseña incorrecta
             return Response(
-                {'success': False, 'error': 'Usuario no encontrado'},
+                {'success': False, 'error': 'Usuario o contraseña incorrectos'},
                 status=status.HTTP_401_UNAUTHORIZED
             )
 
-        user = Usuarios.objects.get(nombre_usuario=username)
-
-        # Verificación segura de contraseña (hash)
-        if not check_password(password, user.contrasena):
-            return Response(
-                {'success': False, 'error': 'Credenciales inválidas'},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
-
-        # Login exitoso - Generar tokens
+        # Login exitoso - Generar tokens (marcados como tokens de Usuarios, ver auth.py)
         refresh = RefreshToken.for_user(user)
+        refresh[TOKEN_APP_CLAIM] = TOKEN_APP_VALUE
         return Response({
             'success': True,
             'access_token': str(refresh.access_token),
@@ -98,6 +120,12 @@ class UserRegisterSerializer(ModelSerializer):
         fields = ['nombre_usuario', 'email', 'contrasena']
         extra_kwargs = {'contrasena': {'write_only': True}}
 
+    def validate_nombre_usuario(self, value):
+        return validar_nombre_usuario_unico(value)
+
+    def validate_contrasena(self, value):
+        return validar_contrasena(value)
+
     def create(self, validated_data):
         # AQUI ESTA EL CAMBIO DE SEGURIDAD
         validated_data['contrasena'] = make_password(validated_data['contrasena'])
@@ -111,6 +139,7 @@ class UserRegisterView(generics.CreateAPIView):
     queryset = Usuarios.objects.all()
     serializer_class = UserRegisterSerializer
     permission_classes = [AllowAny]
+    throttle_classes = [RegisterRateThrottle]
 
 
 class UsuarioActualView(APIView):
@@ -129,6 +158,7 @@ class TienditasViewSet(viewsets.ModelViewSet):
     """CRUD de Cafeterías"""
     queryset = Tienditas.objects.all()
     serializer_class = TienditasSerializer
+    permission_classes = [IsAppAdminOrReadOnly]
     filter_backends = [filters.SearchFilter]
     search_fields = ['nombre']
 
@@ -137,6 +167,7 @@ class MenusViewSet(viewsets.ModelViewSet):
     """CRUD de Menús"""
     queryset = Menus.objects.all()
     serializer_class = MenusSerializer
+    permission_classes = [IsAppAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['id_tiendita', 'categoria']
     search_fields = ['nombre', 'descripcion']
@@ -147,28 +178,24 @@ class FacultadesViewSet(viewsets.ModelViewSet):
     """CRUD de Facultades"""
     queryset = Facultades.objects.all()
     serializer_class = FacultadesSerializer
+    permission_classes = [IsAppAdminOrReadOnly]
 
 
 class UsuariosViewSet(viewsets.ModelViewSet):
-    """CRUD de Usuarios"""
+    """Perfil de usuario: cada quien el suyo; el listado es solo para admins.
+    El alta de usuarios se hace en /api/register."""
     queryset = Usuarios.objects.all()
     serializer_class = UsuariosSerializer
+    permission_classes = [IsSelfOrAppAdmin]
+    http_method_names = ['get', 'put', 'patch', 'delete', 'head', 'options']
+    ordering_fields = ['nombre_usuario', 'fecha_registro']
 
 
-# --- AQUI ESTA EL CAMBIO NUCLEAR PARA LAS RESEÑAS ---
 class ResenaViewSet(viewsets.ModelViewSet):
-    """
-    CRUD de Reseñas - MODIFICADO PARA DEMO
-    Se ha deshabilitado la seguridad estricta para permitir el flujo sin tokens complejos.
-    El Frontend DEBE enviar 'id_usuario'.
-    """
-    queryset = Resenas.objects.all()
+    """CRUD de Reseñas: lectura pública; crear requiere sesión; editar/borrar solo autor o admin."""
+    queryset = Resenas.objects.select_related('id_usuario')
     serializer_class = ResenaSerializer
-
-    # 1. Esto evita que Django intente leer el Token y falle
-    authentication_classes = []
-    # 2. Esto deja pasar la petición sin preguntar quién es
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsReviewOwnerOrAppAdmin]
 
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['id_tiendita']
@@ -176,10 +203,8 @@ class ResenaViewSet(viewsets.ModelViewSet):
     ordering = ['-fecha_registro']
 
     def perform_create(self, serializer):
-        # Guardamos directamente usando el id_usuario que viene del frontend
-        # Ya no intentamos leer self.request.user
-        serializer.save()
-# ----------------------------------------------------
+        # El autor sale del token, nunca del cuerpo de la petición
+        serializer.save(id_usuario=self.request.user)
 
 
 class MenusPorTiendita(generics.ListAPIView):
@@ -209,6 +234,18 @@ except ImportError as e:
 # Límites defensivos para el historial que envía el cliente (no confiar en input externo)
 MAX_HISTORY_TURNS = 6
 MAX_HISTORY_CHARS = 1000
+MAX_MESSAGE_CHARS = 500
+
+# El RAG atiende una consulta a la vez (un solo GPU): acotar cuántas pueden esperar
+# en cola para que un pico no deje hilos bloqueados indefinidamente.
+MAX_PENDING_CHAT = 8
+_chat_slots = threading.BoundedSemaphore(MAX_PENDING_CHAT)
+
+
+class ChatbotRateThrottle(UserRateThrottle):
+    """Cada consulta ocupa el LLM varios segundos: limitar por usuario/IP."""
+    scope = 'chatbot'
+    rate = '15/min'
 
 
 def _sanitize_history(raw):
@@ -242,13 +279,15 @@ def get_rag_instance():
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([ChatbotRateThrottle])
 def chatbot_query(request):
     """
     Endpoint para el chatbot RAG
     """
     try:
         # Validar entrada
-        message = request.data.get('message', '').strip()
+        message = request.data.get('message', '')
+        message = message.strip() if isinstance(message, str) else ''
         user_lat = request.data.get('lat')
         user_lon = request.data.get('lon')
 
@@ -257,6 +296,15 @@ def chatbot_query(request):
                 {
                     'success': False,
                     'error': 'El mensaje no puede estar vacío'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if len(message) > MAX_MESSAGE_CHARS:
+            return Response(
+                {
+                    'success': False,
+                    'error': f'El mensaje es muy largo (máximo {MAX_MESSAGE_CHARS} caracteres)'
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
@@ -285,12 +333,21 @@ def chatbot_query(request):
 
         # Procesar consulta normal
         logger.info(f"[Chat] Consulta chatbot: {message[:50]}...")
-        rag = get_rag_instance()
-        result = rag.query(message, user_lat=user_lat, user_lon=user_lon, history=history)
+        if not _chat_slots.acquire(blocking=False):
+            return Response(
+                {
+                    'success': False,
+                    'error': 'El Buhito está atendiendo muchas preguntas. Intenta en un momento.'
+                },
+                status=status.HTTP_503_SERVICE_UNAVAILABLE
+            )
+        try:
+            rag = get_rag_instance()
+            result = rag.query(message, user_lat=user_lat, user_lon=user_lon, history=history)
+        finally:
+            _chat_slots.release()
 
-        # FIX: Verificar que los saltos de línea están presentes
         answer_text = result['answer']
-        logger.info(f"[Chat] Respuesta con {answer_text.count(chr(10))} saltos de linea")
 
         return Response({
             'success': True,

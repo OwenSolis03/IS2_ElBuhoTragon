@@ -34,6 +34,12 @@ const AdminDashboard = () => {
 
   const categoriasComida = ["Desayuno", "Almuerzo", "Comida", "Comida Corrida", "Vegana / Vegetariana", "Fit / Saludable", "Bebidas", "Postres", "Snacks"];
 
+  // Las escrituras del panel requieren el token de un admin (el backend verifica es_admin)
+  const authHeaders = () => ({
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+  });
+
   useEffect(() => {
     fetchCafeterias();
     fetch("http://127.0.0.1:8000/api/Facultades/")
@@ -69,7 +75,7 @@ const AdminDashboard = () => {
     try {
       const res = await fetch("http://127.0.0.1:8000/api/Tienditas/", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(),
         body: JSON.stringify(newCafe)
       });
       if (res.ok) {
@@ -77,6 +83,8 @@ const AdminDashboard = () => {
         setShowModal(false);
         setNewCafe({ nombre: "", direccion: "", id_facultad: "", latitud: "", longitud: "", imagen_url: "", hora_apertura: "", hora_cierre: "" });
         alert("Cafetería creada");
+      } else {
+        alert("No se pudo crear. Verifica que tu sesión de administrador siga activa.");
       }
     } catch (error) { console.error(error); }
   };
@@ -105,13 +113,15 @@ const AdminDashboard = () => {
     try {
       const res = await fetch(`http://127.0.0.1:8000/api/Tienditas/${editingCafe.id_tiendita}/`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(),
         body: JSON.stringify(editingCafe)
       });
       if (res.ok) {
         alert("Cafetería actualizada");
         fetchCafeterias();
         setShowEditModal(false);
+      } else {
+        alert("No se pudo actualizar. Verifica que tu sesión de administrador siga activa.");
       }
     } catch (error) { console.error(error); }
   };
@@ -144,7 +154,7 @@ const AdminDashboard = () => {
     try {
       const res = await fetch(url, {
         method: method,
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(),
         body: JSON.stringify({ ...newMenuItem, id_tiendita: editingCafe.id_tiendita })
       });
 
@@ -164,7 +174,8 @@ const AdminDashboard = () => {
 
   const handleDeleteMenuItem = async (id) => {
     if(!window.confirm("¿Borrar platillo?")) return;
-    await fetch(`http://127.0.0.1:8000/api/Menus/${id}/`, { method: "DELETE" });
+    const res = await fetch(`http://127.0.0.1:8000/api/Menus/${id}/`, { method: "DELETE", headers: authHeaders() });
+    if (!res.ok) return alert("No se pudo borrar. Verifica que tu sesión de administrador siga activa.");
     setCafeMenu(cafeMenu.filter(item => item.id_menu !== id));
   };
 
@@ -199,7 +210,8 @@ const AdminDashboard = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm("¿Eliminar cafetería?")) return;
-    await fetch(`http://127.0.0.1:8000/api/Tienditas/${id}/`, { method: "DELETE" });
+    const res = await fetch(`http://127.0.0.1:8000/api/Tienditas/${id}/`, { method: "DELETE", headers: authHeaders() });
+    if (!res.ok) return alert("No se pudo borrar. Verifica que tu sesión de administrador siga activa.");
     fetchCafeterias();
   };
 

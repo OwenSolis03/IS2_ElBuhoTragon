@@ -116,8 +116,10 @@ IS2_ElBuhoTragon/
 ├── llm_rag/                    # Motor de Inteligencia Artificial (HPC)
 │   ├── __init__.py             # Singleton del motor (get_rag_engine)
 │   ├── rag_engine_hpc.py       # Motor RAG principal (ACARUS Yuca, AMD GPU/ROCm)
-│   ├── rag_utils.py            # Utilidades de geolocalización y cálculo de distancias
-│   ├── rag_data_fixed.json     # Datos pre-vectorizados de cafeterías
+│   ├── catalog.py              # Fragmentos indexados, búsqueda léxica y contexto para el LLM
+│   ├── rag_utils.py            # Geolocalización, presupuesto, horarios y formato de respuesta
+│   ├── rag_data_fixed.json     # Datos de cafeterías (exportados de la BD)
+│   ├── tests/                  # Pruebas de la lógica sin modelos (pytest)
 │   ├── data_utils/             # Scripts para limpieza y conversión de JSONs crudos
 │   ├── requirements.txt        # Dependencias del módulo IA
 │   └── README.md               # Documentación detallada del RAG
@@ -268,13 +270,17 @@ El frontend estará disponible en `http://localhost:5173/`.
 ### 4. 🤖 Módulo de IA (RAG Engine)
 
 ```bash
-cd llm_rag
+# Instalar dependencias
+pip install -r llm_rag/requirements.txt
 
-# Instalar dependencias (requiere ~2-3 GB para modelos)
-pip install -r requirements.txt
+# Desde la raíz del repo: chat interactivo sin Django (--debug muestra el contexto recuperado)
+python -m llm_rag --debug
 
-# Probar el sistema RAG de forma independiente
-python rag_engine_hpc.py
+# Pruebas de la lógica determinista (no cargan modelos)
+python -m pytest llm_rag/tests
+
+# Precargar modelos + índice antes de levantar Django
+cd backend && python manage.py warmup_rag
 ```
 
 > **Nota:** La primera ejecución descarga los modelos de HuggingFace y genera el caché del FAISS index (~28 GB, modelo 14B). Las consultas subsecuentes son ultrarrápidas (~1-3 seg).

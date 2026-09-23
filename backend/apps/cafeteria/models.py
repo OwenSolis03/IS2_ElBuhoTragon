@@ -62,6 +62,10 @@ class Usuarios(models.Model):
     def id(self):
         return self.id_usuarios
 
+    # Interfaz mínima que DRF espera de request.user (IsAuthenticated, throttles)
+    is_authenticated = True
+    is_anonymous = False
+
 class Resenas(models.Model):
     id_resena = models.AutoField(primary_key=True)
     id_tiendita = models.ForeignKey(Tienditas, on_delete=models.CASCADE, db_column='id_tiendita', related_name='resenas')

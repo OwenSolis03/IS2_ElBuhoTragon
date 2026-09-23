@@ -39,8 +39,8 @@ const Registro = () => {
     }
 
     try {
-      // Usamos el endpoint estándar del modelo Usuarios
-      const respuesta = await fetch("http://127.0.0.1:8000/api/Usuarios/", {
+      // Endpoint de registro: el servidor fija es_admin=0 y valida la contraseña
+      const respuesta = await fetch("http://127.0.0.1:8000/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -48,8 +48,7 @@ const Registro = () => {
         body: JSON.stringify({
           nombre_usuario: nombreUsuario,
           contrasena: contrasena,
-          email: email,
-          es_admin: 0 
+          email: email
         })
       });
 

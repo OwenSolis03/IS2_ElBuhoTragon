@@ -9,7 +9,8 @@ import os
 from django.core.management.base import BaseCommand
 
 # Add repo root to path so `llm_rag` is importable as a package
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../../..'))
+# (commands -> management -> cafeteria -> apps -> backend -> repo root)
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../..')))
 
 
 class Command(BaseCommand):
@@ -24,16 +25,13 @@ class Command(BaseCommand):
             return
 
         self.stdout.write("[2/4] Creating RAG instance (singleton reused by the Django views)...")
-        self.stdout.write("[3/4] Loading data + building FAISS index...")
+        self.stdout.write("[3/4] Loading models + data + FAISS index (first run downloads ~30GB)...")
         rag = get_rag_engine()
-        self.stdout.write(f"       Index built: {len(rag.documents)} chunks indexed")
-
-        self.stdout.write("[4/4] Loading LLM models (this may download ~1GB the first time)...")
-        rag._load_models()
+        self.stdout.write(f"[4/4] Index ready: {len(rag.documents)} chunks indexed")
 
         # Quick smoke test
         self.stdout.write("\n[Test] Running smoke test query...")
-        result = rag.query("que desayunos hay?")
+        result = rag.query("que desayunos hay?", history=[])
         answer = result.get('answer', '')[:100]
         self.stdout.write(f"[Test] Response: {answer}...")
 

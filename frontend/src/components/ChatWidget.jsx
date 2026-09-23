@@ -23,7 +23,7 @@ const ChatWidget = () => {
     const buildHistoryPairs = (history) => {
         const pairs = [];
         for (let i = 0; i < history.length - 1; i++) {
-            if (history[i].type === "user" && history[i + 1].type === "bot") {
+            if (history[i].type === "user" && history[i + 1].type === "bot" && !history[i + 1].isError) {
                 pairs.push([history[i].text, history[i + 1].text]);
             }
         }
@@ -49,7 +49,9 @@ const ChatWidget = () => {
                             lon: position.coords.longitude
                         });
                     },
-                    () => resolve(null) // Si falla, enviar sin ubicación
+                    () => resolve(null), // Si falla o se niega el permiso, enviar sin ubicación
+                    // Sin timeout, un aviso de permiso ignorado dejaba el chat en "Pensando..." para siempre
+                    { timeout: 5000, maximumAge: 5 * 60 * 1000 }
                 );
             } else {
                 resolve(null);
@@ -67,12 +69,13 @@ const ChatWidget = () => {
         setMessage("");
         setIsLoading(true);
 
+        let response;
         try {
             // Obtener ubicación (opcional)
             const location = await getUserLocation();
 
             // Llamar al backend
-            const response = await fetch("http://127.0.0.1:8000/api/chatbot/", {
+            response = await fetch("http://127.0.0.1:8000/api/chatbot/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -87,7 +90,10 @@ const ChatWidget = () => {
 
             const data = await response.json();
 
-            if (data.success) {
+            if (data.success && data.metadata?.command === "reset") {
+                // Reiniciar también el historial local, que es el que se reenvía al backend
+                setChatHistory([{ type: "bot", text: data.answer }]);
+            } else if (data.success) {
                 let formattedAnswer = data.answer;
 
                 // Caso 1: Si JSON escapó los \n como \\n literales (texto)
@@ -117,7 +123,10 @@ const ChatWidget = () => {
                 ...prev,
                 {
                     type: "bot",
-                    text: "😔 Lo siento, hubo un problema. ¿Puedes intentar de nuevo?"
+                    isError: true,
+                    text: response?.status === 429
+                        ? "🦉 Vas muy rápido. Espera un momento antes de preguntar de nuevo."
+                        : "😔 Lo siento, hubo un problema. ¿Puedes intentar de nuevo?"
                 }
             ]);
         } finally {

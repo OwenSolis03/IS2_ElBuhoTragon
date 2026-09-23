@@ -15,8 +15,7 @@
 *.pyc
 *.pyo
 db.sqlite3
-backend/.env
-frontend/.env
+**/.env
 Ingenieria-de-Software-2025-1/
 
 # Node / Frontend

@@ -19,6 +19,10 @@ pymysql==1.1.0
 
 # Utilities
 numpy>=1.24.3
+thefuzz>=0.20.0        # Fuzzy matching de lugares del campus (rag_utils.py)
+
+# Tests (python -m pytest llm_rag/tests)
+pytest>=7.0
 
 # Optional but recommended for better performance
 sentencepiece>=0.1.99  # For some tokenizers

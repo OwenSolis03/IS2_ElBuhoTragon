@@ -26,13 +26,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "SECRET_KEY")
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Solo se activa explícitamente con DJANGO_DEBUG=true (p. ej. en tu máquina).
+DEBUG = os.getenv("DJANGO_DEBUG", "false").lower() == "true"
 
-ALLOWED_HOSTS = []
+# SECURITY WARNING: keep the secret key used in production secret!
+# Firma los JWT: nunca debe tener un valor conocido. Sin DJANGO_SECRET_KEY solo se
+# permite arrancar en DEBUG, con una clave aleatoria (los tokens caducan al reiniciar).
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+if not SECRET_KEY:
+    if not DEBUG:
+        from django.core.exceptions import ImproperlyConfigured
+        raise ImproperlyConfigured("Define DJANGO_SECRET_KEY en backend/.env (ver .env.example)")
+    import secrets
+    SECRET_KEY = secrets.token_urlsafe(50)
+
+ALLOWED_HOSTS = [h.strip() for h in os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h.strip()]
 
 # Application definition
 
@@ -50,10 +59,20 @@ INSTALLED_APPS = [
 ]
 REST_FRAMEWORK = {
 
+    # Los tokens son de la tabla Usuarios (no de auth.User): ver apps/cafeteria/auth.py
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-        
+        'apps.cafeteria.auth.UsuariosJWTAuthentication',
     ),
+
+    # Red de seguridad: toda vista nueva exige sesión para escribir salvo que diga lo contrario
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ),
+
+    # Número de proxies de confianza delante de Django. Con 0 se usa la IP real de la
+    # conexión y se ignora X-Forwarded-For (que el cliente puede falsificar para
+    # evadir los límites de peticiones). Si hay nginx delante, poner 1.
+    'NUM_PROXIES': int(os.getenv("DJANGO_NUM_PROXIES", "0")),
 
  'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
@@ -80,7 +99,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.common.CommonMiddleware',
 ]
 
 
@@ -179,3 +197,20 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Logs del chatbot/RAG en consola (el motor ya no configura el logging global por su cuenta)
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s'},
+    },
+    'handlers': {
+        'console': {'class': 'logging.StreamHandler', 'formatter': 'simple'},
+    },
+    'loggers': {
+        'llm_rag': {'handlers': ['console'], 'level': 'INFO'},
+        'apps': {'handlers': ['console'], 'level': 'INFO'},
+    },
+}

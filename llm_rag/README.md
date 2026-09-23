@@ -1,224 +1,119 @@
-# 🦉 El Búho Tragón - Production RAG System
+# 🦉 El Búho Tragón - Sistema RAG
 
-Sistema de IA conversacional para consultas sobre cafeterías del campus UNISON.
+Asistente conversacional para consultar las cafeterías del campus Hermosillo de UNISON.
 
-## 📁 Estructura del Proyecto
+## 📁 Estructura
 
 ```
-IS2_ElBuhoTragon/
-└── llm_rag/
-    ├── __init__.py            # Contiene el Singleton get_rag_engine()
-    ├── rag_engine_hpc.py      # Motor RAG principal (HPC)
-    ├── rag_utils.py           # Utilidades y geolocalización
-    ├── rag_data_fixed.json    # Datos de cafeterías
-    ├── data_utils/            # Scripts auxiliares de datos
-    ├── requirements.txt       # Dependencias
-    └── README.md              # Este archivo
+llm_rag/
+├── __init__.py            # Singleton thread-safe: get_rag_engine()
+├── __main__.py            # Chat interactivo: python -m llm_rag
+├── rag_engine_hpc.py      # Motor: modelos, índice FAISS, recuperación y generación
+├── catalog.py             # Fragmentos indexados, búsqueda léxica y render del contexto
+├── rag_utils.py           # Lugares del campus, presupuesto, intención, horarios, formato
+├── rag_data_fixed.json    # Datos de cafeterías (exportados de la BD)
+├── data_utils/            # Scripts auxiliares de datos
+├── tests/                 # Pruebas de la lógica determinista (pytest)
+└── requirements.txt
 ```
 
-## 🚀 Quick Start
+## ⚙️ Cómo responde una pregunta
 
-### 1. Instalar Dependencias
+1. **Reformulación**: si hay historial, el LLM reescribe la pregunta para que sea independiente
+   ("¿y en Derecho?" → "¿Dónde venden molletes en Derecho?").
+2. **Análisis determinista** (sin LLM): presupuesto (`$50`, `tengo 80`, `menos de 60`),
+   intención (`barato`, `cerca`), ubicación (alias del campus con fuzzy matching, o el GPS
+   del navegador **solo si el usuario está en el campus**) y hora actual de Hermosillo.
+3. **Recuperación híbrida**:
+   - Semántica: FAISS (coseno) sobre fragmentos de ≤6 platillos por categoría + una ficha por cafetería.
+   - Léxica: coincidencia de nombres de platillos/cafeterías ("molletes" → fragmentos con "Mollete").
+   - Re-ranking con un Cross-Encoder multilingüe, bono a coincidencias léxicas y penalización
+     por distancia cuando se pide algo "cerca".
+4. **Contexto calculado por código**: horario con `ABIERTA AHORA`/`CERRADA AHORA`, distancia en
+   metros, platillos filtrados por presupuesto y bloques de "más cercanas" / "más baratas".
+5. **Generación** con Qwen2.5-14B-Instruct (plantilla de chat oficial, decodificación greedy) y
+   limpieza del formato para el ChatWidget.
+
+El motor **no guarda estado de conversación**: el historial lo manda el cliente en cada consulta,
+así que una sola instancia atiende a todos los usuarios sin mezclar conversaciones. Las consultas
+se serializan con un lock (un solo GPU / un solo modelo).
+
+## 🚀 Uso
 
 ```bash
-cd llm_rag
-pip install -r requirements.txt
+# Desde la raíz del repo
+pip install -r llm_rag/requirements.txt
+
+python -m llm_rag --debug                              # chat interactivo, muestra el contexto
+python -m llm_rag --lat 29.0848 --lon -110.9632        # simulando estar en Derecho
+python -m pytest llm_rag/tests                         # pruebas (no cargan modelos)
 ```
 
-**Nota:** Primera instalación descarga ~2-3GB de modelos (una sola vez).
-
-### 2. Probar el Sistema
-
-```bash
-python rag_engine.py
-```
-
-### 3. Usar en Código
+En código:
 
 ```python
 from llm_rag import get_rag_engine
 
-# Inicializar (usar Singleton)
-rag = get_rag_engine(data_path="rag_data_fixed.json")
-# get_rag_engine ya carga los datos e inicializa FAISS automáticamente
-
-# Consultar
-result = rag.query("¿Cuánto cuesta la Torta Cubana?")
-print(result['answer'])
+rag = get_rag_engine()   # carga datos, modelos e índice una sola vez
+result = rag.query("¿Dónde venden molletes baratos?", user_lat=29.0848, user_lon=-110.9632,
+                   history=[("¿Qué hay en Artes?", "En Cafeteria Artes hay...")])
+result["answer"]            # texto para el usuario
+result["context"]           # fragmentos que vio el LLM
+result["budget_detected"]   # 50.0 | None
+result["location_used"]     # "DERECHO" | "tu ubicación actual (GPS)" | None
+result["search_query"]      # pregunta reformulada
 ```
 
-## 🎯 Características Anti-Alucinación
-
-Este sistema está optimizado para **minimizar alucinaciones**:
-
-1. **Temperatura baja (0.1)** - Reduce creatividad, aumenta precisión
-2. **Prompts estrictos** - Instrucciones claras de no inventar
-3. **Contexto explícito** - Marca claramente qué información usar
-4. **Modelo robusto** - Qwen2.5-14B-Instruct entrenado para seguir instrucciones
-5. **Validación de contexto** - Solo responde con info disponible
-
-## 📍 Uso con Ubicación del Usuario
-
-```python
-# Con ubicación GPS del usuario
-result = rag.query(
-    "¿Cuál es la cafetería más cercana?",
-    user_lat=29.085,  # Latitud del usuario
-    user_lon=-110.963  # Longitud del usuario
-)
-
-# El sistema calculará distancias y priorizará cafeterías cercanas
-```
-
-## 🔧 Integración con Django
-
-### Opción 1: Singleton (Recomendado para Producción)
-
-```python
-from llm_rag import get_rag_engine
-
-# En tu view
-def chat_endpoint(request):
-    rag = get_rag_engine()  # Reusa instancia existente
-    result = rag.query(request.data['question'])
-    return JsonResponse({'answer': result['answer']})
-```
-
-### Opción 2: Instancia Manual
-
-```python
-from llm_rag.rag_engine_hpc import BuhoRAG
-
-# Inicializar una vez al iniciar Django
-rag_engine = BuhoRAG()
-rag_engine.load_data()
-rag_engine.build_index()
-
-# Usar en views
-def chat_endpoint(request):
-    result = rag_engine.query(request.data['question'])
-    return JsonResponse({'answer': result['answer']})
-```
-
-## 🌐 Despliegue en Servidor
-
-### En el Servidor (Turing)
+Django lo usa en `backend/apps/cafeteria/views.py` (`POST /api/chatbot/`). Para evitar que la
+primera petición tarde minutos, precarga todo antes de levantar el servidor:
 
 ```bash
-# 1. Clonar/actualizar repositorio
-cd ~/IS2_ElBuhoTragon
-git pull origin test
-
-# 2. Instalar dependencias
-cd llm_rag
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-
-# 3. Probar
-python rag_engine_hpc.py
+cd backend
+python manage.py warmup_rag
+python manage.py runserver
 ```
 
-### Desde tu Laptop (SSH Tunnel)
+## 🔧 Configuración
+
+Variables de entorno opcionales:
+
+| Variable | Default | Uso |
+|---|---|---|
+| `BUHO_LLM_MODEL` | `Qwen/Qwen2.5-14B-Instruct` | Usa `Qwen/Qwen2.5-3B-Instruct` para probar con poca memoria |
+| `BUHO_EMBEDDING_MODEL` | `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` | Embeddings |
+| `BUHO_RERANKER_MODEL` | `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1` | Re-ranker multilingüe (vacío = sin re-ranking) |
+
+El índice FAISS se guarda en `llm_rag/.cache/` y se invalida solo cuando cambia el contenido
+indexado, el modelo de embeddings o `CACHE_VERSION`.
+
+## 🔄 Actualizar datos
 
 ```bash
-# Conectar con port forwarding
-ssh -L 8000:localhost:8000 a223201053@turing.mat.uson.mx
-
-# Ahora puedes acceder al servidor desde http://localhost:8000
+cd backend
+python export_for_rag.py                       # genera rag_data.json
+cp rag_data.json ../llm_rag/rag_data_fixed.json
+# reiniciar Django: el índice se reconstruye automáticamente
 ```
 
-## 📊 Performance
+## 🌐 Despliegue (clúster Yuca, ACARUS)
 
 | Métrica | Valor |
-|---------|-------|
-| **Primera consulta** | ~10-30 segundos (carga modelos) |
-| **Consultas siguientes** | ~1-3 segundos |
-| **Hardware Requerido** | AMD Instinct MI210 (64GB VRAM) o equivalente |
-| **Tamaño modelos** | ~28 GB (Qwen-14B-Instruct float16) |
+|---|---|
+| Hardware | AMD Instinct MI210 (64 GB VRAM, ROCm) |
+| Modelo | Qwen2.5-14B-Instruct float16 (~28 GB) |
+| Primera carga | varios minutos (descarga + carga en VRAM) |
+| Consulta | ~2-6 s (+1 llamada corta al LLM si hay historial) |
+
+```bash
+# Túnel al backend corriendo en Yuca
+ssh -L 8000:localhost:8000 <usuario>@<host-de-yuca>
+```
 
 ## 🐛 Troubleshooting
 
-### Error: "No module named 'llm_rag'"
-
-**Solución:** Agregar al Python path en Django:
-
-```python
-# En manage.py o settings.py
-import sys
-import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-```
-
-### Error: "Out of memory"
-
-**Solución:** Cambiar a modelo más ligero en `rag_engine_hpc.py` o aplicar cuantización en el pipeline:
-
-```python
-# Línea ~150, cambiar:
-model_id = "Qwen/Qwen2.5-3B-Instruct"  # Más ligero
-```
-
-### LLM sigue alucinando
-
-**Solución:** Ya está optimizado al máximo. Si persiste:
-1. Aumentar `k` en `_retrieve_context()` para más contexto
-2. Revisar que `rag_data_fixed.json` tenga toda la info necesaria
-3. Ajustar el system prompt en `query()`
-
-### Primera consulta muy lenta
-
-**Solución:** Esto es normal, los modelos se cargan en VRAM. Además, implementamos caché persistente de FAISS en disco. Usa el singleton `get_rag_engine()` para mantener los modelos precargados.
-
-## 🔄 Actualizar Datos
-
-Cuando cambies la base de datos:
-
-```bash
-# 1. Exportar nuevos datos (en backend/)
-python export_for_rag.py
-
-# 2. Copiar a llm_rag/
-cp rag_data_fixed.json ../llm_rag/
-
-# 3. Reiniciar Django para recargar
-```
-
-## 📝 API Response Format
-
-```json
-{
-  "answer": "La Torta Cubana cuesta $85.00 pesos y está disponible en...",
-  "context": [
-    "Platillo: Torta Cubana. Precio: $85.00 pesos...",
-    "Cafetería: ..."
-  ]
-}
-```
-
-## 🎨 Próxima Integración
-
-Este sistema está listo para integrarse con tu chat widget del frontend. Cuando compartas los archivos del chat, integraremos:
-
-1. Llamada al endpoint desde React
-2. Obtención de ubicación GPS del usuario
-3. Manejo de estados de carga
-4. Display de respuestas en el chat
-
-## 📞 Soporte
-
-Para dudas sobre este sistema RAG:
-- Revisar este README
-- Ejecutar `python rag_engine_hpc.py` para testing
-- Verificar logs del servidor
-
-## 🔐 Seguridad
-
-- No incluir API keys en el código
-- Validar inputs del usuario
-- Limitar rate de consultas si es necesario
-- Logs para monitorear uso
-
----
-
-**Listo para producción** ✅
+- **`/api/chatbot/` responde 503**: el import de `llm_rag` falló; el motivo aparece en el log
+  (`RAG no disponible: ...`). Normalmente falta una dependencia de `requirements.txt`.
+- **Out of memory**: usa `BUHO_LLM_MODEL=Qwen/Qwen2.5-3B-Instruct`.
+- **Respuestas sin datos de distancia**: el GPS del navegador está fuera del campus (se ignora)
+  y la pregunta no menciona ningún lugar conocido (ver `KNOWN_LOCATIONS` en `rag_utils.py`).
+- **429 en el chat**: límite de 15 consultas/minuto por usuario (`ChatbotRateThrottle`).
