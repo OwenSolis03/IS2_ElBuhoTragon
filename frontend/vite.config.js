@@ -6,6 +6,11 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: true // Esto permite ver la página desde un celular/red
+    host: true, // Esto permite ver la página desde un celular/red
+    allowedHosts: true,
+    watch: {
+      usePolling: true,
+      interval: 1000
+    }
   }
 })

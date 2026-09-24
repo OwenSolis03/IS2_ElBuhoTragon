@@ -92,8 +92,8 @@ const Home = () => {
         result = result.filter(c => tiendasConComida.includes(c.id_tiendita));
     }
 
-    if (filterPrecio) {
-        const maxPrecio = parseFloat(filterPrecio);
+    if (filterPrecio !== "" && !isNaN(parseFloat(filterPrecio))) {
+        const maxPrecio = Math.max(0, parseFloat(filterPrecio));
         const tiendasEnPresupuesto = allMenus
             .filter(m => parseFloat(m.precio) <= maxPrecio)
             .map(m => m.id_tiendita);
@@ -211,10 +211,47 @@ const Home = () => {
                     <div className="relative group">
                         <input 
                             type="number"
+                            min="0"
+                            step="5"
                             placeholder="Presupuesto"
                             className="px-3 py-2 w-28 text-sm font-medium bg-[#141b2d] border border-white/20 rounded-lg text-gray-200 focus:outline-none focus:border-cyan-500 hover:bg-[#1a2236] transition-all placeholder-gray-500"
                             value={filterPrecio}
-                            onChange={(e) => setFilterPrecio(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === '-' || e.key === 'e' || e.key === 'E' || e.key === '+' || e.key === 'Subtract') {
+                                    e.preventDefault();
+                                }
+                                if (e.key === 'ArrowDown') {
+                                    const current = parseFloat(filterPrecio);
+                                    if (isNaN(current) || current <= 0) {
+                                        e.preventDefault();
+                                        setFilterPrecio("");
+                                        e.target.value = "";
+                                    }
+                                }
+                            }}
+                            onInput={(e) => {
+                                if (e.target.value.includes('-') || parseFloat(e.target.value) < 0) {
+                                    e.target.value = "";
+                                    setFilterPrecio("");
+                                }
+                            }}
+                            onChange={(e) => {
+                                const raw = e.target.value;
+                                if (raw === "") {
+                                    setFilterPrecio("");
+                                    return;
+                                }
+                                const clean = raw.replace(/[^0-9.]/g, "");
+                                if (!clean) {
+                                    setFilterPrecio("");
+                                    e.target.value = "";
+                                    return;
+                                }
+                                const num = Math.max(0, parseFloat(clean));
+                                const finalVal = isNaN(num) || num <= 0 ? "" : String(num);
+                                setFilterPrecio(finalVal);
+                                e.target.value = finalVal;
+                            }}
                         />
                     </div>
                     

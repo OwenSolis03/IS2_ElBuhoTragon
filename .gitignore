@@ -26,3 +26,8 @@ package-lock.json
 .gitnexus/
 # tgrep
 .tgrep*
+
+# Logs y runtime local
+*.log
+service_slurm.err
+.active_node

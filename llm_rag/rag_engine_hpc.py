@@ -45,6 +45,9 @@ EMBEDDING_MODEL = os.environ.get("BUHO_EMBEDDING_MODEL", "sentence-transformers/
 # Re-ranker multilingüe: el anterior (ms-marco-MiniLM-L-6-v2) solo entiende inglés.
 RERANKER_MODEL = os.environ.get("BUHO_RERANKER_MODEL", "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1")
 LLM_MODEL = os.environ.get("BUHO_LLM_MODEL", "Qwen/Qwen2.5-14B-Instruct")
+LLM_BACKEND = os.environ.get("BUHO_LLM_BACKEND", "ollama" if os.environ.get("BUHO_OLLAMA_MODEL") else "transformers").lower()
+OLLAMA_URL = os.environ.get("BUHO_OLLAMA_URL", "http://127.0.0.1:11434")
+OLLAMA_MODEL = os.environ.get("BUHO_OLLAMA_MODEL", "qwen2.5:72b")
 
 # Incrementar al cambiar la lógica del índice para invalidar cachés anteriores
 # (el contenido indexado y el modelo de embeddings ya forman parte de la clave).
@@ -61,11 +64,16 @@ HISTORY_TURNS = 4
 NO_CONTEXT = "No se encontró información relevante en la base de datos para esta consulta."
 FALLBACK_ANSWER = "No encontré información sobre eso en las cafeterías del campus. ¿Puedes preguntarlo de otra forma?"
 
-SYSTEM_PROMPT = """Eres "El Búho Tragón", el asistente de comida del campus Hermosillo de la Universidad de Sonora (UNISON).
+SYSTEM_PROMPT = """Eres "El Búho Tragón", el asistente gastronómico del campus Hermosillo de la Universidad de Sonora (UNISON).
 
 HORA ACTUAL: {now}
 UBICACIÓN DEL USUARIO: {location}
 {budget}
+GUARDRAIL ESTRICTO:
+- Tu único objetivo es dar información sobre las cafeterías, menús, platillos, precios y horarios del campus Hermosillo de la UNISON.
+- Si el usuario te pide programar código, resolver tareas generales, contar letras, acertijos, o cualquier tema ajeno a la comida y cafeterías de la UNISON, NO lo hagas. Responde de forma amable y breve:
+  "Disculpa, solo puedo ayudarte con información de comida, menús y cafeterías del campus de la UNISON."
+
 REGLAS:
 1. Responde SOLO con la información de DATOS. Si algo no está en DATOS, di que no tienes esa información; nunca inventes cafeterías, platillos, precios ni horarios.
 2. Respuestas cortas y directas, en español y con tono amigable.
@@ -82,9 +90,9 @@ Los molletes están en:
 • Cafeteria Derecho: Mollete ($30)"""
 
 REFORMULATE_PROMPT = (
-    "Reescribe la última pregunta del usuario para que se entienda por sí sola, usando el historial "
-    "del chat (platillos, cafeterías, lugares o presupuesto mencionados antes). Si ya es clara, "
-    "devuélvela igual. Responde ÚNICAMENTE con la pregunta reescrita, en una sola línea."
+    "Tu objetivo es hacer que la última pregunta del usuario sea autónoma usando el contexto previo de cafeterías, platillos o lugares del campus. "
+    "Si la pregunta es clara por sí misma o si trata de un tema completamente diferente al contexto anterior, NO la modifiques. "
+    "Responde ÚNICAMENTE con la pregunta en una sola línea, sin explicaciones ni añadidos."
 )
 
 
@@ -150,7 +158,9 @@ class BuhoRAG:
                     logger.error(f"No se pudo cargar el Cross-Encoder, se omite el re-ranking: {e}")
                     self._reranker_failed = True
 
-            if self.llm_pipeline is None:
+            if LLM_BACKEND == "ollama":
+                logger.info(f"Usando backend Ollama ({OLLAMA_MODEL} en {OLLAMA_URL})")
+            elif self.llm_pipeline is None:
                 logger.info(f"Cargando LLM ({LLM_MODEL})...")
                 self.tokenizer = AutoTokenizer.from_pretrained(LLM_MODEL)
                 model = AutoModelForCausalLM.from_pretrained(
@@ -203,6 +213,31 @@ class BuhoRAG:
     # ------------------------------------------------------------------ LLM
 
     def _generate(self, messages: List[Dict[str, str]], max_new_tokens: int) -> str:
+        if LLM_BACKEND == "ollama":
+            import urllib.request
+            payload = {
+                "model": OLLAMA_MODEL,
+                "messages": messages,
+                "stream": False,
+                "options": {
+                    "num_predict": max_new_tokens,
+                    "temperature": 0.1,
+                    "repeat_penalty": 1.05,
+                }
+            }
+            req = urllib.request.Request(
+                f"{OLLAMA_URL}/api/chat",
+                data=json.dumps(payload).encode("utf-8"),
+                headers={"Content-Type": "application/json"}
+            )
+            try:
+                with urllib.request.urlopen(req, timeout=180) as resp:
+                    data = json.loads(resp.read().decode("utf-8"))
+                    return data["message"]["content"]
+            except Exception as e:
+                logger.error(f"Error llamando a Ollama ({OLLAMA_URL}): {e}")
+                return FALLBACK_ANSWER
+
         prompt = self.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         outputs = self.llm_pipeline(
             prompt,

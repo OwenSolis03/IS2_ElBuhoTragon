@@ -330,7 +330,7 @@ const AdminDashboard = () => {
                       </h4>
                       <div className="grid grid-cols-3 gap-2 mb-2">
                          <input className="col-span-2 p-2 bg-[#1e2538] border border-white/10 rounded text-white text-sm" placeholder="Nombre" value={newMenuItem.nombre} onChange={e => setNewMenuItem({...newMenuItem, nombre: e.target.value})} />
-                         <input className="col-span-1 p-2 bg-[#1e2538] border border-white/10 rounded text-white text-sm" type="number" placeholder="$" value={newMenuItem.precio} onChange={e => setNewMenuItem({...newMenuItem, precio: e.target.value})} />
+                         <input className="col-span-1 p-2 bg-[#1e2538] border border-white/10 rounded text-white text-sm" type="number" min="0" placeholder="$" value={newMenuItem.precio} onChange={e => { const val = e.target.value; setNewMenuItem({...newMenuItem, precio: val === "" ? "" : Math.max(0, parseFloat(val)).toString()}); }} />
                       </div>
                       <div className="grid grid-cols-2 gap-2 mb-2">
                           <select className="p-2 bg-[#1e2538] border border-white/10 rounded text-white text-sm" value={newMenuItem.categoria} onChange={e => setNewMenuItem({...newMenuItem, categoria: e.target.value})}>

@@ -110,7 +110,7 @@ def detect_device():
         device_name = torch.cuda.get_device_name(0)
         backend = "ROCm" if "AMD" in device_name or "Radeon" in device_name else "CUDA"
         logger.info(f"GPU detectada: {device_name} ({backend})")
-        return "cuda:0", torch.float16
+        return "cuda:0", torch.bfloat16
     logger.warning("Usando CPU")
     return "cpu", torch.float32
 
