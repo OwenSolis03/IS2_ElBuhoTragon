@@ -18,17 +18,17 @@ const PageHeader = ({
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div className="max-w-3xl">
           {eyebrow && (
-            <span className="font-mono text-xs uppercase tracking-[0.25em] text-[#B39A3A] block mb-2 font-medium">
+            <span className="font-mono text-sm uppercase tracking-[0.22em] text-[#B39A3A] block mb-2.5 font-medium">
               {eyebrow}
             </span>
           )}
           {title && (
-            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-[#F2F2F0] font-normal tracking-tight mb-2 leading-[1.05]">
+            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-[#F2F2F0] font-normal tracking-tight mb-3 leading-[1.05]">
               {title}
             </h1>
           )}
           {description && (
-            <p className="text-neutral-300 text-sm sm:text-base font-light leading-relaxed">
+            <p className="text-neutral-200 text-base sm:text-lg font-light leading-relaxed">
               {description}
             </p>
           )}

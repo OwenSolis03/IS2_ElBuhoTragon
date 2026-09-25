@@ -33,37 +33,37 @@ const ConfirmModal = ({
       aria-modal="true"
       aria-labelledby="confirm-modal-title"
     >
-      <div className="bg-[#0a1830] w-full max-w-md rounded-2xl p-6 border border-white/[0.12] shadow-2xl space-y-4">
+      <div className="bg-[#0a1830] w-full max-w-md rounded-2xl p-6 sm:p-7 border border-white/[0.12] shadow-2xl space-y-4">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3.5">
             {isDestructive ? (
-              <div className="w-9 h-9 rounded-full bg-rose-950/60 border border-rose-500/30 text-rose-400 flex items-center justify-center flex-shrink-0">
-                <FiAlertTriangle size={18} />
+              <div className="w-10 h-10 rounded-full bg-rose-950/60 border border-rose-500/30 text-rose-400 flex items-center justify-center flex-shrink-0">
+                <FiAlertTriangle size={20} />
               </div>
             ) : (
-              <div className="w-9 h-9 rounded-full bg-[#163A70]/60 border border-[#204a8e]/40 text-[#B39A3A] flex items-center justify-center flex-shrink-0">
-                <FiAlertTriangle size={18} />
+              <div className="w-10 h-10 rounded-full bg-[#163A70]/60 border border-[#204a8e]/40 text-[#B39A3A] flex items-center justify-center flex-shrink-0">
+                <FiAlertTriangle size={20} />
               </div>
             )}
             <div>
-              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-400 block mb-0.5">
+              <span className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-400 block mb-1">
                 Confirmación
               </span>
-              <h3 id="confirm-modal-title" className="font-display text-2xl text-white font-normal leading-tight">
+              <h3 id="confirm-modal-title" className="font-display text-2xl sm:text-3xl text-white font-normal leading-tight">
                 {title}
               </h3>
             </div>
           </div>
           <button
             onClick={onCancel}
-            className="text-neutral-400 hover:text-white p-1 rounded-lg hover:bg-white/5 transition-colors"
+            className="text-neutral-400 hover:text-white p-1.5 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
             aria-label="Cerrar modal"
           >
-            <FiX size={18} />
+            <FiX size={20} />
           </button>
         </div>
 
-        <p className="text-sm text-neutral-300 font-light leading-relaxed pl-12">
+        <p className="text-base text-neutral-200 font-light leading-relaxed pl-13">
           {message}
         </p>
 
@@ -71,17 +71,17 @@ const ConfirmModal = ({
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 text-xs font-mono uppercase tracking-wider text-neutral-400 hover:text-white transition-colors cursor-pointer"
+            className="px-5 py-2.5 text-sm font-mono uppercase tracking-wider text-neutral-400 hover:text-white transition-colors cursor-pointer"
           >
             {cancelText}
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className={`px-5 py-2.5 rounded-full text-xs font-medium uppercase tracking-wider transition-colors cursor-pointer ${
+            className={`px-6 py-2.5 rounded-full text-sm font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
               isDestructive
                 ? "bg-[#702B32] hover:bg-[#8f3740] text-white border border-rose-500/30"
-                : "bg-white text-black hover:bg-neutral-200"
+                : "bg-white text-black hover:bg-neutral-200 shadow-md"
             }`}
           >
             {confirmText}

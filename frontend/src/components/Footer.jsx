@@ -13,12 +13,12 @@ const Footer = () => {
           {/* Columna 1: Marca Hungry Owl */}
           <div className="flex flex-col items-center md:items-start gap-2.5">
             <div className="flex items-center gap-2.5">
-              <img src={logo} alt="Hungry Owl" className="h-7 w-7 object-contain opacity-90" />
-              <span className="font-display font-semibold text-lg text-[#F2F2F0] tracking-wider uppercase">
+              <img src={logo} alt="Hungry Owl" className="h-8 w-8 object-contain opacity-90" />
+              <span className="font-display font-semibold text-xl text-[#F2F2F0] tracking-wider uppercase">
                 Hungry Owl
               </span>
             </div>
-            <p className="text-xs text-neutral-400 text-center md:text-left max-w-xs leading-relaxed font-light">
+            <p className="text-sm text-neutral-300 text-center md:text-left max-w-sm leading-relaxed font-light">
               Guía gastronómica independiente y asistente inteligente para la comunidad universitaria de la UNISON.
             </p>
           </div>
@@ -28,19 +28,19 @@ const Footer = () => {
             <img
               src={UnisonLogo}
               alt="Universidad de Sonora"
-              className="h-10 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity duration-300"
+              className="h-11 w-auto object-contain opacity-85 hover:opacity-100 transition-opacity duration-300"
             />
-            <span className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
+            <span className="text-xs font-mono tracking-widest text-neutral-300 uppercase">
               Campus Hermosillo · Sonora
             </span>
           </div>
 
           {/* Columna 3: Enlaces Institucionales y Navegación */}
           <div className="flex flex-col items-center md:items-end gap-2.5">
-            <span className="text-[10px] font-mono font-semibold tracking-widest uppercase text-[#B39A3A]">
+            <span className="text-xs font-mono font-semibold tracking-widest uppercase text-[#B39A3A]">
               Documentación & Legal
             </span>
-            <div className="flex flex-wrap gap-4 text-xs font-medium text-neutral-300">
+            <div className="flex flex-wrap gap-4 text-sm font-medium text-neutral-200">
               <Link to="/terminos" className="hover:text-white transition-colors py-1">
                 Términos
               </Link>
@@ -57,11 +57,11 @@ const Footer = () => {
         </div>
 
         {/* Barra inferior de créditos */}
-        <div className="pt-6 flex flex-col sm:flex-row justify-between items-center text-[11px] text-neutral-400 font-mono gap-2 text-center sm:text-left">
+        <div className="pt-6 flex flex-col sm:flex-row justify-between items-center text-xs text-neutral-300 font-mono gap-2 text-center sm:text-left">
           <span>
             Desarrollado para Ingeniería de Software II · Departamento de Matemáticas
           </span>
-          <span className="text-neutral-500">
+          <span className="text-neutral-400">
             © {new Date().getFullYear()} Hungry Owl. Comunidad Búho UNISON.
           </span>
         </div>

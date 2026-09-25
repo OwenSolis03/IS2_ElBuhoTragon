@@ -343,55 +343,55 @@ const AdminDashboard = () => {
         >
           <button 
             onClick={() => setShowModal(true)} 
-            className="px-6 py-2.5 bg-white text-black font-sans text-xs font-mono uppercase tracking-wider rounded-full hover:bg-neutral-200 transition-colors flex items-center gap-2 cursor-pointer font-medium"
+            className="px-7 py-3 bg-white text-black font-sans text-sm font-mono uppercase tracking-wider rounded-full hover:bg-neutral-200 transition-colors flex items-center gap-2.5 cursor-pointer font-semibold"
           >
-            <FiPlus size={15} /> 
+            <FiPlus size={17} /> 
             <span>Nueva Cafetería</span>
           </button>
         </PageHeader>
 
         {/* Tabla de Cafeterías */}
         {loading ? (
-          <div className="py-20 text-center text-neutral-400 font-mono text-xs uppercase tracking-widest animate-pulse">
+          <div className="py-20 text-center text-neutral-300 font-mono text-sm uppercase tracking-widest animate-pulse font-medium">
             Sincronizando catálogo con el servidor...
           </div>
         ) : (
           <div className="rounded-2xl bg-[#0a1830] border border-white/[0.08] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
-                <thead className="bg-[#071326] text-neutral-300 font-mono text-[11px] uppercase tracking-wider border-b border-white/[0.08]">
+                <thead className="bg-[#071326] text-neutral-200 font-mono text-xs uppercase tracking-wider border-b border-white/[0.08]">
                   <tr>
-                    <th className="px-6 py-4 font-medium">Establecimiento</th>
-                    <th className="px-6 py-4 font-medium">Horario Regular</th>
-                    <th className="px-6 py-4 font-medium text-center">Acciones</th>
+                    <th className="px-6 py-4.5 font-semibold">Establecimiento</th>
+                    <th className="px-6 py-4.5 font-semibold">Horario Regular</th>
+                    <th className="px-6 py-4.5 font-semibold text-center">Acciones</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/[0.06] text-sm">
+                <tbody className="divide-y divide-white/[0.06] text-base">
                   {cafeterias.map((cafe) => (
                     <tr key={cafe.id_tiendita} className="hover:bg-white/[0.02] transition-colors">
-                      <td className="px-6 py-4 font-medium text-white">
+                      <td className="px-6 py-4.5 font-medium text-white">
                         {cafe.nombre}
                       </td>
-                      <td className="px-6 py-4 font-mono text-xs text-neutral-300">
+                      <td className="px-6 py-4.5 font-mono text-sm text-neutral-200">
                         {cafe.hora_apertura ? `${cafe.hora_apertura.slice(0, 5)} – ${cafe.hora_cierre?.slice(0, 5)}` : "Sin horario registrado"}
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center justify-center gap-2">
+                      <td className="px-6 py-4.5">
+                        <div className="flex items-center justify-center gap-3">
                           <button 
                             onClick={() => openEditModal(cafe)} 
-                            className="p-2 text-neutral-300 hover:text-white hover:bg-white/[0.06] rounded-lg transition-colors cursor-pointer"
+                            className="p-2.5 text-neutral-300 hover:text-white hover:bg-white/[0.06] rounded-xl transition-colors cursor-pointer"
                             title="Editar cafetería"
                             aria-label={`Editar cafetería ${cafe.nombre}`}
                           >
-                            <FiEdit2 size={15} />
+                            <FiEdit2 size={17} />
                           </button>
                           <button 
                             onClick={() => handleDelete(cafe.id_tiendita, cafe.nombre)} 
-                            className="p-2 text-neutral-300 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
+                            className="p-2.5 text-neutral-300 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors cursor-pointer"
                             title="Eliminar cafetería"
                             aria-label={`Eliminar cafetería ${cafe.nombre}`}
                           >
-                            <FiTrash2 size={15} />
+                            <FiTrash2 size={17} />
                           </button>
                         </div>
                       </td>
@@ -417,25 +417,25 @@ const AdminDashboard = () => {
         >
           <div className="bg-[#0a1830] w-full max-w-lg rounded-2xl p-6 sm:p-8 border border-white/[0.12] shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-4 mb-6">
-              <h3 id="modal-create-title" className="font-display text-2xl text-white font-normal">
+              <h3 id="modal-create-title" className="font-display text-2xl sm:text-3xl text-white font-normal">
                 Registrar Cafetería
               </h3>
               <button 
                 onClick={() => setShowModal(false)} 
-                className="text-neutral-400 hover:text-white p-1 cursor-pointer"
+                className="text-neutral-400 hover:text-white p-1.5 cursor-pointer"
                 aria-label="Cerrar modal"
               >
-                <FiX size={18} />
+                <FiX size={20} />
               </button>
             </div>
 
             <form onSubmit={handleCreate} className="space-y-4 text-sm font-sans">
               <div>
-                <label htmlFor="new-cafe-nombre" className="block font-mono text-[11px] uppercase tracking-wider text-neutral-300 mb-1 font-medium">Nombre</label>
+                <label htmlFor="new-cafe-nombre" className="block font-mono text-xs uppercase tracking-wider text-neutral-300 mb-1.5 font-medium">Nombre</label>
                 <input 
                   id="new-cafe-nombre"
                   name="nombre" 
-                  className="w-full p-3 bg-[#071326] border border-white/[0.1] rounded-xl text-white focus:outline-none focus:border-[#B39A3A]" 
+                  className="w-full p-3.5 bg-[#071326] border border-white/[0.1] rounded-xl text-white text-base focus:outline-none focus:border-[#B39A3A]" 
                   placeholder="Nombre de la cafetería" 
                   onChange={handleChange} 
                   required 
@@ -444,22 +444,22 @@ const AdminDashboard = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="new-cafe-apertura" className="block font-mono text-[11px] uppercase tracking-wider text-neutral-300 mb-1 font-medium">Apertura</label>
+                  <label htmlFor="new-cafe-apertura" className="block font-mono text-xs uppercase tracking-wider text-neutral-300 mb-1.5 font-medium">Apertura</label>
                   <input 
                     id="new-cafe-apertura"
                     type="time" 
                     name="hora_apertura" 
-                    className="w-full p-3 bg-[#071326] border border-white/[0.1] rounded-xl text-white focus:outline-none focus:border-[#B39A3A] font-mono" 
+                    className="w-full p-3.5 bg-[#071326] border border-white/[0.1] rounded-xl text-white focus:outline-none focus:border-[#B39A3A] font-mono text-sm" 
                     onChange={handleChange} 
                   />
                 </div>
                 <div>
-                  <label htmlFor="new-cafe-cierre" className="block font-mono text-[11px] uppercase tracking-wider text-neutral-300 mb-1 font-medium">Cierre</label>
+                  <label htmlFor="new-cafe-cierre" className="block font-mono text-xs uppercase tracking-wider text-neutral-300 mb-1.5 font-medium">Cierre</label>
                   <input 
                     id="new-cafe-cierre"
                     type="time" 
                     name="hora_cierre" 
-                    className="w-full p-3 bg-[#071326] border border-white/[0.1] rounded-xl text-white focus:outline-none focus:border-[#B39A3A] font-mono" 
+                    className="w-full p-3.5 bg-[#071326] border border-white/[0.1] rounded-xl text-white focus:outline-none focus:border-[#B39A3A] font-mono text-sm" 
                     onChange={handleChange} 
                   />
                 </div>
@@ -467,37 +467,37 @@ const AdminDashboard = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="new-cafe-latitud" className="block font-mono text-[11px] uppercase tracking-wider text-neutral-300 mb-1 font-medium">Latitud</label>
+                  <label htmlFor="new-cafe-latitud" className="block font-mono text-xs uppercase tracking-wider text-neutral-300 mb-1.5 font-medium">Latitud</label>
                   <input 
                     id="new-cafe-latitud"
                     type="number" 
                     step="any" 
                     placeholder="29.083..." 
                     name="latitud" 
-                    className="w-full p-3 bg-[#071326] border border-white/[0.1] rounded-xl text-white focus:outline-none focus:border-[#B39A3A] font-mono text-xs" 
+                    className="w-full p-3.5 bg-[#071326] border border-white/[0.1] rounded-xl text-white focus:outline-none focus:border-[#B39A3A] font-mono text-sm" 
                     onChange={handleChange} 
                   />
                 </div>
                 <div>
-                  <label htmlFor="new-cafe-longitud" className="block font-mono text-[11px] uppercase tracking-wider text-neutral-300 mb-1 font-medium">Longitud</label>
+                  <label htmlFor="new-cafe-longitud" className="block font-mono text-xs uppercase tracking-wider text-neutral-300 mb-1.5 font-medium">Longitud</label>
                   <input 
                     id="new-cafe-longitud"
                     type="number" 
                     step="any" 
                     placeholder="-110.961..." 
                     name="longitud" 
-                    className="w-full p-3 bg-[#071326] border border-white/[0.1] rounded-xl text-white focus:outline-none focus:border-[#B39A3A] font-mono text-xs" 
+                    className="w-full p-3.5 bg-[#071326] border border-white/[0.1] rounded-xl text-white focus:outline-none focus:border-[#B39A3A] font-mono text-sm" 
                     onChange={handleChange} 
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="new-cafe-facultad" className="block font-mono text-[11px] uppercase tracking-wider text-neutral-300 mb-1 font-medium">Facultad</label>
+                <label htmlFor="new-cafe-facultad" className="block font-mono text-xs uppercase tracking-wider text-neutral-300 mb-1.5 font-medium">Facultad</label>
                 <select 
                   id="new-cafe-facultad"
                   name="id_facultad" 
-                  className="w-full p-3 bg-[#071326] border border-white/[0.1] rounded-xl text-white focus:outline-none focus:border-[#B39A3A]" 
+                  className="w-full p-3.5 bg-[#071326] border border-white/[0.1] rounded-xl text-white text-base focus:outline-none focus:border-[#B39A3A]" 
                   onChange={handleChange} 
                   required
                 >
@@ -506,8 +506,8 @@ const AdminDashboard = () => {
                 </select>
               </div>
 
-              <label className="cursor-pointer bg-white/[0.04] border border-white/[0.1] text-neutral-300 px-4 py-3 rounded-xl text-xs font-mono uppercase tracking-wider flex items-center gap-2 justify-center hover:bg-white/[0.08] transition">
-                <FiImage size={15} /> 
+              <label className="cursor-pointer bg-white/[0.04] border border-white/[0.1] text-neutral-300 px-4 py-3.5 rounded-xl text-sm font-mono uppercase tracking-wider flex items-center gap-2 justify-center hover:bg-white/[0.08] transition">
+                <FiImage size={17} /> 
                 <span>Imagen de portada</span>
                 <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, false)} />
               </label>
@@ -516,13 +516,13 @@ const AdminDashboard = () => {
                 <button 
                   type="button" 
                   onClick={() => setShowModal(false)} 
-                  className="px-5 py-2 text-xs font-mono uppercase tracking-wider text-neutral-400 hover:text-white cursor-pointer"
+                  className="px-5 py-2.5 text-sm font-mono uppercase tracking-wider text-neutral-400 hover:text-white cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button 
                   type="submit" 
-                  className="px-6 py-2.5 bg-white text-black font-sans text-xs font-mono uppercase tracking-wider rounded-full hover:bg-neutral-200 transition-colors cursor-pointer font-medium"
+                  className="px-7 py-3 bg-white text-black font-sans text-sm font-mono uppercase tracking-wider rounded-full hover:bg-neutral-200 transition-colors cursor-pointer font-semibold shadow-md"
                 >
                   Guardar
                 </button>
@@ -541,26 +541,26 @@ const AdminDashboard = () => {
           aria-labelledby="modal-edit-title"
         >
           <div className="bg-[#0a1830] w-full max-w-2xl h-[85vh] rounded-2xl border border-white/[0.12] shadow-2xl flex flex-col overflow-hidden">
-            <div className="flex justify-between items-center p-5 border-b border-white/[0.08] bg-[#071326]">
-              <h3 id="modal-edit-title" className="font-display text-2xl text-white font-normal">
+            <div className="flex justify-between items-center p-5 sm:p-6 border-b border-white/[0.08] bg-[#071326]">
+              <h3 id="modal-edit-title" className="font-display text-2xl sm:text-3xl text-white font-normal">
                 Editar: {editingCafe.nombre}
               </h3>
               <button 
                 onClick={() => setShowEditModal(false)} 
-                className="text-neutral-400 hover:text-white p-1 cursor-pointer"
+                className="text-neutral-400 hover:text-white p-1.5 cursor-pointer"
                 aria-label="Cerrar ventana de edición"
               >
-                <FiX size={18} />
+                <FiX size={20} />
               </button>
             </div>
             
             {/* TABS DE NAVEGACIÓN */}
-            <div className="flex border-b border-white/[0.08] bg-[#071326] px-5 gap-6 text-xs font-mono uppercase tracking-wider" role="tablist">
+            <div className="flex border-b border-white/[0.08] bg-[#071326] px-6 gap-8 text-sm font-mono uppercase tracking-wider" role="tablist">
               <button 
                 role="tab"
                 aria-selected={activeTab === "info"}
                 onClick={() => setActiveTab("info")} 
-                className={`py-3.5 border-b-2 transition-colors cursor-pointer ${
+                className={`py-4 border-b-2 transition-colors cursor-pointer ${
                   activeTab === "info" ? "text-white border-[#B39A3A] font-semibold" : "text-neutral-400 border-transparent hover:text-white"
                 }`}
               >
@@ -570,7 +570,7 @@ const AdminDashboard = () => {
                 role="tab"
                 aria-selected={activeTab === "menu"}
                 onClick={() => setActiveTab("menu")} 
-                className={`py-3.5 border-b-2 transition-colors cursor-pointer ${
+                className={`py-4 border-b-2 transition-colors cursor-pointer ${
                   activeTab === "menu" ? "text-white border-[#B39A3A] font-semibold" : "text-neutral-400 border-transparent hover:text-white"
                 }`}
               >
@@ -580,7 +580,7 @@ const AdminDashboard = () => {
                 role="tab"
                 aria-selected={activeTab === "reviews"}
                 onClick={() => setActiveTab("reviews")} 
-                className={`py-3.5 border-b-2 transition-colors cursor-pointer ${
+                className={`py-4 border-b-2 transition-colors cursor-pointer ${
                   activeTab === "reviews" ? "text-white border-[#B39A3A] font-semibold" : "text-neutral-400 border-transparent hover:text-white"
                 }`}
               >
@@ -588,25 +588,25 @@ const AdminDashboard = () => {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-6 sm:p-7">
               {/* --- TAB 1: INFORMACIÓN GENERAL --- */}
               {activeTab === "info" && (
                 <form onSubmit={handleUpdateCafe} className="space-y-4 font-sans text-sm">
                   <div>
-                    <label htmlFor="edit-cafe-nombre" className="block font-mono text-[11px] uppercase tracking-wider text-neutral-300 mb-1 font-medium">Nombre</label>
+                    <label htmlFor="edit-cafe-nombre" className="block font-mono text-xs uppercase tracking-wider text-neutral-300 mb-1.5 font-medium">Nombre</label>
                     <input 
                       id="edit-cafe-nombre"
-                      className="w-full p-3 bg-[#071326] border border-white/[0.1] rounded-xl text-white focus:outline-none focus:border-[#B39A3A]" 
+                      className="w-full p-3.5 bg-[#071326] border border-white/[0.1] rounded-xl text-white text-base focus:outline-none focus:border-[#B39A3A]" 
                       value={editingCafe.nombre} 
                       onChange={(e) => setEditingCafe({ ...editingCafe, nombre: e.target.value })} 
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="edit-cafe-direccion" className="block font-mono text-[11px] uppercase tracking-wider text-neutral-300 mb-1 font-medium">Dirección / Ubicación</label>
+                    <label htmlFor="edit-cafe-direccion" className="block font-mono text-xs uppercase tracking-wider text-neutral-300 mb-1.5 font-medium">Dirección / Ubicación</label>
                     <input 
                       id="edit-cafe-direccion"
-                      className="w-full p-3 bg-[#071326] border border-white/[0.1] rounded-xl text-white focus:outline-none focus:border-[#B39A3A]" 
+                      className="w-full p-3.5 bg-[#071326] border border-white/[0.1] rounded-xl text-white text-base focus:outline-none focus:border-[#B39A3A]" 
                       value={editingCafe.direccion || ""} 
                       placeholder="Ubicación o edificio del campus" 
                       onChange={(e) => setEditingCafe({ ...editingCafe, direccion: e.target.value })} 
@@ -614,21 +614,21 @@ const AdminDashboard = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="edit-cafe-apertura" className="block font-mono text-[11px] uppercase tracking-wider text-neutral-300 mb-1 font-medium">Apertura</label>
+                      <label htmlFor="edit-cafe-apertura" className="block font-mono text-xs uppercase tracking-wider text-neutral-300 mb-1.5 font-medium">Apertura</label>
                       <input 
                         id="edit-cafe-apertura"
                         type="time" 
-                        className="w-full p-3 bg-[#071326] border border-white/[0.1] rounded-xl text-white focus:outline-none focus:border-[#B39A3A] font-mono" 
+                        className="w-full p-3.5 bg-[#071326] border border-white/[0.1] rounded-xl text-white focus:outline-none focus:border-[#B39A3A] font-mono text-sm" 
                         value={editingCafe.hora_apertura || ""} 
                         onChange={(e) => setEditingCafe({ ...editingCafe, hora_apertura: e.target.value })} 
                       />
                     </div>
                     <div>
-                      <label htmlFor="edit-cafe-cierre" className="block font-mono text-[11px] uppercase tracking-wider text-neutral-300 mb-1 font-medium">Cierre</label>
+                      <label htmlFor="edit-cafe-cierre" className="block font-mono text-xs uppercase tracking-wider text-neutral-300 mb-1.5 font-medium">Cierre</label>
                       <input 
                         id="edit-cafe-cierre"
                         type="time" 
-                        className="w-full p-3 bg-[#071326] border border-white/[0.1] rounded-xl text-white focus:outline-none focus:border-[#B39A3A] font-mono" 
+                        className="w-full p-3.5 bg-[#071326] border border-white/[0.1] rounded-xl text-white focus:outline-none focus:border-[#B39A3A] font-mono text-sm" 
                         value={editingCafe.hora_cierre || ""} 
                         onChange={(e) => setEditingCafe({ ...editingCafe, hora_cierre: e.target.value })} 
                       />
@@ -636,38 +636,38 @@ const AdminDashboard = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="edit-cafe-latitud" className="block font-mono text-[11px] uppercase tracking-wider text-neutral-300 mb-1 font-medium">Latitud</label>
+                      <label htmlFor="edit-cafe-latitud" className="block font-mono text-xs uppercase tracking-wider text-neutral-300 mb-1.5 font-medium">Latitud</label>
                       <input 
                         id="edit-cafe-latitud"
                         type="number" 
                         step="any" 
-                        className="w-full p-3 bg-[#071326] border border-white/[0.1] rounded-xl text-white focus:outline-none focus:border-[#B39A3A] font-mono text-xs" 
+                        className="w-full p-3.5 bg-[#071326] border border-white/[0.1] rounded-xl text-white focus:outline-none focus:border-[#B39A3A] font-mono text-sm" 
                         value={editingCafe.latitud || ""} 
                         onChange={(e) => setEditingCafe({ ...editingCafe, latitud: e.target.value })} 
                       />
                     </div>
                     <div>
-                      <label htmlFor="edit-cafe-longitud" className="block font-mono text-[11px] uppercase tracking-wider text-neutral-300 mb-1 font-medium">Longitud</label>
+                      <label htmlFor="edit-cafe-longitud" className="block font-mono text-xs uppercase tracking-wider text-neutral-300 mb-1.5 font-medium">Longitud</label>
                       <input 
                         id="edit-cafe-longitud"
                         type="number" 
                         step="any" 
-                        className="w-full p-3 bg-[#071326] border border-white/[0.1] rounded-xl text-white focus:outline-none focus:border-[#B39A3A] font-mono text-xs" 
+                        className="w-full p-3.5 bg-[#071326] border border-white/[0.1] rounded-xl text-white focus:outline-none focus:border-[#B39A3A] font-mono text-sm" 
                         value={editingCafe.longitud || ""} 
                         onChange={(e) => setEditingCafe({ ...editingCafe, longitud: e.target.value })} 
                       />
                     </div>
                   </div>
-                  <label className="cursor-pointer bg-white/[0.04] border border-white/[0.1] text-neutral-300 px-4 py-3 rounded-xl text-xs font-mono uppercase tracking-wider flex items-center gap-2 justify-center hover:bg-white/[0.08] transition">
-                    <FiImage size={15} /> 
+                  <label className="cursor-pointer bg-white/[0.04] border border-white/[0.1] text-neutral-300 px-4 py-3.5 rounded-xl text-sm font-mono uppercase tracking-wider flex items-center gap-2 justify-center hover:bg-white/[0.08] transition">
+                    <FiImage size={17} /> 
                     <span>Actualizar Fotografía</span>
                     <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, true)} />
                   </label>
                   <button 
                     type="submit" 
-                    className="w-full py-3 bg-white text-black font-sans text-xs font-mono uppercase tracking-wider rounded-full hover:bg-neutral-200 transition-colors flex items-center justify-center gap-2 cursor-pointer mt-2 font-medium"
+                    className="w-full py-3.5 bg-white text-black font-sans text-sm font-mono uppercase tracking-wider rounded-full hover:bg-neutral-200 transition-colors flex items-center justify-center gap-2 cursor-pointer mt-2 font-semibold shadow-md"
                   >
-                    <FiSave size={14} /> 
+                    <FiSave size={16} /> 
                     <span>Guardar Cambios</span>
                   </button>
                 </form>
@@ -676,19 +676,19 @@ const AdminDashboard = () => {
               {/* --- TAB 2: MENÚ DEL DÍA --- */}
               {activeTab === "menu" && (
                 <div className="space-y-6">
-                  <div className="bg-[#071326] p-5 rounded-2xl border border-white/[0.08]">
-                    <span className="font-mono text-xs uppercase tracking-wider text-[#B39A3A] block mb-3 font-medium">
+                  <div className="bg-[#071326] p-5 sm:p-6 rounded-2xl border border-white/[0.08]">
+                    <span className="font-mono text-sm uppercase tracking-wider text-[#B39A3A] block mb-3 font-semibold">
                       {editingMenuItemId ? "Editar Platillo" : "Agregar Platillo a la Carta"}
                     </span>
                     <div className="grid grid-cols-3 gap-3 mb-3">
                       <input 
-                        className="col-span-2 p-2.5 bg-[#0a1830] border border-white/[0.1] rounded-xl text-white text-xs focus:outline-none focus:border-[#B39A3A]" 
+                        className="col-span-2 p-3 bg-[#0a1830] border border-white/[0.1] rounded-xl text-white text-sm sm:text-base focus:outline-none focus:border-[#B39A3A]" 
                         placeholder="Nombre del platillo" 
                         value={newMenuItem.nombre} 
                         onChange={(e) => setNewMenuItem({ ...newMenuItem, nombre: e.target.value })} 
                       />
                       <input 
-                        className="col-span-1 p-2.5 bg-[#0a1830] border border-white/[0.1] rounded-xl text-white text-xs font-mono focus:outline-none focus:border-[#B39A3A]" 
+                        className="col-span-1 p-3 bg-[#0a1830] border border-white/[0.1] rounded-xl text-white text-sm sm:text-base font-mono focus:outline-none focus:border-[#B39A3A]" 
                         type="number" 
                         placeholder="Precio ($)" 
                         value={newMenuItem.precio} 
@@ -697,7 +697,7 @@ const AdminDashboard = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-3 mb-3">
                       <select 
-                        className="p-2.5 bg-[#0a1830] border border-white/[0.1] rounded-xl text-white text-xs focus:outline-none focus:border-[#B39A3A]" 
+                        className="p-3 bg-[#0a1830] border border-white/[0.1] rounded-xl text-white text-sm sm:text-base focus:outline-none focus:border-[#B39A3A]" 
                         value={newMenuItem.categoria} 
                         onChange={(e) => setNewMenuItem({ ...newMenuItem, categoria: e.target.value })}
                       >
@@ -705,24 +705,24 @@ const AdminDashboard = () => {
                         {categoriasComida.map((c) => <option key={c} value={c}>{c}</option>)}
                       </select>
                       <input 
-                        className="p-2.5 bg-[#0a1830] border border-white/[0.1] rounded-xl text-white text-xs focus:outline-none focus:border-[#B39A3A]" 
+                        className="p-3 bg-[#0a1830] border border-white/[0.1] rounded-xl text-white text-sm sm:text-base focus:outline-none focus:border-[#B39A3A]" 
                         placeholder="Descripción breve" 
                         value={newMenuItem.descripcion} 
                         onChange={(e) => setNewMenuItem({ ...newMenuItem, descripcion: e.target.value })} 
                       />
                     </div>
-                    <div className="flex gap-2 justify-end pt-1">
+                    <div className="flex gap-3 justify-end pt-1">
                       {editingMenuItemId && (
                         <button 
                           onClick={cancelEditMenuItem} 
-                          className="px-4 py-1.5 text-xs font-mono uppercase tracking-wider text-neutral-400 hover:text-white cursor-pointer"
+                          className="px-4 py-2 text-sm font-mono uppercase tracking-wider text-neutral-400 hover:text-white cursor-pointer"
                         >
                           Cancelar
                         </button>
                       )}
                       <button 
                         onClick={handleSaveMenuItem} 
-                        className="px-5 py-1.5 bg-white text-black font-sans text-xs font-mono uppercase tracking-wider rounded-full hover:bg-neutral-200 transition-colors cursor-pointer font-medium"
+                        className="px-6 py-2.5 bg-white text-black font-sans text-sm font-mono uppercase tracking-wider rounded-full hover:bg-neutral-200 transition-colors cursor-pointer font-semibold shadow-md"
                       >
                         {editingMenuItemId ? "Actualizar" : "Guardar Platillo"}
                       </button>
@@ -730,37 +730,39 @@ const AdminDashboard = () => {
                   </div>
 
                   <div>
-                    <h4 className="font-display text-xl text-white mb-3 flex items-center gap-2 font-normal">
-                      <FiList size={16} className="text-[#B39A3A]" /> 
+                    <h4 className="font-display text-2xl text-white mb-3 flex items-center gap-2 font-normal">
+                      <FiList size={18} className="text-[#B39A3A]" /> 
                       <span>Carta Actual ({cafeMenu.length})</span>
                     </h4>
                     <div className="space-y-2 max-h-60 overflow-y-auto pr-1 divide-y divide-white/[0.04]">
                       {cafeMenu.length === 0 && (
-                        <p className="text-neutral-400 text-center text-xs py-6 font-light">
+                        <p className="text-neutral-400 text-center text-sm py-6 font-light">
                           No hay platillos registrados en este menú.
                         </p>
                       )}
                       {cafeMenu.map((item) => (
-                        <div key={item.id_menu} className="pt-2.5 pb-2.5 flex justify-between items-center group">
+                        <div key={item.id_menu} className="pt-3 pb-3 flex justify-between items-center group">
                           <div>
-                            <p className="font-medium text-white text-sm">{item.nombre}</p>
-                            <p className="text-xs text-neutral-400 font-light">{item.categoria} {item.descripcion ? `· ${item.descripcion}` : ""}</p> 
-                            <p className="text-xs text-[#B39A3A] font-mono mt-0.5">${parseFloat(item.precio).toFixed(2)}</p>
+                            <p className="font-medium text-white text-base">{item.nombre}</p>
+                            <p className="text-sm text-neutral-400 font-light">{item.categoria} {item.descripcion ? `· ${item.descripcion}` : ""}</p> 
+                            <p className="text-sm text-[#B39A3A] font-mono mt-0.5 font-medium">${parseFloat(item.precio).toFixed(2)}</p>
                           </div>
-                          <div className="flex gap-1">
+                          <div className="flex gap-2">
                             <button 
                               onClick={() => startEditMenuItem(item)} 
-                              className="p-1.5 text-neutral-400 hover:text-white rounded transition cursor-pointer"
+                              className="p-2 text-neutral-400 hover:text-white rounded-lg hover:bg-white/[0.05] transition cursor-pointer"
                               title="Editar platillo"
+                              aria-label={`Editar platillo ${item.nombre}`}
                             >
-                              <FiEdit2 size={14} />
+                              <FiEdit2 size={16} />
                             </button>
                             <button 
                               onClick={() => handleDeleteMenuItem(item.id_menu)} 
-                              className="p-1.5 text-neutral-400 hover:text-rose-400 rounded transition cursor-pointer"
+                              className="p-2 text-neutral-400 hover:text-rose-400 rounded-lg hover:bg-rose-500/10 transition cursor-pointer"
                               title="Eliminar platillo"
+                              aria-label={`Eliminar platillo ${item.nombre}`}
                             >
-                              <FiTrash2 size={14} />
+                              <FiTrash2 size={16} />
                             </button>
                           </div>
                         </div>
@@ -774,42 +776,43 @@ const AdminDashboard = () => {
               {activeTab === "reviews" && (
                 <div className="space-y-4">
                   <div className="flex justify-between items-center mb-4">
-                    <h4 className="font-display text-xl text-white flex items-center gap-2 font-normal">
-                      <FiMessageSquare size={16} className="text-[#B39A3A]" /> 
+                    <h4 className="font-display text-2xl text-white flex items-center gap-2 font-normal">
+                      <FiMessageSquare size={18} className="text-[#B39A3A]" /> 
                       <span>Moderación de Opiniones</span>
                     </h4>
-                    <span className="font-mono text-xs text-neutral-400">Total: {cafeReviews.length}</span>
+                    <span className="font-mono text-sm text-neutral-400">Total: {cafeReviews.length}</span>
                   </div>
 
                   {cafeReviews.length === 0 ? (
-                    <div className="text-center py-10 text-neutral-400 text-xs font-light">
+                    <div className="text-center py-10 text-neutral-400 text-sm font-light">
                       No hay reseñas registradas para este establecimiento.
                     </div>
                   ) : (
                     <div className="space-y-3 max-h-[55vh] overflow-y-auto pr-2 divide-y divide-white/[0.04]">
                       {cafeReviews.map((review) => (
-                        <div key={review.id_resena} className="pt-3 pb-3 flex justify-between items-start gap-4">
+                        <div key={review.id_resena} className="pt-3.5 pb-3.5 flex justify-between items-start gap-4">
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="font-sans font-medium text-xs text-white flex items-center gap-1.5">
-                                <FiUser size={12} className="text-neutral-400" />
+                            <div className="flex items-center gap-2 mb-1.5">
+                              <span className="font-sans font-medium text-sm sm:text-base text-white flex items-center gap-1.5">
+                                <FiUser size={14} className="text-neutral-400" />
                                 {review.nombre_usuario || "Anónimo"}
                               </span>
-                              <span className="text-[10px] font-mono text-neutral-500">· {new Date(review.fecha_registro).toLocaleDateString()}</span>
+                              <span className="text-xs font-mono text-neutral-400">· {new Date(review.fecha_registro).toLocaleDateString()}</span>
                             </div>
-                            <div className="flex text-[#B39A3A] text-xs mb-1.5">
+                            <div className="flex text-[#B39A3A] text-sm mb-2">
                               {[...Array(5)].map((_, i) => (
-                                <FaStar key={i} size={10} className={i < review.calificacion ? "" : "text-neutral-700"} />
+                                <FaStar key={i} size={12} className={i < review.calificacion ? "" : "text-neutral-700"} />
                               ))}
                             </div>
-                            <p className="text-xs text-neutral-300 font-light leading-relaxed">"{review.comentario}"</p>
+                            <p className="text-sm sm:text-[15px] text-neutral-200 font-light leading-relaxed">"{review.comentario}"</p>
                           </div>
                           <button 
                             onClick={() => handleDeleteReview(review.id_resena)}
-                            className="p-1.5 text-neutral-400 hover:text-rose-400 rounded transition cursor-pointer"
+                            className="p-2 text-neutral-400 hover:text-rose-400 rounded-lg hover:bg-rose-500/10 transition cursor-pointer"
                             title="Eliminar comentario"
+                            aria-label={`Eliminar comentario de ${review.nombre_usuario || "usuario"}`}
                           >
-                            <FiTrash2 size={15} />
+                            <FiTrash2 size={17} />
                           </button>
                         </div>
                       ))}

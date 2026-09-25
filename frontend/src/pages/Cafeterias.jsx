@@ -159,18 +159,18 @@ const Cafeterias = () => {
             alt="" 
             className="w-40 h-40 object-contain opacity-85 mb-8 filter contrast-110" 
           />
-          <span className="font-mono text-xs uppercase tracking-[0.25em] text-[#B39A3A] block mb-2 font-medium">
+          <span className="font-mono text-sm uppercase tracking-[0.22em] text-[#B39A3A] block mb-3 font-medium">
             Pasaporte Tragón · UNISON
           </span>
           <h1 className="font-display text-4xl sm:text-5xl text-[#F2F2F0] font-normal mb-3">
             Acceso Requerido
           </h1>
-          <p className="text-neutral-300 text-sm font-light mb-8 leading-relaxed">
+          <p className="text-neutral-200 text-base sm:text-lg font-light mb-8 leading-relaxed">
             Inicia sesión con tu cuenta universitaria para consultar tu historial de visitas, registrar opiniones y desbloquear tus avances en el campus.
           </p>
           <Link to="/login">
-            <button className="px-6 py-2.5 bg-white text-black text-xs font-mono uppercase tracking-wider rounded-full hover:bg-neutral-200 transition-colors flex items-center gap-2 cursor-pointer font-medium">
-              <FiLock size={13} />
+            <button className="px-7 py-3 bg-white text-black text-sm font-mono uppercase tracking-wider rounded-full hover:bg-neutral-200 transition-colors flex items-center gap-2 cursor-pointer font-semibold">
+              <FiLock size={15} />
               <span>Iniciar Sesión</span>
             </button>
           </Link>
@@ -188,45 +188,45 @@ const Cafeterias = () => {
       <main className="flex-grow pt-28 pb-28 px-4 sm:px-8 lg:px-16 max-w-7xl mx-auto w-full">
         {/* --- ENCABEZADO EDITORIAL DEL PASAPORTE --- */}
         <section className="mb-16 border-b border-white/[0.08] pb-12" aria-label="Resumen de avance del estudiante">
-          <span className="font-mono text-xs uppercase tracking-[0.25em] text-[#B39A3A] block mb-2 font-medium">
+          <span className="font-mono text-sm uppercase tracking-[0.22em] text-[#B39A3A] block mb-2.5 font-medium">
             Registro Académico de Visitas
           </span>
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
             <div className="max-w-2xl">
-              <h1 className="font-display text-4xl sm:text-6xl text-[#F2F2F0] font-normal tracking-tight mb-2">
+              <h1 className="font-display text-4xl sm:text-6xl text-[#F2F2F0] font-normal tracking-tight mb-3">
                 Pasaporte de {userName}
               </h1>
-              <p className="text-neutral-300 text-sm font-light leading-relaxed">
+              <p className="text-neutral-200 text-base sm:text-lg font-light leading-relaxed">
                 Acredita cada cafetería asistiendo al local y compartiendo una reseña verificada con la comunidad universitaria.
               </p>
             </div>
 
             {/* Resumen de Métricas */}
-            <div className="flex items-center gap-6 sm:gap-8 text-xs font-mono text-neutral-300 bg-[#071326]/60 border border-white/[0.08] p-4 rounded-2xl backdrop-blur-sm">
+            <div className="flex items-center gap-6 sm:gap-8 text-sm font-mono text-neutral-200 bg-[#071326]/60 border border-white/[0.08] p-5 rounded-2xl backdrop-blur-sm">
               <div>
-                <span className="text-neutral-400 uppercase tracking-widest text-[10px] block mb-0.5">Rango</span>
-                <strong className="text-[#B39A3A] text-base font-display font-medium flex items-center gap-1">
-                  <FiAward size={14} />
+                <span className="text-neutral-400 uppercase tracking-widest text-xs block mb-1 font-medium">Rango</span>
+                <strong className="text-[#B39A3A] text-lg sm:text-xl font-display font-medium flex items-center gap-1.5">
+                  <FiAward size={16} />
                   {nivel}
                 </strong>
               </div>
               <span className="text-white/20" aria-hidden="true">/</span>
               <div>
-                <span className="text-neutral-400 uppercase tracking-widest text-[10px] block mb-0.5">Conquistas</span>
-                <strong className="text-white text-base font-mono font-medium">
-                  {count} <span className="text-xs text-neutral-400 font-light">de {total}</span>
+                <span className="text-neutral-400 uppercase tracking-widest text-xs block mb-1 font-medium">Conquistas</span>
+                <strong className="text-white text-lg sm:text-xl font-mono font-medium">
+                  {count} <span className="text-sm text-neutral-300 font-light">de {total}</span>
                 </strong>
               </div>
               <span className="text-white/20" aria-hidden="true">/</span>
               <div>
-                <span className="text-neutral-400 uppercase tracking-widest text-[10px] block mb-0.5">Progreso</span>
-                <strong className="text-emerald-400 text-base font-mono font-medium">{Math.round(progress)}%</strong>
+                <span className="text-neutral-400 uppercase tracking-widest text-xs block mb-1 font-medium">Progreso</span>
+                <strong className="text-emerald-400 text-lg sm:text-xl font-mono font-medium">{Math.round(progress)}%</strong>
               </div>
             </div>
           </div>
 
           {/* Barra Minimalista de Progreso */}
-          <div className="mt-8 h-1.5 bg-white/[0.08] w-full rounded-full overflow-hidden">
+          <div className="mt-8 h-2 bg-white/[0.08] w-full rounded-full overflow-hidden">
             <div 
               className="h-full bg-emerald-400 transition-all duration-700 ease-out" 
               style={{ width: `${progress}%` }}
@@ -242,11 +242,11 @@ const Cafeterias = () => {
         {/* --- GALERÍA UNIFORME DE CAFETERÍAS --- */}
         <section aria-label="Catálogo del Pasaporte">
           <div className="flex items-baseline justify-between border-b border-white/[0.08] pb-3 mb-10">
-            <span className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-300 font-medium">
+            <span className="font-mono text-sm sm:text-base uppercase tracking-[0.18em] text-neutral-200 font-semibold">
               Directorio Universitario ({cafeterias.length})
             </span>
-            <span className="text-xs font-mono text-emerald-400 flex items-center gap-1.5">
-              <FiCheckCircle size={13} />
+            <span className="text-sm font-mono text-emerald-400 flex items-center gap-2 font-medium">
+              <FiCheckCircle size={15} />
               <span>{count} acreditadas</span>
             </span>
           </div>

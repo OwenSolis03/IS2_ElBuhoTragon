@@ -199,10 +199,10 @@ const ChatWidget = () => {
         aria-hidden="true"
       />
 
-      {/* Panel lateral drawer (420px) desplegable desde la izquierda */}
+      {/* Panel lateral drawer (450px) desplegable desde la izquierda */}
       <aside
         ref={drawerRef}
-        className={`fixed top-0 bottom-0 left-0 z-50 w-full sm:w-[420px] max-w-[92vw] h-full bg-[#071326] border-r border-white/10 shadow-[20px_0_50px_rgba(0,0,0,0.85)] flex flex-col font-sans transition-transform duration-300 ease-out transform ${
+        className={`fixed top-0 bottom-0 left-0 z-50 w-full sm:w-[450px] max-w-[94vw] h-full bg-[#071326] border-r border-white/10 shadow-[20px_0_50px_rgba(0,0,0,0.85)] flex flex-col font-sans transition-transform duration-300 ease-out transform ${
           isOpen ? "translate-x-0" : "-translate-x-full pointer-events-none"
         }`}
         aria-label="Asistente inteligente de campus Hungry Owl"
@@ -215,13 +215,13 @@ const ChatWidget = () => {
             <img
               src={logo}
               alt=""
-              className="w-7 h-7 object-contain filter grayscale invert contrast-125 brightness-110 opacity-90"
+              className="w-8 h-8 object-contain filter grayscale invert contrast-125 brightness-110 opacity-90"
             />
             <div>
-              <h3 className="font-display text-lg font-normal text-white leading-none">
+              <h3 className="font-display text-xl font-normal text-white leading-none">
                 Asistente Hungry Owl
               </h3>
-              <span className="font-mono text-[10px] text-emerald-400 uppercase tracking-[0.18em] block mt-1">
+              <span className="font-mono text-xs text-emerald-400 uppercase tracking-[0.16em] block mt-1.5 font-medium">
                 En servicio · RAG Campus UNISON
               </span>
             </div>
@@ -229,16 +229,16 @@ const ChatWidget = () => {
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="text-neutral-400 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/5 cursor-pointer"
+            className="text-neutral-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/5 cursor-pointer"
             aria-label="Cerrar asistente"
           >
-            <FiX size={18} />
+            <FiX size={20} />
           </button>
         </div>
 
         {/* Historial de Mensajes */}
         <div
-          className="flex-1 p-4 sm:p-5 overflow-y-auto space-y-3.5 bg-[#0a1830]"
+          className="flex-1 p-4 sm:p-5 overflow-y-auto space-y-4 bg-[#0a1830]"
           aria-live="polite"
         >
           {chatHistory.map((msg, index) => (
@@ -247,10 +247,10 @@ const ChatWidget = () => {
               className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[85%] p-3.5 text-xs leading-relaxed ${
+                className={`max-w-[88%] p-4 text-sm sm:text-[15px] leading-relaxed ${
                   msg.type === "user"
                     ? "bg-[#163A70] text-white rounded-2xl rounded-br-sm font-normal border border-[#204a8e]/40 shadow-md"
-                    : "bg-[#071326] text-neutral-200 border border-white/[0.08] rounded-2xl rounded-bl-sm font-light whitespace-pre-line shadow-sm"
+                    : "bg-[#071326] text-neutral-100 border border-white/[0.08] rounded-2xl rounded-bl-sm font-light whitespace-pre-line shadow-sm"
                 }`}
               >
                 {msg.text}
@@ -260,17 +260,17 @@ const ChatWidget = () => {
 
           {/* Sugerencias Rápidas para el estudiante si solo está el saludo inicial */}
           {chatHistory.length === 1 && !isLoading && (
-            <div className="pt-2 space-y-2">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block px-1 flex items-center gap-1.5">
-                <FiHelpCircle size={11} className="text-[#B39A3A]" />
+            <div className="pt-2 space-y-2.5">
+              <span className="text-xs font-mono uppercase tracking-wider text-neutral-300 block px-1 flex items-center gap-2 font-medium">
+                <FiHelpCircle size={13} className="text-[#B39A3A]" />
                 <span>Consultas frecuentes</span>
               </span>
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-2">
                 {quickPrompts.map((prompt, i) => (
                   <button
                     key={i}
                     onClick={() => handleSendMessage(prompt)}
-                    className="text-left p-2.5 rounded-xl bg-[#071326]/70 hover:bg-[#071326] border border-white/[0.08] hover:border-[#B39A3A]/40 text-xs text-neutral-300 hover:text-white transition-colors cursor-pointer"
+                    className="text-left p-3 rounded-xl bg-[#071326]/75 hover:bg-[#071326] border border-white/[0.08] hover:border-[#B39A3A]/40 text-sm text-neutral-200 hover:text-white transition-colors cursor-pointer"
                   >
                     {prompt}
                   </button>
@@ -282,8 +282,8 @@ const ChatWidget = () => {
           {/* Indicador de Carga */}
           {isLoading && (
             <div className="flex justify-start">
-              <div className="bg-[#071326] text-neutral-300 text-xs px-4 py-2.5 rounded-2xl rounded-bl-sm border border-white/[0.08] flex items-center gap-2.5 font-mono">
-                <FiLoader className="animate-spin text-[#B39A3A]" size={14} />
+              <div className="bg-[#071326] text-neutral-200 text-sm px-4 py-3 rounded-2xl rounded-bl-sm border border-white/[0.08] flex items-center gap-3 font-mono">
+                <FiLoader className="animate-spin text-[#B39A3A]" size={16} />
                 <span>Consultando cafeterías del campus...</span>
               </div>
             </div>
@@ -298,13 +298,13 @@ const ChatWidget = () => {
             e.preventDefault();
             handleSendMessage();
           }}
-          className="p-3.5 sm:p-4 bg-[#071326] border-t border-white/[0.08] flex gap-2.5 items-center"
+          className="p-4 bg-[#071326] border-t border-white/[0.08] flex gap-3 items-center"
         >
           <input
             ref={inputRef}
             type="text"
             placeholder="Pregunta por platillos, presupuestos o tienditas..."
-            className="flex-1 bg-[#0a1830] text-white text-xs rounded-full px-4 py-2.5 border border-white/[0.1] focus:border-[#B39A3A]/60 focus:outline-none placeholder:text-neutral-400 font-sans"
+            className="flex-1 bg-[#0a1830] text-white text-sm sm:text-base rounded-full px-4 py-3 border border-white/[0.12] focus:border-[#B39A3A]/70 focus:outline-none placeholder:text-neutral-400 font-sans"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             disabled={isLoading}
@@ -313,10 +313,10 @@ const ChatWidget = () => {
           <button
             type="submit"
             disabled={!message.trim() || isLoading}
-            className="w-9 h-9 rounded-full bg-white text-black hover:bg-neutral-200 transition-colors flex items-center justify-center disabled:opacity-40 cursor-pointer flex-shrink-0"
+            className="w-11 h-11 rounded-full bg-white text-black hover:bg-neutral-200 transition-colors flex items-center justify-center disabled:opacity-40 cursor-pointer flex-shrink-0"
             aria-label="Enviar pregunta"
           >
-            <FiSend size={13} />
+            <FiSend size={15} />
           </button>
         </form>
       </aside>

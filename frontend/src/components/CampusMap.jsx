@@ -52,8 +52,8 @@ const CampusMap = () => {
     <div className="w-full h-full relative z-0 leaflet-dark-tiles">
       {/* Indicador sutil de carga sobre el mapa */}
       {loading && (
-        <div className="absolute top-4 right-4 z-[500] bg-[#071326]/90 border border-white/10 px-3 py-1.5 rounded-full backdrop-blur-md flex items-center gap-2 text-xs font-mono text-neutral-300">
-          <FiLoader className="animate-spin text-[#B39A3A]" size={13} />
+        <div className="absolute top-4 right-4 z-[500] bg-[#071326]/90 border border-white/10 px-4 py-2 rounded-full backdrop-blur-md flex items-center gap-2.5 text-sm font-mono text-neutral-200">
+          <FiLoader className="animate-spin text-[#B39A3A]" size={15} />
           <span>Localizando tienditas...</span>
         </div>
       )}
@@ -78,23 +78,23 @@ const CampusMap = () => {
               position={[parseFloat(tiendita.latitud), parseFloat(tiendita.longitud)]}
             >
               <Popup>
-                <div className="text-center min-w-[170px] p-1.5">
-                  <span className="font-mono text-[10px] uppercase tracking-wider text-[#B39A3A] block mb-1 font-medium">
+                <div className="text-center min-w-[190px] p-2">
+                  <span className="font-mono text-xs uppercase tracking-wider text-[#B39A3A] block mb-1 font-semibold">
                     Cafetería UNISON
                   </span>
-                  <h3 className="font-display text-lg font-normal text-white mb-2 leading-snug">
+                  <h3 className="font-display text-xl font-normal text-white mb-2 leading-snug">
                     {tiendita.nombre}
                   </h3>
 
                   {tiendita.hora_apertura && tiendita.hora_cierre && (
-                    <div className="text-[11px] font-mono text-neutral-300 mb-3 bg-white/[0.08] py-1 px-2.5 rounded-md border border-white/[0.08]">
+                    <div className="text-xs font-mono text-neutral-200 mb-3 bg-white/[0.08] py-1.5 px-3 rounded-md border border-white/[0.08]">
                       {tiendita.hora_apertura.slice(0, 5)} – {tiendita.hora_cierre.slice(0, 5)}
                     </div>
                   )}
 
                   <button
                     onClick={() => navigate(`/cafeterias/${tiendita.id_tiendita}`)}
-                    className="w-full bg-[#163A70] hover:bg-[#204a8e] text-white text-xs font-mono uppercase tracking-wider py-2 px-3 rounded-full transition-colors cursor-pointer border border-[#204a8e]/50 font-medium"
+                    className="w-full bg-[#163A70] hover:bg-[#204a8e] text-white text-sm font-mono uppercase tracking-wider py-2.5 px-4 rounded-full transition-colors cursor-pointer border border-[#204a8e]/50 font-semibold"
                   >
                     Consultar carta
                   </button>

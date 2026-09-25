@@ -212,7 +212,7 @@ const Home = () => {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-8 lg:px-16 w-full">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 pt-8 sm:pt-14">
             <div>
-              <span className="text-[11px] font-mono tracking-[0.25em] text-[#B39A3A] uppercase block mb-3 font-medium">
+              <span className="text-sm font-mono tracking-[0.22em] text-[#B39A3A] uppercase block mb-3 font-medium">
                 Universidad de Sonora · Hermosillo
               </span>
               <h1 className="font-display text-6xl sm:text-8xl lg:text-9xl font-normal tracking-tight text-[#F2F2F0] leading-[0.92]">
@@ -220,15 +220,15 @@ const Home = () => {
               </h1>
             </div>
 
-            <div className="max-w-md lg:text-right flex flex-col lg:items-end gap-2.5">
-              <p className="text-neutral-300 text-base sm:text-lg font-light leading-snug">
+            <div className="max-w-md lg:text-right flex flex-col lg:items-end gap-3">
+              <p className="text-neutral-200 text-lg sm:text-xl font-light leading-snug">
                 Directorio y horarios en tiempo real de las cafeterías del campus universitario.
               </p>
-              <div className="flex items-center gap-4 text-xs font-mono text-neutral-300">
+              <div className="flex items-center gap-4 text-sm font-mono text-neutral-200">
                 <span>{cafeterias.length} establecimientos</span>
                 <span className="text-white/20" aria-hidden="true">/</span>
-                <span className="text-white flex items-center gap-1.5 font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
+                <span className="text-white flex items-center gap-2 font-medium">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse" />
                   {abiertas.length} en servicio
                 </span>
                 <span className="text-white/20" aria-hidden="true">/</span>
@@ -264,23 +264,23 @@ const Home = () => {
                 className="absolute right-0 top-1 text-neutral-400 hover:text-white p-1.5 transition-colors cursor-pointer"
                 aria-label="Limpiar término de búsqueda"
               >
-                <FiX size={20} />
+                <FiX size={22} />
               </button>
             ) : (
-              <FiSearch className="absolute right-0 top-2 text-neutral-400 pointer-events-none" size={20} />
+              <FiSearch className="absolute right-0 top-2 text-neutral-400 pointer-events-none" size={22} />
             )}
           </div>
 
           {/* Filtros Tipográficos Editoriales */}
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 sm:gap-8">
             {/* Categorías de comida */}
-            <div className="flex flex-wrap items-center gap-x-6 sm:gap-x-7 gap-y-3 font-mono text-xs uppercase tracking-[0.16em]">
+            <div className="flex flex-wrap items-center gap-x-6 sm:gap-x-8 gap-y-3 font-mono text-sm uppercase tracking-[0.14em]">
               <button
                 type="button"
                 onClick={() => setFilterComida("")}
-                className={`py-1 relative transition-colors cursor-pointer ${
+                className={`py-1.5 relative transition-colors cursor-pointer ${
                   filterComida === ""
-                    ? "text-white font-medium after:absolute after:-bottom-0.5 after:left-0 after:right-0 after:h-[1.5px] after:bg-[#B39A3A]"
+                    ? "text-white font-medium after:absolute after:-bottom-0.5 after:left-0 after:right-0 after:h-[2px] after:bg-[#B39A3A]"
                     : "text-neutral-400 hover:text-white font-normal"
                 }`}
               >
@@ -293,9 +293,9 @@ const Home = () => {
                     key={cat}
                     type="button"
                     onClick={() => setFilterComida(isActive ? "" : cat)}
-                    className={`py-1 relative transition-colors cursor-pointer ${
+                    className={`py-1.5 relative transition-colors cursor-pointer ${
                       isActive
-                        ? "text-white font-medium after:absolute after:-bottom-0.5 after:left-0 after:right-0 after:h-[1.5px] after:bg-[#B39A3A]"
+                        ? "text-white font-medium after:absolute after:-bottom-0.5 after:left-0 after:right-0 after:h-[2px] after:bg-[#B39A3A]"
                         : "text-neutral-400 hover:text-white font-normal"
                     }`}
                   >
@@ -306,17 +306,17 @@ const Home = () => {
             </div>
 
             {/* Selectores de Facultad, Presupuesto y Reset */}
-            <div className="flex flex-wrap items-center gap-4 sm:gap-5 text-neutral-300 font-mono text-xs">
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-neutral-200 font-mono text-sm">
               {/* Selector de Facultad */}
-              <div className="flex items-center gap-1.5">
-                <label htmlFor="filter-facultad" className="text-neutral-400 uppercase tracking-wider text-[11px]">
+              <div className="flex items-center gap-2">
+                <label htmlFor="filter-facultad" className="text-neutral-300 uppercase tracking-wider text-xs font-medium">
                   Facultad:
                 </label>
                 <select
                   id="filter-facultad"
                   value={filterFacultad}
                   onChange={(e) => setFilterFacultad(e.target.value)}
-                  className="bg-[#071326] text-neutral-200 border border-white/10 px-2.5 py-1 rounded-lg focus:outline-none focus:border-[#B39A3A] cursor-pointer hover:text-white uppercase tracking-wider text-xs"
+                  className="bg-[#071326] text-neutral-100 border border-white/12 px-3 py-1.5 rounded-lg focus:outline-none focus:border-[#B39A3A] cursor-pointer hover:text-white uppercase tracking-wider text-sm"
                 >
                   <option value="">Todas</option>
                   {facultades.map((f) => (
@@ -330,8 +330,8 @@ const Home = () => {
               <span className="text-white/20 hidden sm:inline" aria-hidden="true">|</span>
 
               {/* Filtro de Presupuesto */}
-              <div className="flex items-center gap-2">
-                <span className="text-neutral-400 uppercase tracking-wider text-[11px]">Máx:</span>
+              <div className="flex items-center gap-2.5">
+                <span className="text-neutral-300 uppercase tracking-wider text-xs font-medium">Máx:</span>
                 {[
                   { label: "Todo", value: "" },
                   { label: "$40", value: "40" },
@@ -344,9 +344,9 @@ const Home = () => {
                       key={p.label}
                       type="button"
                       onClick={() => setFilterPrecio(p.value)}
-                      className={`transition-colors cursor-pointer px-1.5 py-0.5 rounded ${
+                      className={`transition-colors cursor-pointer px-2.5 py-1 rounded text-sm ${
                         isSelected
-                          ? "text-[#B39A3A] font-semibold bg-[#B39A3A]/10 border border-[#B39A3A]/30"
+                          ? "text-[#B39A3A] font-semibold bg-[#B39A3A]/15 border border-[#B39A3A]/35"
                           : "text-neutral-400 hover:text-white"
                       }`}
                     >
@@ -363,7 +363,7 @@ const Home = () => {
                   <button
                     type="button"
                     onClick={resetFilters}
-                    className="text-rose-400 hover:text-rose-300 uppercase tracking-wider underline underline-offset-4 cursor-pointer transition-colors"
+                    className="text-rose-400 hover:text-rose-300 uppercase tracking-wider underline underline-offset-4 cursor-pointer transition-colors text-sm font-medium"
                   >
                     Restablecer
                   </button>
@@ -382,14 +382,14 @@ const Home = () => {
             <h3 className="font-display text-2xl text-white font-normal">
               Error de Conexión
             </h3>
-            <p className="text-xs text-neutral-300 font-light leading-relaxed">
+            <p className="text-sm sm:text-base text-neutral-200 font-light leading-relaxed">
               No fue posible conectar con el servidor universitario para cargar el catálogo. Verifica que el servicio esté en ejecución.
             </p>
             <button
               onClick={loadData}
-              className="mt-2 px-5 py-2 rounded-full bg-white text-black text-xs font-mono uppercase tracking-wider hover:bg-neutral-200 transition-colors inline-flex items-center gap-2 cursor-pointer"
+              className="mt-2 px-6 py-2.5 rounded-full bg-white text-black text-sm font-mono uppercase tracking-wider hover:bg-neutral-200 transition-colors inline-flex items-center gap-2 cursor-pointer font-semibold"
             >
-              <FiRefreshCw size={12} />
+              <FiRefreshCw size={14} />
               <span>Reintentar</span>
             </button>
           </div>
@@ -401,7 +401,7 @@ const Home = () => {
         {loading ? (
           <section aria-label="Cargando cafeterías">
             <div className="flex items-baseline justify-between border-b border-white/[0.08] pb-3 mb-10">
-              <span className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-400 animate-pulse">
+              <span className="font-mono text-sm uppercase tracking-[0.18em] text-neutral-300 animate-pulse font-medium">
                 Sincronizando información del campus...
               </span>
             </div>
@@ -422,12 +422,12 @@ const Home = () => {
                 <h3 className="font-display text-3xl text-white mb-2 font-normal">
                   Sin coincidencias
                 </h3>
-                <p className="text-neutral-300 text-sm mb-6 font-light">
+                <p className="text-neutral-200 text-base mb-6 font-light">
                   No hay cafeterías o platillos que coincidan con los filtros seleccionados actualmente.
                 </p>
                 <button
                   onClick={resetFilters}
-                  className="px-6 py-2.5 rounded-full bg-white text-black text-xs font-mono uppercase tracking-wider hover:bg-neutral-200 transition-colors cursor-pointer"
+                  className="px-7 py-3 rounded-full bg-white text-black text-sm font-mono uppercase tracking-wider hover:bg-neutral-200 transition-colors cursor-pointer font-semibold"
                 >
                   Restablecer filtros
                 </button>
@@ -439,12 +439,12 @@ const Home = () => {
               <section className="mb-24" aria-label="Cafeterías abiertas en este momento">
                 <div className="flex items-baseline justify-between border-b border-white/[0.08] pb-3 mb-10">
                   <div className="flex items-center gap-3">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse" />
-                    <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-200 font-medium">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
+                    <h2 className="font-mono text-sm sm:text-base uppercase tracking-[0.18em] text-neutral-100 font-semibold">
                       En servicio ({abiertas.length})
                     </h2>
                   </div>
-                  <span className="text-xs font-mono text-neutral-400">
+                  <span className="text-sm font-mono text-neutral-300">
                     Horario en vivo
                   </span>
                 </div>
@@ -471,12 +471,12 @@ const Home = () => {
               <section className="pt-6" aria-label="Cafeterías cerradas en este momento">
                 <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-white/[0.08] pb-3 mb-10">
                   <div className="flex items-center gap-3">
-                    <span className="w-2 h-2 rounded-full bg-neutral-500" />
-                    <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-400">
+                    <span className="w-2.5 h-2.5 rounded-full bg-neutral-400" />
+                    <h2 className="font-mono text-sm sm:text-base uppercase tracking-[0.18em] text-neutral-300 font-semibold">
                       Fuera de Horario ({cerradas.length})
                     </h2>
                   </div>
-                  <span className="text-xs font-mono text-neutral-400">
+                  <span className="text-sm font-mono text-neutral-300">
                     Apertura regular matutina
                   </span>
                 </div>
@@ -497,7 +497,7 @@ const Home = () => {
                 </div>
 
                 {/* Detalle visual con el Búho en reposo */}
-                <div className="mt-16 flex items-center justify-between text-xs text-neutral-400 font-mono pt-6 border-t border-white/[0.06]">
+                <div className="mt-16 flex items-center justify-between text-sm text-neutral-300 font-mono pt-6 border-t border-white/[0.08]">
                   <span>Horarios sujetos al calendario y periodo de exámenes UNISON</span>
                   <img
                     src={BuhoZZZ}

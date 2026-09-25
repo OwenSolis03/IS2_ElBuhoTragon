@@ -285,23 +285,23 @@ const PlantillaCafeteria = () => {
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-8 lg:px-16 w-full pt-4">
               <Link 
                 to="/" 
-                className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-neutral-300 hover:text-white transition-colors mb-6"
+                className="inline-flex items-center gap-2 text-sm font-mono uppercase tracking-wider text-neutral-300 hover:text-white transition-colors mb-6 font-medium"
               >
-                <FiArrowLeft size={13} />
+                <FiArrowLeft size={15} />
                 <span>Directorio de Cafeterías</span>
               </Link>
 
               <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
                 <div className="max-w-3xl">
-                  <div className="flex flex-wrap items-center gap-3 mb-3">
+                  <div className="flex flex-wrap items-center gap-3.5 mb-3.5">
                     {isCurrentlyOpen(info.hora_apertura, info.hora_cierre) ? (
-                      <span className="font-mono text-xs tracking-[0.2em] uppercase font-medium text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-3 py-1 rounded-full flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="font-mono text-sm tracking-[0.16em] uppercase font-semibold text-emerald-400 bg-emerald-950/70 border border-emerald-500/35 px-3.5 py-1.5 rounded-full flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                         ABIERTO
                       </span>
                     ) : (
-                      <span className="font-mono text-xs tracking-[0.2em] uppercase font-medium text-rose-400 bg-rose-950/60 border border-rose-500/30 px-3 py-1 rounded-full flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+                      <span className="font-mono text-sm tracking-[0.16em] uppercase font-semibold text-rose-400 bg-rose-950/70 border border-rose-500/35 px-3.5 py-1.5 rounded-full flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-rose-400" />
                         CERRADO
                       </span>
                     )}
@@ -309,7 +309,7 @@ const PlantillaCafeteria = () => {
                     {info.hora_apertura && info.hora_cierre && (
                       <>
                         <span className="text-white/20" aria-hidden="true">/</span>
-                        <span className="font-mono text-xs text-neutral-300">
+                        <span className="font-mono text-sm text-neutral-200 font-medium">
                           {info.hora_apertura.slice(0, 5)} – {info.hora_cierre.slice(0, 5)}
                         </span>
                       </>
@@ -318,10 +318,10 @@ const PlantillaCafeteria = () => {
                     {averageRating && (
                       <>
                         <span className="text-white/20" aria-hidden="true">/</span>
-                        <span className="font-mono text-xs text-[#B39A3A] flex items-center gap-1.5">
-                          <FaStar size={12} />
-                          <strong className="text-white">{averageRating}</strong>
-                          <span className="text-neutral-400">({reviews.length} opiniones)</span>
+                        <span className="font-mono text-sm text-[#B39A3A] flex items-center gap-1.5">
+                          <FaStar size={13} />
+                          <strong className="text-white font-semibold">{averageRating}</strong>
+                          <span className="text-neutral-300">({reviews.length} opiniones)</span>
                         </span>
                       </>
                     )}
@@ -332,8 +332,8 @@ const PlantillaCafeteria = () => {
                   </h1>
 
                   {info.direccion && (
-                    <p className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-300 mt-3 flex items-center gap-1.5 font-light">
-                      <FiMapPin size={13} className="text-[#B39A3A]" />
+                    <p className="font-mono text-sm uppercase tracking-[0.16em] text-neutral-200 mt-3.5 flex items-center gap-2 font-light">
+                      <FiMapPin size={15} className="text-[#B39A3A]" />
                       <span>{info.direccion}</span>
                     </p>
                   )}
@@ -353,16 +353,16 @@ const PlantillaCafeteria = () => {
                 <section aria-label="Carta de platillos">
                   <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-white/[0.08] pb-4 mb-8">
                     <div>
-                      <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-[#B39A3A] block mb-1 font-medium">
+                      <span className="font-mono text-sm uppercase tracking-[0.2em] text-[#B39A3A] block mb-1.5 font-medium">
                         Carta Oficial
                       </span>
-                      <h2 className="font-display text-3xl sm:text-4xl font-normal text-[#F2F2F0]">
+                      <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-normal text-[#F2F2F0]">
                         Menú del día
                       </h2>
                     </div>
 
                     {/* Buscador de platillo integrado */}
-                    <div className="relative w-full sm:w-64 border-b border-white/20 pb-1 focus-within:border-[#B39A3A] transition-colors">
+                    <div className="relative w-full sm:w-72 border-b border-white/20 pb-1.5 focus-within:border-[#B39A3A] transition-colors">
                       <label htmlFor="dish-search-input" className="sr-only">Buscar platillo en la carta</label>
                       <input 
                         id="dish-search-input"
@@ -370,7 +370,7 @@ const PlantillaCafeteria = () => {
                         placeholder="Buscar platillo..." 
                         value={searchTerm} 
                         onChange={(e) => setSearchTerm(e.target.value)} 
-                        className="w-full bg-transparent text-sm text-neutral-200 placeholder-neutral-400 focus:outline-none pr-6" 
+                        className="w-full bg-transparent text-base text-neutral-100 placeholder-neutral-400 focus:outline-none pr-8" 
                       />
                       {searchTerm ? (
                         <button 
@@ -378,56 +378,56 @@ const PlantillaCafeteria = () => {
                           className="absolute right-0 top-1 text-neutral-400 hover:text-white cursor-pointer"
                           aria-label="Limpiar búsqueda de platillo"
                         >
-                          <FiX size={14} />
+                          <FiX size={16} />
                         </button>
                       ) : (
-                        <FiSearch className="absolute right-0 top-1 text-neutral-400 pointer-events-none" size={14} />
+                        <FiSearch className="absolute right-0 top-1.5 text-neutral-400 pointer-events-none" size={16} />
                       )}
                     </div>
                   </div>
 
                   {/* Lista de Platillos */}
                   {filteredMenuItems.length === 0 ? (
-                    <div className="py-16 text-center text-neutral-400 font-light space-y-2">
-                      <p className="text-base">
+                    <div className="py-16 text-center text-neutral-300 font-light space-y-2">
+                      <p className="text-base sm:text-lg">
                         {searchTerm ? "No hay platillos coincidentes con el término ingresado." : "Carta de platillos en proceso de actualización."}
                       </p>
                       {searchTerm && (
                         <button
                           onClick={() => setSearchTerm("")}
-                          className="text-xs font-mono uppercase tracking-wider text-[#B39A3A] underline cursor-pointer"
+                          className="text-sm font-mono uppercase tracking-wider text-[#B39A3A] underline cursor-pointer font-medium"
                         >
                           Ver toda la carta
                         </button>
                       )}
                     </div>
                   ) : (
-                    <div className="divide-y divide-white/[0.06]">
+                    <div className="divide-y divide-white/[0.08]">
                       {filteredMenuItems.map((item, index) => (
                         <div 
                           key={item.id_menu || index} 
-                          className="py-4 flex items-baseline justify-between gap-6 group hover:bg-white/[0.02] px-3 transition-colors rounded-xl"
+                          className="py-4.5 flex items-baseline justify-between gap-6 group hover:bg-white/[0.02] px-3.5 transition-colors rounded-xl"
                         >
                           <div className="flex-1 min-w-0">
                             <div className="flex items-baseline gap-3 flex-wrap">
-                              <h3 className="font-sans text-base sm:text-lg font-medium text-[#F2F2F0] group-hover:text-white transition-colors">
+                              <h3 className="font-sans text-lg sm:text-xl font-medium text-[#F2F2F0] group-hover:text-white transition-colors">
                                 {item.nombre}
                               </h3>
                               {item.categoria && (
-                                <span className="font-mono text-[10px] uppercase tracking-wider text-neutral-300 bg-white/[0.06] px-2 py-0.5 rounded border border-white/[0.06] flex-shrink-0">
+                                <span className="font-mono text-xs uppercase tracking-wider text-neutral-200 bg-white/[0.08] px-2.5 py-1 rounded border border-white/[0.08] flex-shrink-0 font-medium">
                                   {item.categoria}
                                 </span>
                               )}
                             </div>
                             {item.descripcion && (
-                              <p className="text-xs text-neutral-300 font-light mt-1 max-w-xl leading-relaxed">
+                              <p className="text-sm sm:text-[15px] text-neutral-200 font-light mt-1.5 max-w-xl leading-relaxed">
                                 {item.descripcion}
                               </p>
                             )}
                           </div>
 
                           <div className="text-right flex-shrink-0">
-                            <span className="font-mono text-base font-semibold text-[#B39A3A]">
+                            <span className="font-mono text-lg sm:text-xl font-semibold text-[#B39A3A]">
                               ${parseFloat(item.precio).toFixed(2)}
                             </span>
                           </div>
@@ -441,23 +441,23 @@ const PlantillaCafeteria = () => {
                 <section className="pt-8 border-t border-white/[0.08]" aria-label="Opiniones de estudiantes">
                   <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 mb-8">
                     <div>
-                      <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-[#B39A3A] block mb-1 font-medium">
+                      <span className="font-mono text-sm uppercase tracking-[0.2em] text-[#B39A3A] block mb-1.5 font-medium">
                         Comunidad Universitaria
                       </span>
-                      <h2 className="font-display text-3xl sm:text-4xl font-normal text-[#F2F2F0]">
+                      <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-normal text-[#F2F2F0]">
                         Opiniones ({reviews.length})
                       </h2>
                     </div>
                     {averageRating && (
-                      <span className="font-mono text-xs text-neutral-300">
-                        Promedio general: <strong className="text-white font-medium">{averageRating} / 5.0</strong>
+                      <span className="font-mono text-sm text-neutral-200">
+                        Promedio general: <strong className="text-white font-semibold">{averageRating} / 5.0</strong>
                       </span>
                     )}
                   </div>
 
                   {/* Formulario de Reseña */}
-                  <form onSubmit={handleSubmitResena} className="mb-12 p-6 rounded-2xl bg-[#0a1830] border border-white/[0.08] shadow-lg">
-                    <span className="font-mono text-xs uppercase tracking-widest text-[#B39A3A] block mb-3 font-medium">
+                  <form onSubmit={handleSubmitResena} className="mb-12 p-6 sm:p-7 rounded-2xl bg-[#0a1830] border border-white/[0.08] shadow-lg">
+                    <span className="font-mono text-sm uppercase tracking-wider text-[#B39A3A] block mb-3.5 font-semibold">
                       Comparte tu experiencia en este local
                     </span>
 
@@ -474,12 +474,12 @@ const PlantillaCafeteria = () => {
                           aria-label={`${val} estrellas`}
                         >
                           <FaStar 
-                            size={22} 
+                            size={24} 
                             className={val <= (hover || rating) ? "text-[#B39A3A]" : "text-neutral-600"} 
                           />
                         </button>
                       ))}
-                      <span className="ml-3 font-mono text-xs text-neutral-300">
+                      <span className="ml-3 font-mono text-sm text-neutral-200">
                         {rating > 0 ? `${rating} de 5 estrellas` : "Selecciona tu valoración"}
                       </span>
                     </div>
@@ -487,7 +487,7 @@ const PlantillaCafeteria = () => {
                     <label htmlFor="review-textarea" className="sr-only">Comentario sobre la cafetería</label>
                     <textarea 
                       id="review-textarea"
-                      className="w-full p-4 bg-[#071326] text-[#F2F2F0] rounded-xl border border-white/[0.1] focus:border-[#B39A3A] focus:outline-none text-sm placeholder-neutral-400 resize-none mb-4 font-sans leading-relaxed" 
+                      className="w-full p-4 bg-[#071326] text-[#F2F2F0] rounded-xl border border-white/[0.12] focus:border-[#B39A3A] focus:outline-none text-base placeholder-neutral-400 resize-none mb-4 font-sans leading-relaxed" 
                       rows="3" 
                       placeholder="Comenta sobre la calidad de los alimentos, atención, rapidez o precios..." 
                       value={comentario} 
@@ -498,7 +498,7 @@ const PlantillaCafeteria = () => {
                       <button 
                         type="submit" 
                         disabled={submitting} 
-                        className="px-6 py-2.5 bg-white text-black font-sans text-xs font-mono uppercase tracking-wider rounded-full hover:bg-neutral-200 transition-colors disabled:opacity-50 cursor-pointer font-medium"
+                        className="px-7 py-3 bg-white text-black font-sans text-sm font-mono uppercase tracking-wider rounded-full hover:bg-neutral-200 transition-colors disabled:opacity-50 cursor-pointer font-semibold"
                       >
                         {submitting ? "Publicando..." : "Publicar Reseña"}
                       </button>
@@ -508,24 +508,24 @@ const PlantillaCafeteria = () => {
                   {/* Lista de Reseñas */}
                   <div className="space-y-6">
                     {reviews.length === 0 ? (
-                      <p className="text-center py-10 text-neutral-400 text-sm font-light">
+                      <p className="text-center py-10 text-neutral-300 text-base font-light">
                         Aún no hay opiniones registradas para este establecimiento. Sé el primero en acreditar tu visita.
                       </p>
                     ) : (
                       reviews.map((review) => (
                         <article 
                           key={review.id_resena} 
-                          className="py-5 border-b border-white/[0.06] last:border-none"
+                          className="py-5 border-b border-white/[0.08] last:border-none"
                         >
-                          <div className="flex items-baseline justify-between gap-4 mb-2">
+                          <div className="flex items-baseline justify-between gap-4 mb-2.5">
                             <div className="flex items-center gap-3">
-                              <div className="w-6 h-6 rounded-full bg-[#163A70] flex items-center justify-center text-[10px] text-white">
-                                <FiUser size={12} />
+                              <div className="w-7 h-7 rounded-full bg-[#163A70] flex items-center justify-center text-xs text-white">
+                                <FiUser size={14} />
                               </div>
-                              <span className="font-sans font-medium text-sm text-white">
+                              <span className="font-sans font-medium text-base text-white">
                                 {review.nombre_usuario || "Estudiante UNISON"}
                               </span>
-                              <div className="flex text-[#B39A3A] text-xs">
+                              <div className="flex text-[#B39A3A] text-sm gap-0.5">
                                 {[...Array(5)].map((_, i) => (
                                   <FaStar 
                                     key={i} 
@@ -534,11 +534,11 @@ const PlantillaCafeteria = () => {
                                 ))}
                               </div>
                             </div>
-                            <span className="font-mono text-[11px] text-neutral-400">
+                            <span className="font-mono text-xs text-neutral-300">
                               {formatDate(review.fecha_registro)}
                             </span>
                           </div>
-                          <p className="text-sm text-neutral-300 font-light leading-relaxed pl-9">
+                          <p className="text-base text-neutral-200 font-light leading-relaxed pl-10">
                             {review.comentario}
                           </p>
                         </article>
@@ -553,7 +553,7 @@ const PlantillaCafeteria = () => {
                 {info.latitud && info.longitud && (
                   <aside className="sticky top-28 space-y-6">
                     <div className="p-6 rounded-2xl bg-[#0a1830] border border-white/[0.08] shadow-lg">
-                      <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-[#B39A3A] block mb-4 font-medium">
+                      <span className="font-mono text-sm uppercase tracking-[0.2em] text-[#B39A3A] block mb-4 font-semibold">
                         Ubicación en Campus
                       </span>
 
@@ -575,24 +575,24 @@ const PlantillaCafeteria = () => {
                       </div>
 
                       <div className="flex items-center justify-between pt-2">
-                        <span className="font-mono text-xs text-neutral-400">
+                        <span className="font-mono text-sm text-neutral-300">
                           Coordenadas registradas
                         </span>
                         <a 
                           href={`https://www.google.com/maps/search/?api=1&query=${info.latitud},${info.longitud}`} 
                           target="_blank" 
                           rel="noreferrer" 
-                          className="text-xs font-mono text-[#B39A3A] hover:underline inline-flex items-center gap-1 font-medium"
+                          className="text-sm font-mono text-[#B39A3A] hover:underline inline-flex items-center gap-1.5 font-semibold"
                         >
                           <span>Abrir GPS</span>
-                          <FiExternalLink size={12} />
+                          <FiExternalLink size={14} />
                         </a>
                       </div>
                     </div>
 
                     {/* Nota Institucional */}
-                    <div className="p-6 rounded-2xl bg-[#0a1830]/60 border border-white/[0.06] text-xs text-neutral-300 font-light leading-relaxed">
-                      <span className="font-mono text-[10px] uppercase tracking-widest text-[#B39A3A] block mb-2 font-medium">
+                    <div className="p-6 rounded-2xl bg-[#0a1830]/60 border border-white/[0.06] text-sm text-neutral-200 font-light leading-relaxed">
+                      <span className="font-mono text-xs uppercase tracking-wider text-[#B39A3A] block mb-2 font-semibold">
                         Aviso Institucional
                       </span>
                       Los horarios y cartas de platillos están sujetos al calendario oficial, periodo de exámenes y periodos vacacionales de la Universidad de Sonora.

@@ -30,23 +30,23 @@ const Facultad = () => {
           </div>
           
           {/* Barra inferior de Guía */}
-          <div className="bg-[#071326] px-6 py-5 border-t border-white/[0.08]">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-neutral-300 font-sans">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-[#163A70]/60 border border-[#204a8e]/30 flex items-center justify-center flex-shrink-0">
-                  <FiNavigation className="text-[#B39A3A]" size={15} />
+          <div className="bg-[#071326] px-6 py-6 border-t border-white/[0.08]">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-neutral-200 font-sans">
+              <div className="flex items-center gap-3.5">
+                <div className="w-9 h-9 rounded-full bg-[#163A70]/60 border border-[#204a8e]/30 flex items-center justify-center flex-shrink-0">
+                  <FiNavigation className="text-[#B39A3A]" size={17} />
                 </div>
                 <span>Navega y haz zoom interactivo sobre los cuadrantes del campus.</span>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-[#163A70]/60 border border-[#204a8e]/30 flex items-center justify-center flex-shrink-0">
-                  <FiTarget className="text-[#B39A3A]" size={15} />
+              <div className="flex items-center gap-3.5">
+                <div className="w-9 h-9 rounded-full bg-[#163A70]/60 border border-[#204a8e]/30 flex items-center justify-center flex-shrink-0">
+                  <FiTarget className="text-[#B39A3A]" size={17} />
                 </div>
                 <span>Toca cualquier marcador para abrir el resumen y carta de la tiendita.</span>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-[#163A70]/60 border border-[#204a8e]/30 flex items-center justify-center flex-shrink-0">
-                  <FiInfo className="text-[#B39A3A]" size={15} />
+              <div className="flex items-center gap-3.5">
+                <div className="w-9 h-9 rounded-full bg-[#163A70]/60 border border-[#204a8e]/30 flex items-center justify-center flex-shrink-0">
+                  <FiInfo className="text-[#B39A3A]" size={17} />
                 </div>
                 <span>Información sincronizada con el ciclo académico UNISON.</span>
               </div>

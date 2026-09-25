@@ -50,63 +50,63 @@ const CafeCard = ({
       <div className="absolute inset-0 bg-gradient-to-b from-[#0e2246]/70 via-transparent to-transparent opacity-75 pointer-events-none" />
 
       {/* Cabecera superior interna: Estado, acreditación y número de catálogo */}
-      <div className="relative z-10 p-4 sm:p-5 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="relative z-10 p-5 sm:p-6 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
           {isOpen ? (
-            <span className="font-mono text-[11px] tracking-[0.2em] uppercase font-medium text-emerald-400 flex items-center gap-1.5 bg-[#071326]/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-emerald-500/20">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
+            <span className="font-mono text-xs tracking-[0.16em] uppercase font-semibold text-emerald-400 flex items-center gap-2 bg-[#071326]/75 backdrop-blur-sm px-3 py-1.5 rounded-full border border-emerald-500/25">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse" />
               ABIERTO
             </span>
           ) : (
-            <span className="font-mono text-[11px] tracking-[0.2em] uppercase font-medium text-rose-400 flex items-center gap-1.5 bg-[#071326]/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-rose-500/20">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-400/80 inline-block" />
+            <span className="font-mono text-xs tracking-[0.16em] uppercase font-semibold text-rose-400 flex items-center gap-2 bg-[#071326]/75 backdrop-blur-sm px-3 py-1.5 rounded-full border border-rose-500/25">
+              <span className="w-2 h-2 rounded-full bg-rose-400/80 inline-block" />
               CERRADO
             </span>
           )}
 
           {isVisited && (
-            <span className="font-mono text-[10px] tracking-wider uppercase text-emerald-300 bg-emerald-950/70 border border-emerald-500/30 px-2 py-0.5 rounded-full flex items-center gap-1 backdrop-blur-sm">
-              <FiCheck size={11} className="text-emerald-400" />
+            <span className="font-mono text-xs tracking-wider uppercase text-emerald-300 bg-emerald-950/80 border border-emerald-500/35 px-2.5 py-1 rounded-full flex items-center gap-1.5 backdrop-blur-sm font-medium">
+              <FiCheck size={12} className="text-emerald-400" />
               <span>Visitada</span>
             </span>
           )}
         </div>
 
-        <span className="text-[11px] font-mono text-white/65 tracking-wider bg-[#071326]/50 backdrop-blur-sm px-2 py-0.5 rounded">
+        <span className="text-xs font-mono font-medium text-white/80 tracking-wider bg-[#071326]/60 backdrop-blur-sm px-2.5 py-1 rounded">
           {String(index + 1).padStart(2, "0")}
         </span>
       </div>
 
       {/* Bloque inferior: Facultad, Nombre, Coincidencias y Horario */}
-      <div className="relative z-10 p-4 sm:p-5 flex flex-col justify-end">
+      <div className="relative z-10 p-5 sm:p-6 flex flex-col justify-end">
         {facultadNombre && (
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-300 mb-1 line-clamp-1 block font-medium">
+          <span className="font-mono text-xs uppercase tracking-[0.18em] text-neutral-300 mb-1.5 line-clamp-1 block font-medium">
             {facultadNombre}
           </span>
         )}
 
-        <h3 className="font-display text-2xl sm:text-[26px] font-normal text-[#F2F2F0] group-hover:text-white leading-[1.15] mb-2 line-clamp-2 transition-colors">
+        <h3 className="font-display text-2xl sm:text-[28px] lg:text-[30px] font-normal text-[#F2F2F0] group-hover:text-white leading-[1.12] mb-2.5 line-clamp-2 transition-colors">
           {cafe.nombre}
         </h3>
 
         {/* Coincidencias de búsqueda en platillos */}
         {matchedDishes && matchedDishes.length > 0 && (
-          <div className="mb-3 p-2 rounded-lg bg-[#071326]/90 border border-[#B39A3A]/30 text-left backdrop-blur-sm">
-            <div className="flex items-center gap-1.5 text-[10px] font-mono font-semibold text-[#B39A3A] uppercase tracking-wider mb-0.5">
-              <FiSearch size={10} />
+          <div className="mb-3.5 p-2.5 rounded-xl bg-[#071326]/95 border border-[#B39A3A]/35 text-left backdrop-blur-sm">
+            <div className="flex items-center gap-1.5 text-xs font-mono font-semibold text-[#B39A3A] uppercase tracking-wider mb-1">
+              <FiSearch size={11} />
               <span>Platillo coincidente</span>
             </div>
-            <p className="text-xs text-neutral-200 line-clamp-1 font-light">
+            <p className="text-sm text-neutral-100 line-clamp-1 font-light">
               {matchedDishes.map((m) => m.nombre).join(", ")}
             </p>
           </div>
         )}
 
-        <div className="flex items-center justify-between text-xs font-mono text-neutral-300 pt-2.5 border-t border-white/[0.1]">
-          <span className="tracking-tight text-neutral-300">{horario}</span>
-          <span className="text-[11px] text-[#B39A3A] group-hover:text-amber-300 transition-colors inline-flex items-center gap-1 font-medium">
+        <div className="flex items-center justify-between text-sm font-mono text-neutral-200 pt-3 border-t border-white/[0.12]">
+          <span className="tracking-tight text-neutral-200 font-medium">{horario}</span>
+          <span className="text-xs text-[#B39A3A] group-hover:text-amber-300 transition-colors inline-flex items-center gap-1 font-semibold uppercase tracking-wider">
             <span>Carta</span>
-            <FiArrowRight className="transform group-hover:translate-x-1 transition-transform" size={12} />
+            <FiArrowRight className="transform group-hover:translate-x-1 transition-transform" size={13} />
           </span>
         </div>
       </div>

@@ -34,11 +34,11 @@ const Contacto = () => {
           {/* Columna Izquierda: Información Académica */}
           <div className="lg:col-span-5 space-y-8">
             <div>
-              <span className="font-mono text-xs uppercase tracking-widest text-[#B39A3A] block mb-2 flex items-center gap-2 font-medium">
-                <FiMapPin size={14} />
+              <span className="font-mono text-sm uppercase tracking-widest text-[#B39A3A] block mb-2.5 flex items-center gap-2 font-semibold">
+                <FiMapPin size={16} />
                 <span>Ubicación Académica</span>
               </span>
-              <p className="text-sm text-neutral-300 font-light leading-relaxed">
+              <p className="text-base text-neutral-200 font-light leading-relaxed">
                 Universidad de Sonora<br />
                 Departamento de Matemáticas<br />
                 Licenciatura en Ciencias de la Computación<br />
@@ -47,25 +47,25 @@ const Contacto = () => {
             </div>
 
             <div>
-              <span className="font-mono text-xs uppercase tracking-widest text-[#B39A3A] block mb-2 flex items-center gap-2 font-medium">
-                <FiMail size={14} />
+              <span className="font-mono text-sm uppercase tracking-widest text-[#B39A3A] block mb-2.5 flex items-center gap-2 font-semibold">
+                <FiMail size={16} />
                 <span>Correo Institucional</span>
               </span>
-              <p className="text-sm font-mono text-neutral-300">
+              <p className="text-base font-mono text-neutral-200">
                 a223201053@unison.mx
               </p>
             </div>
 
             <div>
-              <span className="font-mono text-xs uppercase tracking-widest text-[#B39A3A] block mb-2 flex items-center gap-2 font-medium">
-                <FiGithub size={14} />
+              <span className="font-mono text-sm uppercase tracking-widest text-[#B39A3A] block mb-2.5 flex items-center gap-2 font-semibold">
+                <FiGithub size={16} />
                 <span>Repositorio del Proyecto</span>
               </span>
               <a 
                 href="https://github.com/OwenSolis03/IS2_ElBuhoTragon" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="text-xs font-mono text-neutral-300 hover:text-white underline inline-block"
+                className="text-sm font-mono text-neutral-200 hover:text-white underline inline-block"
               >
                 github.com/OwenSolis03/IS2_ElBuhoTragon ↗
               </a>
@@ -74,21 +74,21 @@ const Contacto = () => {
 
           {/* Columna Derecha: Formulario */}
           <div className="lg:col-span-7">
-            <div className="p-8 rounded-2xl bg-[#0a1830] border border-white/[0.1] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)]">
+            <div className="p-8 sm:p-10 rounded-2xl bg-[#0a1830] border border-white/[0.1] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)]">
               {enviado ? (
                 <div className="py-12 text-center space-y-4 animate-fade-in">
-                  <div className="w-12 h-12 rounded-full bg-emerald-950/60 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto">
-                    <FiCheck size={24} />
+                  <div className="w-14 h-14 rounded-full bg-emerald-950/60 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto">
+                    <FiCheck size={28} />
                   </div>
-                  <h3 className="font-display text-3xl text-white font-normal">
+                  <h3 className="font-display text-3xl sm:text-4xl text-white font-normal">
                     Mensaje Recibido
                   </h3>
-                  <p className="text-neutral-300 text-sm font-light max-w-sm mx-auto leading-relaxed">
+                  <p className="text-neutral-200 text-base font-light max-w-sm mx-auto leading-relaxed">
                     Agradecemos tus observaciones. El equipo de desarrollo del proyecto revisará tu reporte para actualizar el catálogo.
                   </p>
                   <button
                     onClick={() => { setEnviado(false); setNombre(''); setEmail(''); setMensaje(''); }}
-                    className="mt-4 px-6 py-2 rounded-full bg-white text-black text-xs font-mono uppercase tracking-wider hover:bg-neutral-200 transition-colors font-medium cursor-pointer"
+                    className="mt-4 px-7 py-3 rounded-full bg-white text-black text-sm font-mono uppercase tracking-wider hover:bg-neutral-200 transition-colors font-semibold cursor-pointer shadow-md"
                   >
                     Enviar otro mensaje
                   </button>
@@ -98,7 +98,7 @@ const Contacto = () => {
                   <div>
                     <label 
                       htmlFor="contacto-nombre" 
-                      className="block font-mono text-[11px] uppercase tracking-wider text-neutral-300 mb-1.5 font-medium"
+                      className="block font-mono text-xs uppercase tracking-wider text-neutral-300 mb-2 font-medium"
                     >
                       Nombre Completo
                     </label>
@@ -109,14 +109,14 @@ const Contacto = () => {
                       value={nombre}
                       onChange={(e) => setNombre(e.target.value)}
                       placeholder="Tu nombre y apellido"
-                      className="w-full bg-[#071326] border border-white/[0.12] focus:border-[#B39A3A] text-white text-sm rounded-xl px-4 py-3 placeholder-neutral-400 focus:outline-none transition-colors font-sans"
+                      className="w-full bg-[#071326] border border-white/[0.12] focus:border-[#B39A3A] text-white text-base rounded-xl px-4 py-3.5 placeholder-neutral-400 focus:outline-none transition-colors font-sans"
                     />
                   </div>
 
                   <div>
                     <label 
                       htmlFor="contacto-email" 
-                      className="block font-mono text-[11px] uppercase tracking-wider text-neutral-300 mb-1.5 font-medium"
+                      className="block font-mono text-xs uppercase tracking-wider text-neutral-300 mb-2 font-medium"
                     >
                       Correo Electrónico
                     </label>
@@ -127,14 +127,14 @@ const Contacto = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="correo@ejemplo.com"
-                      className="w-full bg-[#071326] border border-white/[0.12] focus:border-[#B39A3A] text-white text-sm rounded-xl px-4 py-3 placeholder-neutral-400 focus:outline-none transition-colors font-sans"
+                      className="w-full bg-[#071326] border border-white/[0.12] focus:border-[#B39A3A] text-white text-base rounded-xl px-4 py-3.5 placeholder-neutral-400 focus:outline-none transition-colors font-sans"
                     />
                   </div>
 
                   <div>
                     <label 
                       htmlFor="contacto-mensaje" 
-                      className="block font-mono text-[11px] uppercase tracking-wider text-neutral-300 mb-1.5 font-medium"
+                      className="block font-mono text-xs uppercase tracking-wider text-neutral-300 mb-2 font-medium"
                     >
                       Mensaje u Observación
                     </label>
@@ -145,13 +145,13 @@ const Contacto = () => {
                       value={mensaje}
                       onChange={(e) => setMensaje(e.target.value)}
                       placeholder="Indica qué cafetería, platillo o sugerencia deseas compartir..."
-                      className="w-full bg-[#071326] border border-white/[0.12] focus:border-[#B39A3A] text-white text-sm rounded-xl p-4 placeholder-neutral-400 focus:outline-none transition-colors resize-none font-sans leading-relaxed"
+                      className="w-full bg-[#071326] border border-white/[0.12] focus:border-[#B39A3A] text-white text-base rounded-xl p-4 placeholder-neutral-400 focus:outline-none transition-colors resize-none font-sans leading-relaxed"
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full py-3 bg-white text-black font-sans text-xs font-mono uppercase tracking-wider rounded-full hover:bg-neutral-200 transition-colors cursor-pointer font-medium"
+                    className="w-full py-3.5 bg-white text-black font-sans text-sm font-mono uppercase tracking-wider rounded-full hover:bg-neutral-200 transition-colors cursor-pointer font-semibold shadow-md mt-2"
                   >
                     Enviar Mensaje
                   </button>
