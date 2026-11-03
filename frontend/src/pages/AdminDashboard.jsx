@@ -19,6 +19,7 @@ import {
   FiAlertCircle 
 } from "react-icons/fi";
 import { FaStar } from "react-icons/fa";
+import { API_URL, authHeaders } from "../config";
 
 const AdminDashboard = () => {
   const [cafeterias, setCafeterias] = useState([]);
@@ -73,7 +74,7 @@ const AdminDashboard = () => {
   ];
 
   const fetchCafeterias = () => {
-    fetch("http://127.0.0.1:8000/api/Tienditas/")
+    fetch(`${API_URL}/api/Tienditas/`)
       .then((res) => res.json())
       .then((data) => { setCafeterias(Array.isArray(data) ? data : []); setLoading(false); })
       .catch((err) => { console.error("Error al cargar cafeterías:", err); setLoading(false); });
@@ -81,7 +82,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchCafeterias();
-    fetch("http://127.0.0.1:8000/api/Facultades/")
+    fetch(`${API_URL}/api/Facultades/`)
       .then((res) => res.json())
       .then((data) => setFacultades(Array.isArray(data) ? data : []))
       .catch((err) => console.error("Error al cargar facultades:", err));
@@ -108,9 +109,9 @@ const AdminDashboard = () => {
     }
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/Tienditas/", {
+      const res = await fetch(`${API_URL}/api/Tienditas/`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...authHeaders() },
         body: JSON.stringify(newCafe)
       });
       if (res.ok) {
@@ -135,12 +136,12 @@ const AdminDashboard = () => {
     setNewMenuItem({ nombre: "", precio: "", descripcion: "", categoria: "" });
     
     // 1. Cargar Menú
-    fetch(`http://127.0.0.1:8000/api/Menus/?id_tiendita=${cafe.id_tiendita}`)
+    fetch(`${API_URL}/api/Menus/?id_tiendita=${cafe.id_tiendita}`)
       .then((res) => res.json())
       .then((data) => setCafeMenu(Array.isArray(data) ? data : []));
 
     // 2. Cargar Reseñas
-    fetch(`http://127.0.0.1:8000/api/Resenas/?id_tiendita=${cafe.id_tiendita}`)
+    fetch(`${API_URL}/api/Resenas/?id_tiendita=${cafe.id_tiendita}`)
       .then((res) => res.json())
       .then((data) => setCafeReviews(Array.isArray(data) ? data : []))
       .catch((err) => console.error("Error al cargar reseñas:", err));
@@ -149,9 +150,9 @@ const AdminDashboard = () => {
   const handleUpdateCafe = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/Tienditas/${editingCafe.id_tiendita}/`, {
+      const res = await fetch(`${API_URL}/api/Tienditas/${editingCafe.id_tiendita}/`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...authHeaders() },
         body: JSON.stringify(editingCafe)
       });
       if (res.ok) {
@@ -189,8 +190,8 @@ const AdminDashboard = () => {
     }
 
     const url = editingMenuItemId 
-      ? `http://127.0.0.1:8000/api/Menus/${editingMenuItemId}/` 
-      : "http://127.0.0.1:8000/api/Menus/";
+      ? `${API_URL}/api/Menus/${editingMenuItemId}/` 
+      : `${API_URL}/api/Menus/`;
     
     const method = editingMenuItemId ? "PUT" : "POST";
 
@@ -203,14 +204,14 @@ const AdminDashboard = () => {
     try {
       const res = await fetch(url, {
         method: method,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...authHeaders() },
         body: JSON.stringify(payload)
       });
 
       if (res.ok) {
         showToast(editingMenuItemId ? "Platillo modificado con éxito." : "Platillo agregado a la carta.", "success");
         cancelEditMenuItem();
-        fetch(`http://127.0.0.1:8000/api/Menus/?id_tiendita=${editingCafe.id_tiendita}`)
+        fetch(`${API_URL}/api/Menus/?id_tiendita=${editingCafe.id_tiendita}`)
           .then((r) => r.json())
           .then((d) => setCafeMenu(Array.isArray(d) ? d : []));
       } else {
@@ -229,7 +230,7 @@ const AdminDashboard = () => {
       message: "¿Deseas eliminar este platillo de la carta de la cafetería?",
       onConfirm: async () => {
         try {
-          const res = await fetch(`http://127.0.0.1:8000/api/Menus/${id}/`, { method: "DELETE" });
+          const res = await fetch(`${API_URL}/api/Menus/${id}/`, { method: "DELETE", headers: authHeaders() });
           if (res.ok) {
             setCafeMenu((prev) => prev.filter((item) => item.id_menu !== id));
             showToast("Platillo eliminado de la carta.", "success");
@@ -255,7 +256,7 @@ const AdminDashboard = () => {
       onConfirm: async () => {
         const token = localStorage.getItem("access_token");
         try {
-          const res = await fetch(`http://127.0.0.1:8000/api/Resenas/${id}/`, {
+          const res = await fetch(`${API_URL}/api/Resenas/${id}/`, {
             method: "DELETE",
             headers: {
               "Authorization": `Bearer ${token}`
@@ -285,7 +286,7 @@ const AdminDashboard = () => {
       message: `¿Estás seguro de eliminar "${nombreCafe || 'esta cafetería'}" permanentemente del directorio? Esta acción no se puede deshacer.`,
       onConfirm: async () => {
         try {
-          const res = await fetch(`http://127.0.0.1:8000/api/Tienditas/${id}/`, { method: "DELETE" });
+          const res = await fetch(`${API_URL}/api/Tienditas/${id}/`, { method: "DELETE", headers: authHeaders() });
           if (res.ok) {
             fetchCafeterias();
             showToast("Cafetería eliminada del catálogo.", "success");

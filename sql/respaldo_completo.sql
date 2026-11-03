@@ -125,7 +125,7 @@ CREATE TABLE `auth_user` (
 
 LOCK TABLES `auth_user` WRITE;
 /*!40000 ALTER TABLE `auth_user` DISABLE KEYS */;
-INSERT INTO `auth_user` VALUES (1,'',NULL,0,'panchito1234','','','',0,1,'2025-11-19 22:35:56.105329'),(2,'',NULL,0,'juan','','','',0,1,'2025-11-19 22:44:50.205525'),(3,'',NULL,0,'1','','','',0,1,'2025-11-19 22:49:13.454952'),(4,'',NULL,0,'2','','','',0,1,'2025-11-19 22:54:04.207282');
+-- Datos de usuarios removidos del repositorio por seguridad
 /*!40000 ALTER TABLE `auth_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -450,7 +450,7 @@ CREATE TABLE `usuarios` (
 
 LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
-INSERT INTO `usuarios` VALUES (1,'panchito1234','pbkdf2_sha256$1000000$PAwkUxlKVsDytSyL6gQ1vp$OT+H/nMkm470yCNewk7bYw2J0KkaEnmRceSKCl298ck=','papu@pro.com',1,'2025-11-19 15:47:13'),(2,'juan','pbkdf2_sha256$1000000$fiv3qt6OITyt1aKNRbDNN1$RKn/cBz/Fexoj34wXPgOQLPBZIsjfCD8Q+NKJnlBE5o=','juan@juan.com',0,'2025-11-19 15:47:13'),(3,'1','pbkdf2_sha256$1000000$wFjKgxjTMEwsFuwVenU7im$E+jUhDQRWHUCpd+cIOmawk7Cr9aN6XAtW7ahVg2VMgg=','1@1.com',NULL,NULL),(4,'2','pbkdf2_sha256$1000000$m9tzPwmrYRdd25TwPhy510$ku/npceUYa+dkTocbeTs9nq3r+VEEksZgSdxCO2Uv70=','2@2.com',0,'2025-11-19 22:53:58'),(5,'3','pbkdf2_sha256$1000000$RUmDQfJV7z5uJMLevTlw99$i9/Q7F4sezagG9YvbKpRlhuVFxboFQpRo/2fS+6PrYg=','3@unison.mx',0,'2025-11-21 19:44:45');
+-- Datos de usuarios removidos del repositorio por seguridad
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

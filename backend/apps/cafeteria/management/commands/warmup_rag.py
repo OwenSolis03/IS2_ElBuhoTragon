@@ -28,8 +28,12 @@ class Command(BaseCommand):
         rag = get_rag_engine()
         self.stdout.write(f"       Index built: {len(rag.documents)} chunks indexed")
 
-        self.stdout.write("[4/4] Loading LLM models (this may download ~1GB the first time)...")
-        rag._load_models()
+        if hasattr(rag, '_load_models'):
+            # Solo el motor HPC carga modelos locales; Bedrock no descarga nada
+            self.stdout.write("[4/4] Loading LLM models (this may download ~1GB the first time)...")
+            rag._load_models()
+        else:
+            self.stdout.write("[4/4] Bedrock backend: no local models to load")
 
         # Quick smoke test
         self.stdout.write("\n[Test] Running smoke test query...")

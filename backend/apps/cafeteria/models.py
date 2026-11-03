@@ -62,6 +62,15 @@ class Usuarios(models.Model):
     def id(self):
         return self.id_usuarios
 
+    # Requerido por los permisos de DRF (IsAuthenticated) al autenticar con JWT
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
 class Resenas(models.Model):
     id_resena = models.AutoField(primary_key=True)
     id_tiendita = models.ForeignKey(Tienditas, on_delete=models.CASCADE, db_column='id_tiendita', related_name='resenas')

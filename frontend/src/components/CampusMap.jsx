@@ -9,6 +9,7 @@ import { FiLoader } from 'react-icons/fi';
 // --- ARREGLO DE ICONOS ROTOS DE LEAFLET ---
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import { API_URL } from "../config";
 
 let DefaultIcon = L.icon({
   iconUrl: icon,
@@ -32,7 +33,7 @@ const CampusMap = () => {
     let isMounted = true;
     const fetchTienditas = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/Tienditas/');
+        const response = await fetch(`${API_URL}/api/Tienditas/`);
         if (!response.ok) throw new Error("Error en respuesta de red");
         const data = await response.json();
         if (isMounted) {

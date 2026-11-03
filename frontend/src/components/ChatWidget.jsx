@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FiX, FiSend, FiLoader, FiHelpCircle } from "react-icons/fi";
 import logo from "../assets/logo.png";
+import { API_URL } from "../config";
 
 const ChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,7 +11,7 @@ const ChatWidget = () => {
   const [chatHistory, setChatHistory] = useState([
     {
       type: "bot",
-      text: "Hola. Soy el asistente de Hungry Owl. ¿Qué platillo, cafetería o presupuesto buscas hoy en el campus universitario?"
+      text: "Hola. Soy el asistente de El Búho Tragón. ¿Qué platillo, cafetería o presupuesto buscas hoy en el campus universitario?"
     }
   ]);
 
@@ -137,7 +138,7 @@ const ChatWidget = () => {
     try {
       const location = await getUserLocation();
 
-      const response = await fetch("http://127.0.0.1:8000/api/chatbot/", {
+      const response = await fetch(`${API_URL}/api/chatbot/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -205,7 +206,7 @@ const ChatWidget = () => {
         className={`fixed top-0 bottom-0 left-0 z-50 w-full sm:w-[450px] max-w-[94vw] h-full bg-[#071326] border-r border-white/10 shadow-[20px_0_50px_rgba(0,0,0,0.85)] flex flex-col font-sans transition-transform duration-300 ease-out transform ${
           isOpen ? "translate-x-0" : "-translate-x-full pointer-events-none"
         }`}
-        aria-label="Asistente inteligente de campus Hungry Owl"
+        aria-label="Asistente inteligente de campus El Búho Tragón"
         role="dialog"
         aria-modal="true"
       >
@@ -219,7 +220,7 @@ const ChatWidget = () => {
             />
             <div>
               <h3 className="font-display text-xl font-normal text-white leading-none">
-                Asistente Hungry Owl
+                Asistente El Búho Tragón
               </h3>
               <span className="font-mono text-xs text-emerald-400 uppercase tracking-[0.16em] block mt-1.5 font-medium">
                 En servicio · RAG Campus UNISON

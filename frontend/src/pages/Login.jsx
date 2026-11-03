@@ -5,6 +5,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ChatWidget from "../components/ChatWidget";
 import { FiAlertCircle, FiLock, FiUser, FiEye, FiEyeOff } from "react-icons/fi";
+import { API_URL } from "../config";
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -21,7 +22,7 @@ const Login = () => {
     setError('');
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/login/", {
+      const res = await fetch(`${API_URL}/api/login/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -5,6 +5,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ChatWidget from "../components/ChatWidget";
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiAlertCircle, FiCheckCircle } from "react-icons/fi";
+import { API_URL } from "../config";
 
 const Registro = () => {
   const [mostrarContrasena, setMostrarContrasena] = useState(false);
@@ -37,7 +38,7 @@ const Registro = () => {
     }
 
     try {
-      const respuesta = await fetch("http://127.0.0.1:8000/api/Usuarios/", {
+      const respuesta = await fetch(`${API_URL}/api/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -45,8 +46,7 @@ const Registro = () => {
         body: JSON.stringify({
           nombre_usuario: nombreUsuario,
           contrasena: contrasena,
-          email: email,
-          es_admin: 0 
+          email: email
         })
       });
 

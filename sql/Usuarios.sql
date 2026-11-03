@@ -40,7 +40,7 @@ CREATE TABLE `Usuarios` (
 
 LOCK TABLES `Usuarios` WRITE;
 /*!40000 ALTER TABLE `Usuarios` DISABLE KEYS */;
-INSERT INTO `Usuarios` VALUES (1,'Carlos Moreno','a222200601@unison.mx','e0545d486511c65b153ef67217bb654c09e215a4536416fe74420a62e87ec328',0,'2025-04-14 07:20:04');
+-- Datos de usuarios removidos del repositorio por seguridad
 /*!40000 ALTER TABLE `Usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

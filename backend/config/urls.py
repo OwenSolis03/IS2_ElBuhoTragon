@@ -20,7 +20,6 @@ from django.urls import include, path
 from rest_framework import routers
 from django.views.generic import RedirectView
 from apps.cafeteria.views import TienditasViewSet, MenusViewSet, FacultadesViewSet, UsuariosViewSet, ResenaViewSet
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from apps.cafeteria.views import UserRegisterView
 from apps.cafeteria.views import chatbot_query
 
@@ -40,7 +39,7 @@ urlpatterns = [
     path('api/', include(router.urls)),  
     path('api/login/', login_view, name='login'),
     path('api/register', UserRegisterView.as_view(), name='register'),
-    path('api/token', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # /api/token y /api/token/refresh/ se quitaron: emitían tokens para auth_user
+    # (no para Usuarios) y el frontend no los usa
 
 ]

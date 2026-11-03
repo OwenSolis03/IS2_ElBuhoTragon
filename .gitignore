@@ -25,3 +25,6 @@ package-lock.json
 
 # GitNexus (Evitar bucles recursivos)
 .gitnexus/
+# Base de datos con usuarios: nunca se sube al repo (se copia al servidor aparte)
+backend/*.db
+backend/*.sqlite3

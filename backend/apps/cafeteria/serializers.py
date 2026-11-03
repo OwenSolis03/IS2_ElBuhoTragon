@@ -19,11 +19,12 @@ class MenusSerializer(serializers.ModelSerializer):
         model = Menus
         fields = '__all__'
 
-# --- ESTA ES LA CLASE QUE DEBES CORREGIR ---
 class UsuariosSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuarios
         fields = '__all__'
+        # Nunca devolver el hash de la contraseña en las respuestas
+        extra_kwargs = {'contrasena': {'write_only': True}}
 
     # AGREGAMOS ESTE MÉTODO PARA INTERCEPTAR EL GUARDADO
     def create(self, validated_data):
@@ -43,4 +44,5 @@ class ResenaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Resenas
         fields = '__all__'
-        read_only_fields = ('fecha_registro',)
+        # El autor se toma del token en la vista, no de lo que mande el cliente
+        read_only_fields = ('fecha_registro', 'id_usuario')

@@ -11,12 +11,15 @@ import logging
 # Django & DRF imports
 from django.http import HttpResponse
 from django.contrib.auth.hashers import check_password, make_password
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils import timezone
 from rest_framework import viewsets, filters, generics, status
 from rest_framework.views import APIView
 from rest_framework.serializers import ModelSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django_filters.rest_framework import DjangoFilterBackend
@@ -30,6 +33,15 @@ from .serializers import (
     UsuariosSerializer,
     ResenaSerializer
 )
+from .permissions import (
+    EsAdmin,
+    EsAdminOSoloLectura,
+    PermisoResena,
+    LoginThrottle,
+    RegistroThrottle,
+    ChatbotThrottle,
+    ChatbotGlobalThrottle,
+)
 
 # Configurar logging
 logger = logging.getLogger(__name__)
@@ -41,6 +53,7 @@ logger = logging.getLogger(__name__)
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([LoginThrottle])
 def login_view(request):
     """
     Login personalizado con JWT
@@ -56,18 +69,11 @@ def login_view(request):
         )
 
     try:
-        user_exists = Usuarios.objects.filter(nombre_usuario=username).exists()
+        user = Usuarios.objects.filter(nombre_usuario=username).first()
 
-        if not user_exists:
-            return Response(
-                {'success': False, 'error': 'Usuario no encontrado'},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
-
-        user = Usuarios.objects.get(nombre_usuario=username)
-
-        # Verificación segura de contraseña (hash)
-        if not check_password(password, user.contrasena):
+        # Mismo mensaje si el usuario no existe o la contraseña es incorrecta,
+        # para no revelar qué nombres de usuario están registrados
+        if user is None or not check_password(password, user.contrasena):
             return Response(
                 {'success': False, 'error': 'Credenciales inválidas'},
                 status=status.HTTP_401_UNAUTHORIZED
@@ -96,10 +102,30 @@ class UserRegisterSerializer(ModelSerializer):
     class Meta:
         model = Usuarios
         fields = ['nombre_usuario', 'email', 'contrasena']
-        extra_kwargs = {'contrasena': {'write_only': True}}
+        extra_kwargs = {
+            'contrasena': {'write_only': True},
+            'email': {'required': True, 'allow_null': False},
+        }
+
+    def validate_nombre_usuario(self, value):
+        if Usuarios.objects.filter(nombre_usuario=value).exists():
+            raise ValidationError('Ese nombre de usuario ya está en uso.')
+        return value
+
+    def validate_email(self, value):
+        if not value.lower().endswith('@unison.mx'):
+            raise ValidationError('El registro requiere un correo institucional (@unison.mx).')
+        return value
+
+    def validate_contrasena(self, value):
+        try:
+            validate_password(value)
+        except DjangoValidationError as e:
+            raise ValidationError(list(e.messages))
+        return value
 
     def create(self, validated_data):
-        # AQUI ESTA EL CAMBIO DE SEGURIDAD
+        # es_admin siempre en 0: nunca se acepta desde el cliente
         validated_data['contrasena'] = make_password(validated_data['contrasena'])
         validated_data['es_admin'] = 0
         validated_data['fecha_registro'] = timezone.now()
@@ -111,6 +137,7 @@ class UserRegisterView(generics.CreateAPIView):
     queryset = Usuarios.objects.all()
     serializer_class = UserRegisterSerializer
     permission_classes = [AllowAny]
+    throttle_classes = [RegistroThrottle]
 
 
 class UsuarioActualView(APIView):
@@ -129,6 +156,7 @@ class TienditasViewSet(viewsets.ModelViewSet):
     """CRUD de Cafeterías"""
     queryset = Tienditas.objects.all()
     serializer_class = TienditasSerializer
+    permission_classes = [EsAdminOSoloLectura]
     filter_backends = [filters.SearchFilter]
     search_fields = ['nombre']
 
@@ -137,6 +165,7 @@ class MenusViewSet(viewsets.ModelViewSet):
     """CRUD de Menús"""
     queryset = Menus.objects.all()
     serializer_class = MenusSerializer
+    permission_classes = [EsAdminOSoloLectura]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['id_tiendita', 'categoria']
     search_fields = ['nombre', 'descripcion']
@@ -147,28 +176,24 @@ class FacultadesViewSet(viewsets.ModelViewSet):
     """CRUD de Facultades"""
     queryset = Facultades.objects.all()
     serializer_class = FacultadesSerializer
+    permission_classes = [EsAdminOSoloLectura]
 
 
 class UsuariosViewSet(viewsets.ModelViewSet):
-    """CRUD de Usuarios"""
+    """CRUD de Usuarios (solo administradores; el registro público es /api/register)"""
     queryset = Usuarios.objects.all()
     serializer_class = UsuariosSerializer
+    permission_classes = [EsAdmin]
 
 
-# --- AQUI ESTA EL CAMBIO NUCLEAR PARA LAS RESEÑAS ---
 class ResenaViewSet(viewsets.ModelViewSet):
     """
-    CRUD de Reseñas - MODIFICADO PARA DEMO
-    Se ha deshabilitado la seguridad estricta para permitir el flujo sin tokens complejos.
-    El Frontend DEBE enviar 'id_usuario'.
+    CRUD de Reseñas.
+    Lectura pública; publicar requiere sesión y el autor se toma del token JWT.
     """
     queryset = Resenas.objects.all()
     serializer_class = ResenaSerializer
-
-    # 1. Esto evita que Django intente leer el Token y falle
-    authentication_classes = []
-    # 2. Esto deja pasar la petición sin preguntar quién es
-    permission_classes = [AllowAny]
+    permission_classes = [PermisoResena]
 
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['id_tiendita']
@@ -176,15 +201,13 @@ class ResenaViewSet(viewsets.ModelViewSet):
     ordering = ['-fecha_registro']
 
     def perform_create(self, serializer):
-        # Guardamos directamente usando el id_usuario que viene del frontend
-        # Ya no intentamos leer self.request.user
-        serializer.save()
-# ----------------------------------------------------
+        serializer.save(id_usuario=self.request.user)
 
 
 class MenusPorTiendita(generics.ListAPIView):
     """Lista los menús de una cafetería específica"""
     serializer_class = MenusSerializer
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         tiendita_id = self.kwargs['tiendita_id']
@@ -209,6 +232,16 @@ except ImportError as e:
 # Límites defensivos para el historial que envía el cliente (no confiar en input externo)
 MAX_HISTORY_TURNS = 6
 MAX_HISTORY_CHARS = 1000
+MAX_MESSAGE_CHARS = 500
+
+
+def _parse_coord(value, limit):
+    """Convierte lat/lon a float dentro de rango; None si no es válido."""
+    try:
+        coord = float(value)
+    except (TypeError, ValueError):
+        return None
+    return coord if -limit <= coord <= limit else None
 
 
 def _sanitize_history(raw):
@@ -242,21 +275,34 @@ def get_rag_instance():
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([ChatbotThrottle, ChatbotGlobalThrottle])
 def chatbot_query(request):
     """
     Endpoint para el chatbot RAG
     """
     try:
         # Validar entrada
-        message = request.data.get('message', '').strip()
-        user_lat = request.data.get('lat')
-        user_lon = request.data.get('lon')
+        message = request.data.get('message', '')
+        message = message.strip() if isinstance(message, str) else ''
+        user_lat = _parse_coord(request.data.get('lat'), 90)
+        user_lon = _parse_coord(request.data.get('lon'), 180)
+        if user_lat is None or user_lon is None:
+            user_lat = user_lon = None
 
         if not message:
             return Response(
                 {
                     'success': False,
                     'error': 'El mensaje no puede estar vacío'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if len(message) > MAX_MESSAGE_CHARS:
+            return Response(
+                {
+                    'success': False,
+                    'error': f'El mensaje no puede pasar de {MAX_MESSAGE_CHARS} caracteres'
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )

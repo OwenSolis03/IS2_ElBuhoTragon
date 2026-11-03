@@ -25,6 +25,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import { API_URL } from "../config";
 
 let DefaultIcon = L.icon({
   iconUrl: icon,
@@ -63,7 +64,7 @@ const PlantillaCafeteria = () => {
   };
 
   const fetchResenas = useCallback(() => {
-    fetch(`http://127.0.0.1:8000/api/Resenas/?id_tiendita=${id}`)
+    fetch(`${API_URL}/api/Resenas/?id_tiendita=${id}`)
       .then((res) => res.json())
       .then((data) => setReviews(Array.isArray(data) ? data : []))
       .catch((err) => console.error("Error al cargar reseñas:", err));
@@ -76,8 +77,8 @@ const PlantillaCafeteria = () => {
     const fetchData = async () => {
       try {
         const [resInfo, resMenu] = await Promise.all([
-          fetch(`http://127.0.0.1:8000/api/Tienditas/${id}/`),
-          fetch(`http://127.0.0.1:8000/api/Menus/?id_tiendita=${id}`)
+          fetch(`${API_URL}/api/Tienditas/${id}/`),
+          fetch(`${API_URL}/api/Menus/?id_tiendita=${id}`)
         ]);
 
         if (!resInfo.ok) {
@@ -139,7 +140,7 @@ const PlantillaCafeteria = () => {
     }
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/Resenas/", {
+      const res = await fetch(`${API_URL}/api/Resenas/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

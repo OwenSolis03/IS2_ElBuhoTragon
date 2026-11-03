@@ -1,5 +1,4 @@
 import logging
-import torch
 from math import radians, sin, cos, sqrt, atan2
 from typing import Optional, Tuple
 from thefuzz import fuzz, process
@@ -66,7 +65,10 @@ KNOWN_LOCATIONS = {
 }
 
 
-def detect_device() -> Tuple[str, torch.dtype]:
+def detect_device() -> Tuple[str, "torch.dtype"]:
+    # torch solo se necesita en el motor HPC; el motor de Bedrock no lo instala
+    import torch
+
     if torch.cuda.is_available():
         device_name = torch.cuda.get_device_name(0)
         backend = "ROCm" if "AMD" in device_name or "Radeon" in device_name else "CUDA"

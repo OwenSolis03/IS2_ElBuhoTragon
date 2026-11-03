@@ -25,6 +25,7 @@ import Geologia from "/Cafeteria-Geologia1Card.jpeg";
 import Matematicas from "/Matematicas1Card.png";
 import Artes from "/Artes1Card.png";
 import Derecho1Page from "/Derecho1Page.jpeg";
+import { API_URL } from "../config";
 
 const imagenesOriginales = {
   1: Derecho1, 
@@ -71,9 +72,9 @@ const Home = () => {
     setNetworkError(false);
     try {
       const [resCafes, resMenus, resFacus] = await Promise.all([
-        fetch("http://127.0.0.1:8000/api/Tienditas/"),
-        fetch("http://127.0.0.1:8000/api/Menus/"),
-        fetch("http://127.0.0.1:8000/api/Facultades/")
+        fetch(`${API_URL}/api/Tienditas/`),
+        fetch(`${API_URL}/api/Menus/`),
+        fetch(`${API_URL}/api/Facultades/`)
       ]);
 
       if (!resCafes.ok || !resMenus.ok || !resFacus.ok) {
@@ -216,7 +217,7 @@ const Home = () => {
                 Universidad de Sonora · Hermosillo
               </span>
               <h1 className="font-display text-6xl sm:text-8xl lg:text-9xl font-normal tracking-tight text-[#F2F2F0] leading-[0.92]">
-                Hungry Owl
+                El Búho Tragón
               </h1>
             </div>
 

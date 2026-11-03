@@ -13,10 +13,16 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
-from datetime import timedelta 
+from datetime import timedelta
+from django.core.exceptions import ImproperlyConfigured
 
 # load variables from .env
 load_dotenv()
+
+
+def env_list(name, default):
+    """Lee una variable de entorno separada por comas."""
+    return [item.strip() for item in os.getenv(name, default).split(',') if item.strip()]
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,13 +32,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "SECRET_KEY")
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Seguro por defecto: si no se define, DEBUG queda apagado.
+# Para desarrollo local pon DJANGO_DEBUG=True en backend/.env (ver .env.example).
+DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() in ("1", "true", "yes")
 
-ALLOWED_HOSTS = []
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+if not SECRET_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured("Define DJANGO_SECRET_KEY en el entorno de producción")
+    SECRET_KEY = "dev-insecure-key-solo-para-desarrollo-local"
+
+ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1")
 
 # Application definition
 
@@ -51,9 +63,22 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-        
+        'apps.cafeteria.authentication.UsuariosJWTAuthentication',
     ),
+
+    # Cerrado por defecto: cada vista declara explícitamente quién puede usarla
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+
+    'DEFAULT_THROTTLE_RATES': {
+        'login': os.getenv('THROTTLE_LOGIN', '10/minute'),
+        'registro': os.getenv('THROTTLE_REGISTRO', '5/hour'),
+        'chatbot': os.getenv('THROTTLE_CHATBOT', '30/hour'),
+        'chatbot_global': os.getenv('THROTTLE_CHATBOT_GLOBAL', '400/day'),
+    },
+    # Número de proxies delante de Django (Caddy = 1) para leer la IP real del cliente
+    'NUM_PROXIES': int(os.getenv('NUM_PROXIES', '0')) or None,
 
  'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
@@ -80,14 +105,15 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.common.CommonMiddleware',
 ]
 
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173", #desarollo local 
-    "https://proyectoscc.unison.mx", # produccion 
-]
+# En producción define CORS_ALLOWED_ORIGINS con el dominio de Amplify
+CORS_ALLOWED_ORIGINS = env_list(
+    "CORS_ALLOWED_ORIGINS",
+    "http://localhost:5173,http://127.0.0.1:5173,https://proyectoscc.unison.mx",
+)
+CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS", ",".join(CORS_ALLOWED_ORIGINS))
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = ['DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT']
@@ -159,7 +185,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-mx'
 
 TIME_ZONE = 'UTC'
 
@@ -173,6 +199,17 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+
+if not DEBUG:
+    # Detrás de Caddy (que termina el HTTPS)
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "3600"))
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    # Sin la interfaz navegable de DRF en producción: solo JSON
+    REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] = ('rest_framework.renderers.JSONRenderer',)
 
 
 # Default primary key field type

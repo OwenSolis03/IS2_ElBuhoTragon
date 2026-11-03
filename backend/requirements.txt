@@ -4,9 +4,18 @@ django-cors-headers==4.7.0
 django-filter==24.3
 djangorestframework==3.16.0
 djangorestframework_simplejwt==5.5.0
-mysqlclient==2.2.7
 PyJWT==2.9.0
-PyMySQL==1.1.1
 python-dotenv==1.1.0
 sqlparse==0.5.3
 cryptography>=43.0.0
+
+# Servidor de producción (EC2)
+gunicorn>=23.0
+
+# Chatbot con Amazon Bedrock (llm_rag/rag_engine_bedrock.py)
+boto3>=1.40
+numpy>=2.0
+thefuzz>=0.22.1
+
+# En local con 'aws login' agrega: botocore[crt]
+# El motor HPC (Qwen + FAISS) usa llm_rag/requirements.txt

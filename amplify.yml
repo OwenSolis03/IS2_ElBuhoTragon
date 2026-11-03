@@ -1,0 +1,22 @@
+# Build de Amplify Hosting para el frontend (React + Vite).
+# El repo es un monorepo: Amplify solo compila la carpeta frontend/.
+# Variable de entorno requerida en la consola de Amplify:
+#   VITE_API_URL = https://<dominio-del-backend>   (sin / al final)
+version: 1
+applications:
+  - appRoot: frontend
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - npm ci
+        build:
+          commands:
+            - npm run build
+      artifacts:
+        baseDirectory: dist
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*

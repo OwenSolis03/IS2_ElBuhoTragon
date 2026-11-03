@@ -22,6 +22,7 @@ import IngenieriaQuimica from "/IngQuimica1Card.jpeg";
 import Geologia from "/Cafeteria-Geologia1Card.jpeg";
 import Matematicas from "/Matematicas1Card.png";
 import Artes from "/Artes1Card.png";
+import { API_URL } from "../config";
 
 const imagenesOriginales = {
   1: Derecho1, 
@@ -89,9 +90,9 @@ const Cafeterias = () => {
 
       try {
         const [resCafes, resReviews, resFacus] = await Promise.all([
-          fetch("http://127.0.0.1:8000/api/Tienditas/"),
-          fetch("http://127.0.0.1:8000/api/Resenas/"),
-          fetch("http://127.0.0.1:8000/api/Facultades/")
+          fetch(`${API_URL}/api/Tienditas/`),
+          fetch(`${API_URL}/api/Resenas/`),
+          fetch(`${API_URL}/api/Facultades/`)
         ]);
 
         const cafesData = await resCafes.json();
