@@ -1,0 +1,19 @@
+# __HOST__ lo reemplaza setup.sh por el dominio del backend.
+# Caddy obtiene y renueva solo el certificado HTTPS (Let's Encrypt).
+__HOST__ {
+	encode gzip
+
+	# Archivos estáticos del admin de Django (collectstatic)
+	handle_path /static/* {
+		root * /opt/buho/current/backend/staticfiles
+		file_server
+	}
+
+	reverse_proxy 127.0.0.1:8000
+
+	header {
+		-Server
+		Strict-Transport-Security "max-age=3600"
+		X-Content-Type-Options nosniff
+	}
+}

@@ -1,0 +1,25 @@
+[Unit]
+Description=El Buho Tragon - API Django (gunicorn)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=buho
+Group=buho
+WorkingDirectory=/opt/buho/current/backend
+EnvironmentFile=/opt/buho/data/.env
+# Un solo proceso con hilos: el singleton del RAG y el caché de throttling
+# (tope diario del chatbot) se comparten entre todas las peticiones
+ExecStart=/opt/buho/venv/bin/gunicorn config.wsgi:application \
+    --bind 127.0.0.1:8000 \
+    --workers 1 --threads 4 --worker-class gthread \
+    --timeout 60 --access-logfile -
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target
