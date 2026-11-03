@@ -15,7 +15,7 @@ const Terminos = () => {
         <PageHeader
           eyebrow="Marco Normativo y Académico"
           title="Términos y Condiciones"
-          description="Lineamientos oficiales para la consulta, registro y participación comunitaria en la plataforma Hungry Owl."
+          description="Lineamientos oficiales para la consulta, registro y participación comunitaria en la plataforma El Búho Tragón."
           maxWidth="max-w-4xl"
         />
 
@@ -26,7 +26,7 @@ const Terminos = () => {
               1. Naturaleza del Proyecto
             </h2>
             <p className="text-neutral-200 leading-relaxed">
-              Hungry Owl es un proyecto académico de software desarrollado para la comunidad de la Universidad de Sonora. Su propósito es brindar orientación gastronómica, localización geográfica de cafeterías y visualización de cartas de platillos dentro del campus Hermosillo.
+              El Búho Tragón es un proyecto académico de software desarrollado para la comunidad de la Universidad de Sonora. Su propósito es brindar orientación gastronómica, localización geográfica de cafeterías y visualización de cartas de platillos dentro del campus Hermosillo.
             </p>
           </section>
 
@@ -44,7 +44,7 @@ const Terminos = () => {
               3. Participación y Reseñas Comunitarias
             </h2>
             <p className="text-neutral-200 leading-relaxed">
-              Las opiniones y valoraciones emitidas por los estudiantes deben apegarse al respeto mutuo y a la convivencia universitaria. Hungry Owl se reserva el derecho de moderar contenidos ofensivos, publicitarios o ajenos al objetivo del servicio gastronómico.
+              Las opiniones y valoraciones emitidas por los estudiantes deben apegarse al respeto mutuo y a la convivencia universitaria. El Búho Tragón se reserva el derecho de moderar contenidos ofensivos, publicitarios o ajenos al objetivo del servicio gastronómico.
             </p>
           </section>
 

@@ -15,7 +15,7 @@ const Privacidad = () => {
         <PageHeader
           eyebrow="Protección de Datos · UNISON"
           title="Aviso de Privacidad"
-          description="Transparencia y resguardo institucional en el tratamiento de credenciales y datos de consulta en Hungry Owl."
+          description="Transparencia y resguardo institucional en el tratamiento de credenciales y datos de consulta en El Búho Tragón."
           maxWidth="max-w-4xl"
         />
 
@@ -26,7 +26,7 @@ const Privacidad = () => {
               1. Privacidad Primero
             </h2>
             <p className="text-neutral-200 leading-relaxed">
-              Hungry Owl no comercializa, transfiere ni comparte información de los estudiantes con entidades externas ni empresas de publicidad. La plataforma es un servicio académico sin rastreadores comerciales ni cookies de terceros.
+              El Búho Tragón no comercializa, transfiere ni comparte información de los estudiantes con entidades externas ni empresas de publicidad. La plataforma es un servicio académico sin rastreadores comerciales ni cookies de terceros.
             </p>
           </section>
 

@@ -94,7 +94,7 @@ const Header = () => {
           
           {/* --- MARCA E IDENTIDAD --- */}
           <div className="flex items-center gap-4">
-            <Link to="/" className="flex items-center gap-3.5 group" aria-label="Hungry Owl — Inicio">
+            <Link to="/" className="flex items-center gap-3.5 group" aria-label="El Búho Tragón — Inicio">
               <img
                 src={logo}
                 alt=""
@@ -103,7 +103,7 @@ const Header = () => {
               />
               <div className="flex flex-col">
                 <span className="font-display font-semibold text-2xl tracking-wider text-white group-hover:text-neutral-200 transition-colors uppercase">
-                  Hungry Owl
+                  El Búho Tragón
                 </span>
                 <span className="text-xs tracking-[0.16em] uppercase font-sans text-neutral-300 -mt-0.5 font-medium">
                   UNISON Hermosillo
@@ -156,7 +156,7 @@ const Header = () => {
                   ? "text-white font-semibold after:absolute after:-bottom-2 after:left-0 after:right-0 after:h-[2px] after:bg-[#B39A3A]"
                   : "text-neutral-300 hover:text-white font-normal"
               }`}
-              title="Abrir Asistente Hungry Owl"
+              title="Abrir Asistente El Búho Tragón"
               aria-label="Abrir asistente de inteligencia artificial"
             >
               <FiMessageSquare size={15} className={isAssistantOpen ? "text-[#B39A3A]" : "text-neutral-400"} />
@@ -263,7 +263,7 @@ const Header = () => {
             className="w-full text-left px-4 py-3.5 rounded-xl text-base font-medium text-neutral-300 hover:bg-white/[0.04] flex items-center gap-3 cursor-pointer"
           >
             <FiMessageSquare size={18} className="text-[#B39A3A]" />
-            <span>Asistente Hungry Owl</span>
+            <span>Asistente El Búho Tragón</span>
           </button>
 
           {esAdmin && (

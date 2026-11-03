@@ -10,12 +10,12 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center pb-8 border-b border-white/[0.06]">
           
-          {/* Columna 1: Marca Hungry Owl */}
+          {/* Columna 1: Marca El Búho Tragón */}
           <div className="flex flex-col items-center md:items-start gap-2.5">
             <div className="flex items-center gap-2.5">
-              <img src={logo} alt="Hungry Owl" className="h-8 w-8 object-contain opacity-90" />
+              <img src={logo} alt="El Búho Tragón" className="h-8 w-8 object-contain opacity-90" />
               <span className="font-display font-semibold text-xl text-[#F2F2F0] tracking-wider uppercase">
-                Hungry Owl
+                El Búho Tragón
               </span>
             </div>
             <p className="text-sm text-neutral-300 text-center md:text-left max-w-sm leading-relaxed font-light">
@@ -62,7 +62,7 @@ const Footer = () => {
             Desarrollado para Ingeniería de Software II · Departamento de Matemáticas
           </span>
           <span className="text-neutral-400">
-            © {new Date().getFullYear()} Hungry Owl. Comunidad Búho UNISON.
+            © {new Date().getFullYear()} El Búho Tragón. Comunidad Búho UNISON.
           </span>
         </div>
       </div>
