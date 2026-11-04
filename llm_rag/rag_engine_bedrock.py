@@ -23,7 +23,7 @@ import boto3
 import numpy as np
 from botocore.config import Config
 
-from .rag_utils import calculate_distance, get_coords_from_query
+from .rag_utils import CAMPUS_CENTER, calculate_distance, find_locations, is_on_campus
 
 logger = logging.getLogger(__name__)
 
@@ -198,10 +198,15 @@ class BuhoRAGBedrock:
         # Vectores normalizados: el producto punto es la similitud coseno
         scores = self.embeddings @ self._embed(query)
 
+        has_location = user_lat is not None and user_lon is not None
+        # Con ubicación se junta un grupo más amplio de documentos relevantes y luego se
+        # quedan los k más cercanos; si no, "cerca de X" ignoraría la cafetería de al lado
+        pool_size = k * 3 if has_location else k
+
         results = []  # (distancia, documento)
         seen_stores = {}
         for idx in np.argsort(-scores):
-            if len(results) >= k:
+            if len(results) >= pool_size:
                 break
 
             doc = self.documents[idx]
@@ -215,7 +220,7 @@ class BuhoRAGBedrock:
 
             dist = None
             lat2, lon2 = meta.get('latitud'), meta.get('longitud')
-            if user_lat is not None and user_lon is not None and lat2 is not None and lon2 is not None:
+            if has_location and lat2 is not None and lon2 is not None:
                 dist = calculate_distance(user_lat, user_lon, lat2, lon2)
                 if dist > MAX_DISTANCE_METERS:
                     continue
@@ -227,10 +232,10 @@ class BuhoRAGBedrock:
 
         # Con ubicación, el modelo recibe las cafeterías de la más cercana a la más lejana
         # (sort estable: dentro de la misma cafetería se conserva el orden por relevancia)
-        if user_lat is not None and user_lon is not None:
+        if has_location:
             results.sort(key=lambda r: r[0] if r[0] is not None else float('inf'))
 
-        return [doc for _, doc in results]
+        return [doc for _, doc in results[:k]]
 
     # --- Generación ---
 
@@ -287,14 +292,34 @@ class BuhoRAGBedrock:
         budget_match = re.search(r'(\d+)\s*(pesos|mxn|\$)', search_query.lower())
         budget_val = float(budget_match.group(1)) if budget_match else None
 
-        # 2. Ubicación (GPS o alias en el texto)
-        target_lat, target_lon = user_lat, user_lon
-        location_name = "Ubicación GPS" if user_lat is not None else None
-        if target_lat is None:
-            found_lat, found_lon, found_name = get_coords_from_query(search_query)
-            if found_lat is not None:
-                target_lat, target_lon = found_lat, found_lon
-                location_name = found_name.upper()
+        # 2. Ubicación. Prioridad: el lugar escrito en la pregunta ("cerca de economía")
+        # y después el GPS, solo si está dentro del campus: desde casa, las distancias al
+        # GPS descartarían todas las cafeterías.
+        target_lat = target_lon = location_name = None
+        places = find_locations(question) or find_locations(search_query)
+        location_notes = []
+        if places:
+            name, target_lat, target_lon = places[0]
+            location_name = name.upper()
+            location_notes.append(f"EL USUARIO PREGUNTA DESDE: {location_name}. "
+                                  "Las 'DISTANCIAS' en los DATOS son metros desde ahí.")
+        elif user_lat is not None and user_lon is not None:
+            if is_on_campus(user_lat, user_lon):
+                target_lat, target_lon, location_name = user_lat, user_lon, "Ubicación GPS"
+                location_notes.append("EL USUARIO ESTÁ EN EL CAMPUS (GPS). "
+                                      "Las 'DISTANCIAS' en los DATOS son metros desde su posición.")
+            else:
+                km = calculate_distance(user_lat, user_lon, *CAMPUS_CENTER) / 1000
+                location_notes.append(
+                    f"El usuario está FUERA del campus (a {km:.1f} km). No digas que está cerca de ninguna "
+                    "cafetería ni inventes distancias desde su posición; si pregunta qué le queda cerca, "
+                    "sugiérele decir en qué facultad o edificio estará.")
+
+        # Distancia entre lugares mencionados ("¿qué tan lejos está Medicina de Artes?")
+        for (a, lat_a, lon_a), (b, lat_b, lon_b) in zip(places, places[1:]):
+            meters = calculate_distance(lat_a, lon_a, lat_b, lon_b)
+            location_notes.append(f"DISTANCIA ENTRE {a.upper()} Y {b.upper()}: {meters:.0f} metros "
+                                  f"(unos {max(1, round(meters / 80))} min caminando).")
 
         # 3. Contexto
         context_docs = self._retrieve_context(search_query, target_lat, target_lon, k=10)
@@ -303,8 +328,7 @@ class BuhoRAGBedrock:
         context_block = "\n\n".join(context_docs) if context_docs else \
             "No se encontró información relevante en la base de datos para esta consulta."
 
-        loc_ctx = (f"USUARIO ESTÁ EN: {location_name}. Las 'DISTANCIAS' en el menú son metros desde ahí."
-                   if location_name else "Ubicación desconocida.")
+        loc_ctx = "\n".join(location_notes) or "Ubicación desconocida."
 
         system = f"""Eres "El Búho Tragón", asistente experto en las cafeterías de la Universidad de Sonora (UNISON).
 Responde solo con la información de DATOS; si algo no está ahí, dilo.

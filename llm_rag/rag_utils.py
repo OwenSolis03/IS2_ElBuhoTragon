@@ -65,6 +65,12 @@ KNOWN_LOCATIONS = {
 }
 
 
+# Centro aproximado del campus Hermosillo (promedio de las cafeterías) y radio para
+# decidir si un GPS está "en el campus". Más allá, sus distancias no sirven de referencia.
+CAMPUS_CENTER = (29.0831, -110.9636)
+CAMPUS_RADIUS_METERS = 1500
+
+
 def detect_device() -> Tuple[str, "torch.dtype"]:
     # torch solo se necesita en el motor HPC; el motor de Bedrock no lo instala
     import torch
@@ -115,3 +121,34 @@ def get_coords_from_query(query: str) -> Tuple[Optional[float], Optional[float],
         return coords[0], coords[1], best_match
 
     return None, None, None
+
+
+def find_locations(query: str) -> list:
+    """
+    Todos los lugares del campus mencionados en el texto, en orden de aparición y sin
+    repetir coordenadas: [(nombre, lat, lon), ...]. Sirve para "¿qué tan lejos está
+    Medicina de Artes?", donde get_coords_from_query solo devolvería uno.
+    """
+    words = query.lower().replace('?', '').replace('¿', '').replace(',', '').replace('.', '').split()
+    found, seen_coords = [], set()
+    i = 0
+    while i < len(words):
+        # Primero bigramas ("trabajo social"), luego palabras sueltas
+        for size in (2, 1):
+            token = ' '.join(words[i:i + size])
+            if len(words[i:i + size]) < size or len(token) < 4:
+                continue
+            match, score = process.extractOne(token, list(KNOWN_LOCATIONS), scorer=fuzz.ratio)
+            if score > 85:
+                coords = KNOWN_LOCATIONS[match]
+                if coords not in seen_coords:
+                    seen_coords.add(coords)
+                    found.append((match, coords[0], coords[1]))
+                i += size - 1
+                break
+        i += 1
+    return found
+
+
+def is_on_campus(lat, lon) -> bool:
+    return calculate_distance(lat, lon, *CAMPUS_CENTER) <= CAMPUS_RADIUS_METERS

@@ -168,3 +168,29 @@ class FormatoRAGTests(TestCase):
     def test_limpieza_de_respuesta_separa_vinetas(self):
         from llm_rag.rag_engine_bedrock import clean_answer
         self.assertEqual(clean_answer("Hay: • **A** ($30) • B ($40)"), "Hay:\n• A ($30)\n• B ($40)")
+
+
+class UbicacionRAGTests(TestCase):
+    """Detección de lugares del campus y GPS fuera del campus (sin llamar a AWS)."""
+
+    def test_detecta_lugar_con_acento(self):
+        from llm_rag.rag_utils import find_locations
+        self.assertEqual([p[0] for p in find_locations("cosas por 50 pesos cerca de economía")], ["economia"])
+
+    def test_detecta_dos_lugares_para_calcular_distancia(self):
+        from llm_rag.rag_utils import find_locations
+        lugares = [p[0] for p in find_locations("¿qué tan lejos está medicina de artes?")]
+        self.assertEqual(lugares, ["medicina", "artes"])
+
+    def test_detecta_lugares_de_dos_palabras(self):
+        from llm_rag.rag_utils import find_locations
+        self.assertEqual(find_locations("algo en trabajo social")[0][0], "trabajo social")
+
+    def test_sin_lugar_no_inventa_ubicacion(self):
+        from llm_rag.rag_utils import find_locations
+        self.assertEqual(find_locations("¿dónde venden molletes?"), [])
+
+    def test_gps_lejos_del_campus_no_cuenta(self):
+        from llm_rag.rag_utils import is_on_campus
+        self.assertFalse(is_on_campus(29.13, -111.01))     # ~8 km, otra parte de Hermosillo
+        self.assertTrue(is_on_campus(29.0846, -110.9625))  # junto a la cafetería de Derecho
