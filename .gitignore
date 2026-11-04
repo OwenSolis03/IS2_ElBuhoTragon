@@ -7,7 +7,9 @@
 *.swp
 *.bak
 .agent/
-.claude/
+.claude/*
+# Las skills del proyecto sí se comparten con el equipo
+!.claude/skills/
 .gemini/
 
 # Python
