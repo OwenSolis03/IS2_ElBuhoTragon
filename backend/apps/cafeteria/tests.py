@@ -169,6 +169,11 @@ class FormatoRAGTests(TestCase):
         from llm_rag.rag_engine_bedrock import clean_answer
         self.assertEqual(clean_answer("Hay: • **A** ($30) • B ($40)"), "Hay:\n• A ($30)\n• B ($40)")
 
+    def test_limpieza_de_respuesta_convierte_saltos_escritos_como_texto(self):
+        from llm_rag.rag_engine_bedrock import clean_answer
+        self.assertEqual(clean_answer("Los más baratos son:\\n\\n• A ($5)\\n• B ($12)"),
+                         "Los más baratos son:\n• A ($5)\n• B ($12)")
+
 
 class UbicacionRAGTests(TestCase):
     """Detección de lugares del campus y GPS fuera del campus (sin llamar a AWS)."""

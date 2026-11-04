@@ -198,6 +198,8 @@ def price_list_doc(items: List[Dict], terms: List[str], cheapest: bool, budget: 
 
 def clean_answer(answer: str) -> str:
     """Normaliza el formato de lista con viñetas que espera el ChatWidget."""
+    # A veces el modelo escribe "\n" como texto en vez de un salto de línea
+    answer = answer.replace("\\n", "\n")
     answer = answer.replace("**", "").replace("__", "")
     answer = answer.replace(" •", "\n•")
     answer = answer.replace("• ", "\n• ")
