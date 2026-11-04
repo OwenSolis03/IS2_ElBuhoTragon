@@ -22,6 +22,8 @@ deploy/amplify/deploy-frontend.sh            # https://buhotragon.d2c3gnm85qd306
 
 El script compila con `VITE_API_URL` vacía (las llamadas pasan por el proxy `/api/*` de Amplify) y se niega a publicar un build que apunte a `127.0.0.1`. **No subas builds a mano.** Las reglas de proxy y de la SPA son de la app de Amplify; no las cambies sin entender que el WiFi del campus bloquea sslip.io.
 
+La regla de la SPA manda a `index.html` todo archivo cuya extensión no esté en su lista (`css|js|mjs|png|...`). Si agregas un tipo de archivo nuevo (por ejemplo `.wasm` o `.pbf`), agrégalo a esa regla (`aws amplify update-app --custom-rules`) o Amplify devolverá HTML en su lugar (así se rompió el worker de MapLibre, `.mjs`). Después de cambiar reglas, vuelve a publicar para limpiar la caché.
+
 ## Backend (EC2)
 
 ```bash
