@@ -253,6 +253,14 @@ class ListaDePreciosRAGTests(TestCase):
         self.assertNotIn("$45", doc)
         self.assertEqual(filter_by_budget([doc], 40), [doc])
 
+    def test_lista_incluye_maximo_tres_cafeterias(self):
+        from llm_rag.rag_engine_bedrock import build_menu_items, price_list_doc
+        datos = {'tienditas': [{'id_tiendita': n, 'nombre': f'Cafe {n}'} for n in range(1, 6)],
+                 'menus': [{'nombre': 'Taco', 'precio': str(20 + n), 'id_tiendita': n} for n in range(1, 6)]}
+        doc = price_list_doc(build_menu_items(datos), ["taco"], cheapest=False)
+        self.assertEqual([l.split(" en ")[1] for l in doc.split("\n")[1:]],
+                         ["Cafe 1 ($21 MXN)", "Cafe 2 ($22 MXN)", "Cafe 3 ($23 MXN)"])
+
     def test_lista_con_ubicacion_muestra_metros(self):
         from llm_rag.rag_engine_bedrock import price_list_doc
         doc = price_list_doc(self.items, ["mollet"], cheapest=False, origin=(29.0846, -110.9625))

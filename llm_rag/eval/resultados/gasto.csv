@@ -6,3 +6,6 @@ fecha,label,commit,modelo,preguntas,costo_usd
 2026-11-03_213424,fix2-lugar-del-usuario,3a0410d,us.amazon.nova-2-lite-v1:0,8,0.00664
 2026-11-03_213557,fix3-cercanas-y-mas-barato,3a0410d,us.amazon.nova-2-lite-v1:0,14,0.01191
 2026-11-03_213625,fix3b-mas-barato-arriba,3a0410d,us.amazon.nova-2-lite-v1:0,4,0.00444
+2026-11-03_213944,final,b1a1339,us.amazon.nova-2-lite-v1:0,36,0.03175
+2026-11-03_214131,fix4-lista-3-cafeterias,b1a1339,us.amazon.nova-2-lite-v1:0,20,0.01956
+2026-11-03_214320,fix5-menos-docs-con-lista,b1a1339,us.amazon.nova-2-lite-v1:0,20,0.01381

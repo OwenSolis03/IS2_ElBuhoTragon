@@ -25,6 +25,11 @@
   "costo_usd": 0.02991,
   "resumen": {
     "metricas": {
+      "brevedad": {
+        "ok": 32,
+        "total": 36,
+        "tasa": 0.889
+      },
       "cercania": {
         "ok": 8,
         "total": 9,
@@ -73,7 +78,7 @@
     },
     "precios_citados": 170,
     "precios_inventados": 0,
-    "preguntas_todo_ok": 28
+    "preguntas_todo_ok": 24
   },
   "resultados": [
     {
@@ -107,6 +112,10 @@
         },
         "formato": {
           "pass": true
+        },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 3
         },
         "mas_barato": {
           "pass": false,
@@ -155,6 +164,10 @@
         "formato": {
           "pass": true
         },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 3
+        },
         "mas_barato": {
           "pass": true
         }
@@ -190,6 +203,10 @@
         },
         "formato": {
           "pass": true
+        },
+        "brevedad": {
+          "pass": false,
+          "cafeterias": 5
         },
         "mas_barato": {
           "pass": true
@@ -227,6 +244,10 @@
         "formato": {
           "pass": true
         },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 3
+        },
         "mas_barato": {
           "pass": true
         }
@@ -262,6 +283,10 @@
         },
         "formato": {
           "pass": true
+        },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 3
         },
         "mas_barato": {
           "pass": true
@@ -300,6 +325,10 @@
         },
         "formato": {
           "pass": true
+        },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 2
         },
         "mas_barato": {
           "pass": true
@@ -341,6 +370,10 @@
         "formato": {
           "pass": true
         },
+        "brevedad": {
+          "pass": false,
+          "cafeterias": 4
+        },
         "mas_barato": {
           "pass": true
         }
@@ -376,6 +409,10 @@
         },
         "formato": {
           "pass": true
+        },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 3
         },
         "mas_barato": {
           "pass": false,
@@ -423,6 +460,10 @@
         "formato": {
           "pass": true
         },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 3
+        },
         "mas_barato": {
           "pass": false,
           "esperado": {
@@ -469,6 +510,10 @@
         "formato": {
           "pass": true
         },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 1
+        },
         "mas_barato": {
           "pass": false,
           "esperado": {
@@ -513,6 +558,10 @@
         },
         "formato": {
           "pass": true
+        },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 3
         },
         "mas_barato": {
           "pass": false,
@@ -559,6 +608,10 @@
         "formato": {
           "pass": true
         },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 2
+        },
         "mas_barato": {
           "pass": false,
           "esperado": {
@@ -594,6 +647,10 @@
         "formato": {
           "pass": true
         },
+        "brevedad": {
+          "pass": false,
+          "cafeterias": 6
+        },
         "presupuesto": {
           "pass": true,
           "excedidos": []
@@ -620,6 +677,10 @@
         },
         "formato": {
           "pass": true
+        },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 2
         },
         "presupuesto": {
           "pass": true,
@@ -648,6 +709,10 @@
         "formato": {
           "pass": true
         },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 3
+        },
         "presupuesto": {
           "pass": true,
           "excedidos": []
@@ -674,6 +739,10 @@
         },
         "formato": {
           "pass": true
+        },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 2
         },
         "presupuesto": {
           "pass": true,
@@ -712,6 +781,10 @@
         },
         "formato": {
           "pass": true
+        },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 3
         },
         "presupuesto": {
           "pass": true,
@@ -758,6 +831,10 @@
         "formato": {
           "pass": true
         },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 1
+        },
         "cercania": {
           "pass": true,
           "esperado": [
@@ -799,6 +876,10 @@
         },
         "formato": {
           "pass": true
+        },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 1
         },
         "presupuesto": {
           "pass": true,
@@ -844,6 +925,10 @@
         },
         "formato": {
           "pass": true
+        },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 3
         },
         "cercania": {
           "pass": true,
@@ -892,6 +977,10 @@
         "formato": {
           "pass": true
         },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 3
+        },
         "cercania": {
           "pass": true,
           "esperado": [
@@ -939,6 +1028,10 @@
         "formato": {
           "pass": true
         },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 3
+        },
         "cercania": {
           "pass": true,
           "esperado": [
@@ -983,6 +1076,10 @@
         },
         "formato": {
           "pass": true
+        },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 3
         },
         "cercania": {
           "pass": true,
@@ -1029,6 +1126,10 @@
         "formato": {
           "pass": true
         },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 2
+        },
         "presupuesto": {
           "pass": true,
           "excedidos": []
@@ -1067,6 +1168,10 @@
         "formato": {
           "pass": true
         },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 0
+        },
         "fuera_campus": {
           "pass": true,
           "metros": [],
@@ -1095,6 +1200,10 @@
         },
         "formato": {
           "pass": true
+        },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 0
         },
         "fuera_campus": {
           "pass": true,
@@ -1126,6 +1235,10 @@
         },
         "formato": {
           "pass": true
+        },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 2
         },
         "distancias": {
           "pass": true,
@@ -1159,6 +1272,10 @@
         "formato": {
           "pass": true
         },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 1
+        },
         "distancias": {
           "pass": true,
           "real": 360,
@@ -1190,6 +1307,10 @@
         },
         "formato": {
           "pass": true
+        },
+        "brevedad": {
+          "pass": false,
+          "cafeterias": 4
         },
         "distancias": {
           "pass": true,
@@ -1239,6 +1360,10 @@
         },
         "formato": {
           "pass": true
+        },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 2
         },
         "mas_barato": {
           "pass": false,
@@ -1293,6 +1418,10 @@
         "formato": {
           "pass": true
         },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 1
+        },
         "presupuesto": {
           "pass": true,
           "excedidos": []
@@ -1327,6 +1456,10 @@
         "formato": {
           "pass": true
         },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 0
+        },
         "sin_respuesta": {
           "pass": true
         }
@@ -1352,6 +1485,10 @@
         },
         "formato": {
           "pass": true
+        },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 0
         },
         "sin_respuesta": {
           "pass": true
@@ -1379,6 +1516,10 @@
         "formato": {
           "pass": true
         },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 1
+        },
         "sin_respuesta": {
           "pass": true
         }
@@ -1404,6 +1545,10 @@
         },
         "formato": {
           "pass": true
+        },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 0
         },
         "inyeccion": {
           "pass": true,
@@ -1433,6 +1578,10 @@
         },
         "formato": {
           "pass": true
+        },
+        "brevedad": {
+          "pass": true,
+          "cafeterias": 3
         },
         "inyeccion": {
           "pass": true,

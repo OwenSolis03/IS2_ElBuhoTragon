@@ -34,6 +34,8 @@ EMBED_DIMENSIONS = 512
 MAX_DISTANCE_METERS = 2500
 MAX_DOCS_PER_STORE = 3
 NEAREST_STORES = 3
+CONTEXT_DOCS = 10
+CONTEXT_DOCS_WITH_PRICE_LIST = 4
 
 
 def build_documents(data: Dict) -> Tuple[List[str], List[Dict]]:
@@ -110,7 +112,9 @@ def filter_by_budget(docs: List[str], budget: float) -> List[str]:
 
 
 CHEAPEST_INTENT = re.compile(r'm[aá]s\s+(barat|econ[oó]mic|accesible)|menor precio|lo barato', re.IGNORECASE)
-MAX_PRICE_LIST_ITEMS = 8
+# El prompt pide máximo 3 cafeterías; una lista más larga hacía que el modelo listara todo
+MAX_PRICE_LIST_ITEMS = 6
+MAX_PRICE_LIST_STORES = 3
 
 # Palabras de las preguntas que también aparecen en nombres de platillos y no son un platillo
 DISH_STOPWORDS = {
@@ -175,14 +179,17 @@ def price_list_doc(items: List[Dict], terms: List[str], cheapest: bool, budget: 
 
     if budget:
         matches = [i for i in matches if i['price'] <= budget]
-    lines = []
+    lines, stores = [], set()
     for i in sorted(matches, key=lambda i: i['price']):
+        if i['store'] not in stores and len(stores) >= MAX_PRICE_LIST_STORES:
+            continue
         where = i['store']
         if origin:
             dist = calculate_distance(origin[0], origin[1], i['latitud'], i['longitud'])
             if dist > MAX_DISTANCE_METERS:
                 continue
             where += f", a {dist:.0f} metros"
+        stores.add(i['store'])
         lines.append(f"- {i['name']} en {where} (${i['price']:.0f} MXN)")
         if len(lines) >= MAX_PRICE_LIST_ITEMS:
             break
@@ -434,15 +441,18 @@ class BuhoRAGBedrock:
             location_notes.append(f"DISTANCIA ENTRE {a.upper()} Y {b.upper()}: {meters:.0f} metros "
                                   f"(unos {max(1, round(meters / 80))} min caminando).")
 
-        # 3. Contexto
-        context_docs = self._retrieve_context(search_query, target_lat, target_lon, k=10)
-        if budget_val:
-            context_docs = filter_by_budget(context_docs, budget_val)
-        # Platillo concreto o "el más barato": lista por precio armada en código, al principio
+        # 3. Contexto. Platillo concreto o "el más barato": lista por precio armada en código,
+        # al principio. Con ella bastan menos documentos por similitud; con 10 el modelo
+        # listaba 6 o 7 cafeterías en vez de 3.
         dish_terms = find_dish_terms(question, self.menu_items) or find_dish_terms(search_query, self.menu_items)
         wants_cheapest = bool(CHEAPEST_INTENT.search(question) or CHEAPEST_INTENT.search(search_query))
         origin = (target_lat, target_lon) if target_lat is not None else None
         price_doc = price_list_doc(self.menu_items, dish_terms, wants_cheapest, budget_val, origin)
+
+        context_docs = self._retrieve_context(search_query, target_lat, target_lon,
+                                              k=CONTEXT_DOCS_WITH_PRICE_LIST if price_doc else CONTEXT_DOCS)
+        if budget_val:
+            context_docs = filter_by_budget(context_docs, budget_val)
         if price_doc:
             context_docs.insert(0, price_doc)
         context_block = "\n\n".join(context_docs) if context_docs else \
