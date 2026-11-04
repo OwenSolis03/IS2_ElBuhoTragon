@@ -1,5 +1,5 @@
 // src/pages/PlantillaCafeteria.jsx
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo, Suspense, lazy } from "react";
 import { useParams, Link } from "react-router-dom"; 
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -19,27 +19,19 @@ import {
 import defaultImage from "../assets/logo.png";
 import BuhoCartel from "../assets/cartel.png"; 
 
-// Leaflet
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import { puntoDeTiendita } from "../components/map/puntos";
+
+// MapLibre pesa ~800 KB: solo se descarga cuando la página muestra el mapa
+const BuhoMap = lazy(() => import("../components/map/BuhoMap"));
 import { API_URL } from "../config";
 
-let DefaultIcon = L.icon({
-  iconUrl: icon,
-  shadowUrl: iconShadow,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34]
-});
-L.Marker.prototype.options.icon = DefaultIcon;
-
 const PlantillaCafeteria = () => {
-  const { id } = useParams(); 
-  
-  const [info, setInfo] = useState(null); 
+  const { id } = useParams();
+
+  const [info, setInfo] = useState(null);
+  // Memorizados para que el mapa no rehaga el marcador en cada render
+  const puntoMapa = useMemo(() => (info ? [puntoDeTiendita(info)].filter(Boolean) : []), [info]);
+  const centroMapa = useMemo(() => (puntoMapa[0] ? [puntoMapa[0].lat, puntoMapa[0].lon] : null), [puntoMapa]);
   const [menuItems, setMenuItems] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -558,21 +550,12 @@ const PlantillaCafeteria = () => {
                         Ubicación en Campus
                       </span>
 
-                      <div className="h-60 w-full rounded-xl overflow-hidden border border-white/[0.1] relative mb-4 leaflet-dark-tiles">
-                        <MapContainer 
-                          center={[parseFloat(info.latitud), parseFloat(info.longitud)]} 
-                          zoom={17} 
-                          style={{ height: "100%", width: "100%", background: "#071326" }} 
-                          scrollWheelZoom={false}
-                        >
-                          <TileLayer 
-                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' 
-                            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" 
-                          />
-                          <Marker position={[parseFloat(info.latitud), parseFloat(info.longitud)]}>
-                            <Popup>{info.nombre}</Popup>
-                          </Marker>
-                        </MapContainer>
+                      <div className="h-60 w-full rounded-xl overflow-hidden border border-white/[0.1] relative mb-4">
+                        {centroMapa && (
+                          <Suspense fallback={<div className="w-full h-full bg-canvas-deep" />}>
+                            <BuhoMap puntos={puntoMapa} centro={centroMapa} zoom={17} gestosCooperativos />
+                          </Suspense>
+                        )}
                       </div>
 
                       <div className="flex items-center justify-between pt-2">

@@ -24,7 +24,8 @@ Lee primero `buho-contexto` si no lo has hecho.
 3. **Sin HTML crudo.** No uses `dangerouslySetInnerHTML`: el texto del chatbot y de las reseñas viene de usuarios o de un LLM.
 4. **La seguridad vive en el backend.** Ocultar un botón de admin en React es cosmético; el permiso real lo da `permissions.py`.
 5. **El chatbot** (`ChatWidget.jsx`) manda `{message, lat, lon, history}` con máximo 6 turnos; el backend corta mensajes de más de 500 caracteres.
-6. Iconos: `react-icons/fi` y `react-icons/fa`. Mapas: Leaflet / React-Leaflet. No agregues librerías de componentes (shadcn, MUI) sin acordarlo.
+6. Iconos: `react-icons/fi` y `react-icons/fa`. No agregues librerías de componentes (shadcn, MUI) sin acordarlo.
+7. **Mapas: MapLibre GL (ya no Leaflet).** Usa siempre `components/map/BuhoMap.jsx` cargado con `React.lazy` (MapLibre pesa ~300 KB gzip y no debe ir en el bundle principal). Los colores del mapa están en `components/map/estiloUnison.js` (estilo dark de OpenFreeMap recoloreado y edificios 3D); cámbialos ahí si cambian los tokens. Los popups se arman con nodos de texto, nunca con `setHTML`. Para mapas dentro de una página con scroll pasa `gestosCooperativos`.
 
 ## Trabajar un cambio visual
 
