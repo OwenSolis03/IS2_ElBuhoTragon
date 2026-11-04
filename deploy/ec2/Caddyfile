@@ -1,5 +1,15 @@
 # __HOST__ lo reemplaza setup.sh por el dominio del backend.
 # Caddy obtiene y renueva solo el certificado HTTPS (Let's Encrypt).
+
+{
+	servers {
+		# Las peticiones llegan por el proxy de Amplify (CloudFront -> proxy -> Caddy).
+		# Se conserva X-Forwarded-For para que Django vea la IP del alumno y no la del
+		# proxy (con NUM_PROXIES=3); sin esto todos compartirían el mismo límite por IP.
+		trusted_proxies static 0.0.0.0/0 ::/0
+	}
+}
+
 __HOST__ {
 	encode gzip
 

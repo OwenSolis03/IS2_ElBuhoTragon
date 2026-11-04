@@ -53,14 +53,15 @@ if [ ! -f "$DATA/.env" ]; then
 DJANGO_DEBUG=False
 DJANGO_SECRET_KEY=$(python3.12 -c 'import secrets; print(secrets.token_urlsafe(50))')
 DJANGO_DB_PATH=$DATA/el_buho_tragon.db
-NUM_PROXIES=1
 RAG_BACKEND=bedrock
 BEDROCK_REGION=us-east-2
 EOF
 fi
 # Valores que dependen del despliegue: se actualizan en cada corrida
-sed -i '/^DJANGO_ALLOWED_HOSTS=/d; /^CORS_ALLOWED_ORIGINS=/d' "$DATA/.env"
+sed -i '/^DJANGO_ALLOWED_HOSTS=/d; /^CORS_ALLOWED_ORIGINS=/d; /^NUM_PROXIES=/d' "$DATA/.env"
 echo "DJANGO_ALLOWED_HOSTS=$HOST" >> "$DATA/.env"
+# CloudFront + proxy de Amplify + Caddy: la IP del alumno es la 3a desde la derecha
+echo "NUM_PROXIES=3" >> "$DATA/.env"
 [ -n "$CORS_ORIGINS" ] && echo "CORS_ALLOWED_ORIGINS=$CORS_ORIGINS" >> "$DATA/.env"
 chown buho:buho "$DATA/.env"
 chmod 600 "$DATA/.env"

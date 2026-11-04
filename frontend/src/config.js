@@ -1,7 +1,9 @@
 // URL base de la API de Django.
-// En Amplify se define VITE_API_URL en las variables de entorno del build;
-// en desarrollo local se usa el runserver por defecto.
-export const API_URL = (import.meta.env.VITE_API_URL || "http://127.0.0.1:8000").replace(/\/$/, "");
+// - Sin definir (desarrollo local): el runserver por defecto.
+// - VITE_API_URL vacía (Amplify): mismo dominio; Amplify reenvía /api/* al backend
+//   para que el navegador nunca dependa del dominio del servidor.
+// - Con valor: esa URL.
+export const API_URL = (import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8000").replace(/\/$/, "");
 
 // Encabezado Authorization con el token de la sesión actual (o vacío si no hay sesión)
 export const authHeaders = () => {
