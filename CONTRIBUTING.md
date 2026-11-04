@@ -64,6 +64,14 @@ npm install
    cd frontend && npm run dev
    ```
 
+   **¿Solo cambios visuales?** No necesitas el backend ni una base de datos local:
+
+   ```bash
+   cd frontend && npm run dev:api-real   # http://localhost:5173 con los datos reales del sitio
+   ```
+
+   ⚠️ En este modo lo que guardes (reseñas, cambios en el panel de admin) se escribe en el sitio publicado. Úsalo para ver y navegar, no para probar formularios.
+
    - Si tocaste el backend, corre las pruebas: `venv/bin/python manage.py test apps.cafeteria.tests`
    - Si cambiaste un modelo: `venv/bin/python manage.py makemigrations` y **sube el archivo de migración**.
    - Si tocaste el frontend, revisa que compile: `npm run build`
@@ -92,6 +100,23 @@ npm install
 | Backend y chatbot | Servidor EC2 | `deploy/ec2/setup.sh` actualiza el código, aplica migraciones y reinicia |
 
 **Situación actual:** después del merge, la persona con acceso a AWS publica el cambio (unos 5 minutos). Avísale en el Pull Request.
+
+### Publicar el frontend
+
+Desde la raíz del repo, con sesión de AWS (`aws login --profile buho-tragon`):
+
+```bash
+deploy/amplify/deploy-frontend.sh preview     # vista previa: https://preview.d2c3gnm85qd306.amplifyapp.com
+deploy/amplify/deploy-frontend.sh             # sitio principal: https://buhotragon.d2c3gnm85qd306.amplifyapp.com
+```
+
+- **Cambios grandes (por ejemplo, un rediseño):** publica primero en `preview` desde tu rama, compártelo con el equipo y, cuando esté aprobado y con merge a `main`, publica el sitio principal desde `main`. La vista previa usa los mismos datos reales.
+- **No uses `npm run build` + subida manual:** el build de producción necesita `VITE_API_URL` vacía; si no, el sitio llama a `127.0.0.1` y se rompe. El script lo hace bien y se niega a publicar un build incorrecto.
+- **Regresar a la versión anterior:** `git switch` al commit anterior y vuelve a correr el script (o redeploy desde la consola de Amplify).
+
+### Publicar el backend
+
+Ver `deploy/ec2/setup.sh`: empaqueta el código con `git archive`, súbelo al bucket de despliegue y ejecuta el script en el servidor vía SSM. La base de datos y el `.env` del servidor nunca se reemplazan.
 
 **Objetivo:** el merge a `main` publicará solo (Amplify conectado a GitHub y un GitHub Action para el backend), sin que nadie del equipo necesite cuenta de AWS.
 
