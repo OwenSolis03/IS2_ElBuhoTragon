@@ -3,3 +3,6 @@ fecha,label,commit,modelo,preguntas,costo_usd
 2026-11-03_213008,base,10e0358,us.amazon.nova-2-lite-v1:0,36,0.02847
 2026-11-03_213043,base-reintento,10e0358,us.amazon.nova-2-lite-v1:0,2,0.00144
 2026-11-03_213337,fix1-lista-precios,c747b32,us.amazon.nova-2-lite-v1:0,20,0.02007
+2026-11-03_213424,fix2-lugar-del-usuario,3a0410d,us.amazon.nova-2-lite-v1:0,8,0.00664
+2026-11-03_213557,fix3-cercanas-y-mas-barato,3a0410d,us.amazon.nova-2-lite-v1:0,14,0.01191
+2026-11-03_213625,fix3b-mas-barato-arriba,3a0410d,us.amazon.nova-2-lite-v1:0,4,0.00444

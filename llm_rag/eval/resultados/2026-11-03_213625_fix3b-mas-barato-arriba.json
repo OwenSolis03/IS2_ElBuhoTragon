@@ -1,0 +1,264 @@
+{
+  "fecha": "2026-11-03_213625",
+  "label": "fix3b-mas-barato-arriba",
+  "commit": "3a0410d",
+  "modelo": "us.amazon.nova-2-lite-v1:0",
+  "modelo_reformular": "us.amazon.nova-micro-v1:0",
+  "n_preguntas": 4,
+  "tokens": {
+    "amazon.titan-embed-text-v2:0": {
+      "entrada": 92,
+      "salida": 0,
+      "llamadas": 4
+    },
+    "us.amazon.nova-2-lite-v1:0": {
+      "entrada": 10688,
+      "salida": 327,
+      "llamadas": 4
+    },
+    "us.amazon.nova-micro-v1:0": {
+      "entrada": 152,
+      "salida": 50,
+      "llamadas": 1
+    }
+  },
+  "costo_usd": 0.00444,
+  "resumen": {
+    "metricas": {
+      "formato": {
+        "ok": 4,
+        "total": 4,
+        "tasa": 1.0
+      },
+      "mas_barato": {
+        "ok": 3,
+        "total": 4,
+        "tasa": 0.75
+      },
+      "precios": {
+        "ok": 4,
+        "total": 4,
+        "tasa": 1.0
+      }
+    },
+    "precios_citados": 21,
+    "precios_inventados": 0,
+    "preguntas_todo_ok": 3
+  },
+  "resultados": [
+    {
+      "id": "platillo-molletes",
+      "tipo": "platillo",
+      "pregunta": "¿dónde venden molletes?",
+      "historial": [],
+      "esperado": {
+        "mas_barato": {
+          "precio": 30.0,
+          "tiendas": [
+            1,
+            10
+          ],
+          "platillos": [
+            "Mollete Sencillo"
+          ]
+        }
+      },
+      "respuesta": "Los molletes están en:\n• Cafeteria Derecho: Mollete ($30)\n• Cafeteria Artes: Mollete ($30)\n• Cafeteria Ingenieria Quimica: Molletes ($40)\n• Cafeteria Educacion: Mollete/Pan Pizza (1 ingrediente) ($45)\n• Cafeteria Trabajo Social: Molletes ($45)\n• Cafeteria Civil-Minas: Mollete ($50)\n• Cafeteria Historia / Sociologia: Mollete ($50)\n• Cafeteria Geologia: Molletes ($50)\n• Cafeteria Psicologia/Comunicacion: Mollete ($50)",
+      "error": null,
+      "presupuesto_detectado": null,
+      "ubicacion_usada": null,
+      "docs_contexto": 11,
+      "contexto_resumen": [
+        "PLATILLOS QUE COINCIDEN CON LA PREGUNTA, de menor a mayor precio (el primero es el más bar",
+        "CAFETERÍA: Cafeteria Educacion",
+        "CAFETERÍA: Cafeteria Geologia",
+        "CAFETERÍA: Cafeteria Psicologia/Comunicacion",
+        "CAFETERÍA: Cafeteria Psicologia/Comunicacion",
+        "CAFETERÍA: Cafeteria Psicologia/Comunicacion",
+        "CAFETERÍA: Cafeteria Educacion",
+        "CAFETERÍA: Cafeteria Geologia",
+        "CAFETERÍA: Cafeteria Geologia",
+        "CAFETERÍA: Cafeteria Educacion",
+        "CAFETERÍA: Cafeteria Matematicas"
+      ],
+      "segundos": 1.5,
+      "checks": {
+        "precios": {
+          "pass": true,
+          "precios": 9,
+          "inventados": []
+        },
+        "formato": {
+          "pass": true
+        },
+        "mas_barato": {
+          "pass": true
+        }
+      }
+    },
+    {
+      "id": "barato-global",
+      "tipo": "barato",
+      "pregunta": "¿qué es lo más barato que venden en las cafeterías?",
+      "historial": [],
+      "esperado": {
+        "mas_barato": {
+          "precio": 5.0,
+          "tiendas": [
+            13
+          ],
+          "platillos": [
+            "Paletas",
+            "Zumba Goma"
+          ]
+        }
+      },
+      "respuesta": "Los platillos más baratos que venden en las cafeterías son:\n• Cafeteria Medicina 2: Paletas ($5)\n• Cafeteria Medicina 2: Zumba Goma ($5)\n• Cafeteria Medicina 2: Galleta de costco ($12)",
+      "error": null,
+      "presupuesto_detectado": null,
+      "ubicacion_usada": null,
+      "docs_contexto": 11,
+      "contexto_resumen": [
+        "PLATILLOS MÁS BARATOS DE TODAS LAS CAFETERÍAS, de menor a mayor precio:",
+        "CAFETERÍA: Cafeteria Historia / Sociologia",
+        "CAFETERÍA: Comedor Universitario",
+        "CAFETERÍA: Cafeteria Trabajo Social",
+        "CAFETERÍA: Cafeteria Medicina 2",
+        "CAFETERÍA: Cafeteria Derecho",
+        "CAFETERÍA: Cafeteria Artes",
+        "CAFETERÍA: Cafeteria Artes",
+        "CAFETERÍA: Cafeteria Derecho",
+        "CAFETERÍA: Cafeteria Educacion",
+        "CAFETERÍA: Cafeteria Matematicas"
+      ],
+      "segundos": 2.9,
+      "checks": {
+        "precios": {
+          "pass": true,
+          "precios": 3,
+          "inventados": []
+        },
+        "formato": {
+          "pass": true
+        },
+        "mas_barato": {
+          "pass": true
+        }
+      }
+    },
+    {
+      "id": "barato-torta",
+      "tipo": "barato",
+      "pregunta": "¿cuál es la torta más barata?",
+      "historial": [],
+      "esperado": {
+        "mas_barato": {
+          "precio": 30.0,
+          "tiendas": [
+            2
+          ],
+          "platillos": [
+            "Torta de jamon"
+          ]
+        }
+      },
+      "respuesta": "La torta más barata es la Torta de jamon en Cafeteria Trabajo Social a $30 MXN.\n• Cafeteria Trabajo Social: Torta de jamon ($30)\n• Cafeteria Medicina 2: Torta de jamon ($35)\n• Cafeteria Historia / Sociologia: Torta de jamon ($40)\n• Cafeteria Ingenieria Quimica: Torta de jamon ($40)\n• Cafeteria Psicologia/Comunicacion: Torta de jamon ($40)\n• Tortas de Calidad: Torta de jamon ($50)\n• Tortas de Calidad: Torta Mexicana ($50)",
+      "error": null,
+      "presupuesto_detectado": null,
+      "ubicacion_usada": null,
+      "docs_contexto": 11,
+      "contexto_resumen": [
+        "PLATILLOS QUE COINCIDEN CON LA PREGUNTA, de menor a mayor precio (el primero es el más bar",
+        "CAFETERÍA: Tortas de Calidad",
+        "CAFETERÍA: Tortas de Calidad",
+        "CAFETERÍA: Cafeteria Psicologia/Comunicacion",
+        "CAFETERÍA: Cafeteria Educacion",
+        "CAFETERÍA: Cafeteria Derecho",
+        "CAFETERÍA: Cafeteria Psicologia/Comunicacion",
+        "CAFETERÍA: Cafeteria Artes",
+        "CAFETERÍA: Cafeteria Ingenieria Quimica",
+        "CAFETERÍA: Cafeteria Psicologia/Comunicacion",
+        "CAFETERÍA: Cafeteria Derecho"
+      ],
+      "segundos": 4.0,
+      "checks": {
+        "precios": {
+          "pass": true,
+          "precios": 8,
+          "inventados": []
+        },
+        "formato": {
+          "pass": true
+        },
+        "mas_barato": {
+          "pass": true
+        }
+      }
+    },
+    {
+      "id": "historial-molletes-barato",
+      "tipo": "historial",
+      "pregunta": "¿y cuál es el más barato?",
+      "historial": [
+        [
+          "¿dónde venden molletes?",
+          "Los molletes están en:\n• Cafeteria Civil-Minas: Mollete ($50)\n• Cafeteria Educacion: Mollete/Pan Pizza (1 ingrediente) ($45)\n• Cafeteria Educacion: Mollete/Pan Pizza (2 ingrediente) ($50)"
+        ]
+      ],
+      "esperado": {
+        "mas_barato": {
+          "precio": 30.0,
+          "tiendas": [
+            1,
+            10
+          ],
+          "platillos": [
+            "Mollete Sencillo"
+          ]
+        }
+      },
+      "respuesta": "El mollete más barato está en Cafeteria Educacion por $45 MXN.",
+      "error": null,
+      "presupuesto_detectado": null,
+      "ubicacion_usada": null,
+      "docs_contexto": 11,
+      "contexto_resumen": [
+        "PLATILLOS QUE COINCIDEN CON LA PREGUNTA, de menor a mayor precio (el primero es el más bar",
+        "CAFETERÍA: Cafeteria Civil-Minas",
+        "CAFETERÍA: Cafeteria Civil-Minas",
+        "CAFETERÍA: Cafeteria Civil-Minas",
+        "CAFETERÍA: Cafeteria Educacion",
+        "CAFETERÍA: Cafeteria Educacion",
+        "CAFETERÍA: Cafeteria Educacion",
+        "CAFETERÍA: Cafeteria Medicina 1",
+        "CAFETERÍA: Cafeteria Medicina 2",
+        "CAFETERÍA: Cafeteria Medicina 2",
+        "CAFETERÍA: Cafeteria Matematicas"
+      ],
+      "segundos": 3.4,
+      "checks": {
+        "precios": {
+          "pass": true,
+          "precios": 1,
+          "inventados": []
+        },
+        "formato": {
+          "pass": true
+        },
+        "mas_barato": {
+          "pass": false,
+          "esperado": {
+            "precio": 30.0,
+            "tiendas": [
+              1,
+              10
+            ],
+            "platillos": [
+              "Mollete Sencillo"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

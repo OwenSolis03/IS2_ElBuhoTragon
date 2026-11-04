@@ -1,0 +1,531 @@
+{
+  "fecha": "2026-11-03_213424",
+  "label": "fix2-lugar-del-usuario",
+  "commit": "3a0410d",
+  "modelo": "us.amazon.nova-2-lite-v1:0",
+  "modelo_reformular": "us.amazon.nova-micro-v1:0",
+  "n_preguntas": 8,
+  "tokens": {
+    "amazon.titan-embed-text-v2:0": {
+      "entrada": 135,
+      "salida": 0,
+      "llamadas": 8
+    },
+    "us.amazon.nova-2-lite-v1:0": {
+      "entrada": 11286,
+      "salida": 1052,
+      "llamadas": 8
+    },
+    "us.amazon.nova-micro-v1:0": {
+      "entrada": 299,
+      "salida": 56,
+      "llamadas": 2
+    }
+  },
+  "costo_usd": 0.00664,
+  "resumen": {
+    "metricas": {
+      "cercania": {
+        "ok": 6,
+        "total": 7,
+        "tasa": 0.857
+      },
+      "distancias": {
+        "ok": 3,
+        "total": 3,
+        "tasa": 1.0
+      },
+      "formato": {
+        "ok": 8,
+        "total": 8,
+        "tasa": 1.0
+      },
+      "mas_barato": {
+        "ok": 0,
+        "total": 1,
+        "tasa": 0.0
+      },
+      "precios": {
+        "ok": 8,
+        "total": 8,
+        "tasa": 1.0
+      },
+      "presupuesto": {
+        "ok": 3,
+        "total": 3,
+        "tasa": 1.0
+      }
+    },
+    "precios_citados": 97,
+    "precios_inventados": 0,
+    "preguntas_todo_ok": 6
+  },
+  "resultados": [
+    {
+      "id": "lugar-economia-50",
+      "tipo": "lugar",
+      "pregunta": "cosas por 50 pesos cerca de economía",
+      "historial": [],
+      "esperado": {
+        "origen": [
+          29.084896,
+          -110.963255
+        ],
+        "mas_cercana": {
+          "metros": 49,
+          "tiendas": [
+            2
+          ]
+        }
+      },
+      "respuesta": "Estas son las opciones por 50 pesos cerca de Economía:\n• Cafeteria Historia / Sociologia: Mollete ($50)\n• Cafeteria Historia / Sociologia: Pizza Pan ($50)\n• Cafeteria Historia / Sociologia: Orden de papas sazonadas ($50)\n• Comedor Universitario: Mollete/PIzza Pan ($50)\n• Comedor Universitario: Sincronizada ($50)\n• Comedor Universitario: Burritos ($50)",
+      "error": null,
+      "presupuesto_detectado": 50.0,
+      "ubicacion_usada": "ECONOMIA",
+      "docs_contexto": 9,
+      "contexto_resumen": [
+        "CAFETERÍA: Cafeteria Derecho",
+        "CAFETERÍA: Cafeteria Derecho",
+        "CAFETERÍA: Cafeteria Derecho",
+        "CAFETERÍA: Cafeteria Psicologia/Comunicacion",
+        "CAFETERÍA: Cafeteria Psicologia/Comunicacion",
+        "CAFETERÍA: Cafeteria Psicologia/Comunicacion",
+        "CAFETERÍA: Cafeteria Historia / Sociologia",
+        "CAFETERÍA: Comedor Universitario",
+        "CAFETERÍA: Comedor Universitario"
+      ],
+      "segundos": 1.3,
+      "checks": {
+        "precios": {
+          "pass": true,
+          "precios": 0,
+          "inventados": []
+        },
+        "formato": {
+          "pass": true
+        },
+        "presupuesto": {
+          "pass": true,
+          "excedidos": []
+        },
+        "cercania": {
+          "pass": false,
+          "esperado": [
+            "Cafeteria Trabajo Social"
+          ]
+        }
+      }
+    },
+    {
+      "id": "lugar-medicina",
+      "tipo": "lugar",
+      "pregunta": "estoy en medicina, ¿qué hay de comer?",
+      "historial": [],
+      "esperado": {
+        "origen": [
+          29.081355,
+          -110.968206
+        ],
+        "mas_cercana": {
+          "metros": 91,
+          "tiendas": [
+            8,
+            13
+          ]
+        }
+      },
+      "respuesta": "Estás en Medicina, aquí tienes opciones de comida cercanas:\n• Cafeteria Medicina 1: Calzonne ($45), Orange Chicken ($75), Chicken Bake ($45), Onigiris ($60), Rebanada de Pizza ($30), Dumplings ($60), Burritos ($45), Chicken Waffle ($80), Torta Cubana ($70)\n• Cafeteria Medicina 2: Maruchan ($25), Burritos de papa con machaca o chorizo ($35), Sandwich de jamon ($30), Sandwich de tender ($45), Hamburguesa Tender ($60), Torta de jamon ($35)\n• Cafeteria Educacion: Waffle ($45), Huevo al gusto ($65), Omelette al gusto ($75), Avena ($35), Avena con platano ($45), Yogurt con fruta Chico ($40), Yogurt con fruta Grande ($60), Sandwich de Desayuno ($75)",
+      "error": null,
+      "presupuesto_detectado": null,
+      "ubicacion_usada": "MEDICINA",
+      "docs_contexto": 10,
+      "contexto_resumen": [
+        "CAFETERÍA: Cafeteria Medicina 1",
+        "CAFETERÍA: Cafeteria Medicina 1",
+        "CAFETERÍA: Cafeteria Medicina 2",
+        "CAFETERÍA: Cafeteria Medicina 2",
+        "CAFETERÍA: Cafeteria Medicina 2",
+        "CAFETERÍA: Cafeteria Educacion",
+        "CAFETERÍA: Cafeteria Educacion",
+        "CAFETERÍA: Cafeteria Educacion",
+        "CAFETERÍA: Cafeteria Civil-Minas",
+        "CAFETERÍA: Cafeteria Civil-Minas"
+      ],
+      "segundos": 4.0,
+      "checks": {
+        "precios": {
+          "pass": true,
+          "precios": 23,
+          "inventados": []
+        },
+        "formato": {
+          "pass": true
+        },
+        "cercania": {
+          "pass": true,
+          "esperado": [
+            "Cafeteria Medicina 1",
+            "Cafeteria Medicina 2"
+          ]
+        }
+      }
+    },
+    {
+      "id": "lugar-medicina-35",
+      "tipo": "lugar",
+      "pregunta": "estoy en medicina y tengo 35 pesos",
+      "historial": [],
+      "esperado": {
+        "origen": [
+          29.081355,
+          -110.968206
+        ],
+        "mas_cercana": {
+          "metros": 91,
+          "tiendas": [
+            8,
+            13
+          ]
+        }
+      },
+      "respuesta": "Estás a 91 metros de dos cafeterías con opciones dentro de tu presupuesto:\n• Cafeteria Medicina 1: Rebanada de Pizza ($30)\n• Cafeteria Medicina 2: Maruchan ($25), Burritos de papa con machaca o chorizo ($35), Muffin ($25), Pan dulce ($20), Donas ($15), Paletas ($5), Zumba Goma ($5), Galleta de costco ($12), Barritas/Cremax/Chips Ahoy ($15), Canelitas/Polvorones ($18), Galletas Diversas ($20), Sabritas con queso ($30), Pepihuates ($20), Cacahuates ($15), Sabritas ($20), Fritos Azteca ($25), Churrumais ($15), Fritos ($15)",
+      "error": null,
+      "presupuesto_detectado": 35.0,
+      "ubicacion_usada": "MEDICINA",
+      "docs_contexto": 8,
+      "contexto_resumen": [
+        "CAFETERÍA: Cafeteria Medicina 2",
+        "CAFETERÍA: Cafeteria Medicina 1",
+        "CAFETERÍA: Cafeteria Medicina 2",
+        "CAFETERÍA: Cafeteria Medicina 1",
+        "CAFETERÍA: Cafeteria Medicina 2",
+        "CAFETERÍA: Cafeteria Educacion",
+        "CAFETERÍA: Cafeteria Educacion",
+        "CAFETERÍA: Cafeteria Civil-Minas"
+      ],
+      "segundos": 3.0,
+      "checks": {
+        "precios": {
+          "pass": true,
+          "precios": 18,
+          "inventados": []
+        },
+        "formato": {
+          "pass": true
+        },
+        "presupuesto": {
+          "pass": true,
+          "excedidos": []
+        },
+        "cercania": {
+          "pass": true,
+          "esperado": [
+            "Cafeteria Medicina 1",
+            "Cafeteria Medicina 2"
+          ]
+        }
+      }
+    },
+    {
+      "id": "lugar-artes",
+      "tipo": "lugar",
+      "pregunta": "¿qué cafetería me queda cerca de artes?",
+      "historial": [],
+      "esperado": {
+        "origen": [
+          29.081607,
+          -110.958986
+        ],
+        "mas_cercana": {
+          "metros": 55,
+          "tiendas": [
+            10
+          ]
+        }
+      },
+      "respuesta": "La cafetería más cercana desde Artes es Cafeteria Artes a 55 metros.\n• Cafeteria Artes: Yogurt con fruta ($60), Tapioca ($30), Pastel Helado ($40), Waffles ($40)\n• Cafeteria Matematicas: Fresas con crema ($45), Huevo al gusto ($45), Avena ($30), Yogurt con fruta ($40)\n• Cafeteria Geologia: Cafa ($25), Banderilla ($20), Tostitos Preparados ($35), Huevo ($35)",
+      "error": null,
+      "presupuesto_detectado": null,
+      "ubicacion_usada": "ARTES",
+      "docs_contexto": 10,
+      "contexto_resumen": [
+        "CAFETERÍA: Cafeteria Artes",
+        "CAFETERÍA: Cafeteria Artes",
+        "CAFETERÍA: Cafeteria Artes",
+        "CAFETERÍA: Cafeteria Matematicas",
+        "CAFETERÍA: Cafeteria Matematicas",
+        "CAFETERÍA: Cafeteria Matematicas",
+        "CAFETERÍA: Cafeteria Geologia",
+        "CAFETERÍA: Cafeteria Geologia",
+        "CAFETERÍA: Cafeteria Geologia",
+        "CAFETERÍA: Tortas de Calidad"
+      ],
+      "segundos": 3.3,
+      "checks": {
+        "precios": {
+          "pass": true,
+          "precios": 12,
+          "inventados": []
+        },
+        "formato": {
+          "pass": true
+        },
+        "cercania": {
+          "pass": true,
+          "esperado": [
+            "Cafeteria Artes"
+          ]
+        },
+        "distancias": {
+          "pass": true,
+          "citadas": 1,
+          "erroneas": []
+        }
+      }
+    },
+    {
+      "id": "lugar-ingenieria",
+      "tipo": "lugar",
+      "pregunta": "estoy en ingeniería, ¿dónde desayuno?",
+      "historial": [],
+      "esperado": {
+        "origen": [
+          29.081694,
+          -110.962732
+        ],
+        "mas_cercana": {
+          "metros": 66,
+          "tiendas": [
+            6,
+            7,
+            14
+          ]
+        }
+      },
+      "respuesta": "Estás en Ingeniería y estos son los lugares cercanos para desayunar:\n• Cafeteria Ingenieria Quimica: Huevo ($35), Omelette ($45), Hot Cakes ($40) a 66 metros\n• Cafeteria Civil-Minas: Huevos Revueltos ($70) a 88 metros\n• Cafeteria Geologia: Huevo ($35), Omelette ($45), Hot Cakes ($40) a 197 metros",
+      "error": null,
+      "presupuesto_detectado": null,
+      "ubicacion_usada": "INGENIERIA",
+      "docs_contexto": 10,
+      "contexto_resumen": [
+        "CAFETERÍA: Cafeteria Ingenieria Quimica",
+        "CAFETERÍA: Cafeteria Ingenieria Quimica",
+        "CAFETERÍA: Cafeteria Ingenieria Quimica",
+        "CAFETERÍA: Cafeteria Civil-Minas",
+        "CAFETERÍA: Cafeteria Civil-Minas",
+        "CAFETERÍA: Cafeteria Civil-Minas",
+        "CAFETERÍA: Cafeteria Geologia",
+        "CAFETERÍA: Cafeteria Geologia",
+        "CAFETERÍA: Cafeteria Geologia",
+        "CAFETERÍA: Comedor Universitario"
+      ],
+      "segundos": 3.2,
+      "checks": {
+        "precios": {
+          "pass": true,
+          "precios": 7,
+          "inventados": []
+        },
+        "formato": {
+          "pass": true
+        },
+        "cercania": {
+          "pass": true,
+          "esperado": [
+            "Cafeteria Ingenieria Quimica",
+            "Cafeteria Civil-Minas",
+            "Tortas de Calidad"
+          ]
+        },
+        "distancias": {
+          "pass": true,
+          "citadas": 3,
+          "erroneas": []
+        }
+      }
+    },
+    {
+      "id": "lugar-manda-sobre-gps",
+      "tipo": "lugar",
+      "pregunta": "voy a estar en letras, ¿qué hay cerca?",
+      "historial": [],
+      "esperado": {
+        "origen": [
+          29.082632,
+          -110.960454
+        ],
+        "mas_cercana": {
+          "metros": 50,
+          "tiendas": [
+            11
+          ]
+        }
+      },
+      "respuesta": "Estás cerca de estas cafeterías desde Letras:\n• Cafeteria Geologia: 50 metros\n• Cafeteria Matematicas: 170 metros\n• Cafeteria Artes: 210 metros\nCafeteria Geologia ofrece Huevo ($35), Omelette ($45), Hot Cakes ($40), Banderilla ($20), Tostitos Preparados ($35) y Cafa ($25). \nCafeteria Matematicas ofrece Huevo al gusto ($45), Avena ($30), Yogurt con fruta ($40), Hot Cakes ($45), Fresas con crema ($45), Tamal ($30), Mollete ($55), Quesadilla sincronizada ($30), Quesadilla con carne ($45), Sandwiches ($40), Paquete de burritos ($50), Sandwichon ($40), Baguette de pollo ($60), Pizza Pan ($50), Orden de boneless ($60), Chilaquiles ($55), Chimichangas ($40), Tacos dorados ($35), Ensalada pollo a la plancha ($50), Ensalada Boneless ($70), Burro de carne asada ($75), Torta de jamon ($40), Torta de carne ($60), Hamburguesas de res ($55), Hamburguesa de pollo ($60), Hamburguesa de boneless ($70), Orden de papas ($40) y Maruchan ($30).\nCafeteria Artes ofrece Huevos al gusto ($70), Omelete ($70), Yogurt",
+      "error": null,
+      "presupuesto_detectado": null,
+      "ubicacion_usada": "LETRAS",
+      "docs_contexto": 10,
+      "contexto_resumen": [
+        "CAFETERÍA: Cafeteria Geologia",
+        "CAFETERÍA: Cafeteria Geologia",
+        "CAFETERÍA: Cafeteria Geologia",
+        "CAFETERÍA: Cafeteria Matematicas",
+        "CAFETERÍA: Cafeteria Matematicas",
+        "CAFETERÍA: Cafeteria Matematicas",
+        "CAFETERÍA: Cafeteria Artes",
+        "CAFETERÍA: Cafeteria Artes",
+        "CAFETERÍA: Cafeteria Artes",
+        "CAFETERÍA: Comedor Universitario"
+      ],
+      "segundos": 4.9,
+      "checks": {
+        "precios": {
+          "pass": true,
+          "precios": 36,
+          "inventados": []
+        },
+        "formato": {
+          "pass": true
+        },
+        "cercania": {
+          "pass": true,
+          "esperado": [
+            "Cafeteria Geologia"
+          ]
+        },
+        "distancias": {
+          "pass": true,
+          "citadas": 3,
+          "erroneas": []
+        }
+      }
+    },
+    {
+      "id": "historial-molletes-barato",
+      "tipo": "historial",
+      "pregunta": "¿y cuál es el más barato?",
+      "historial": [
+        [
+          "¿dónde venden molletes?",
+          "Los molletes están en:\n• Cafeteria Civil-Minas: Mollete ($50)\n• Cafeteria Educacion: Mollete/Pan Pizza (1 ingrediente) ($45)\n• Cafeteria Educacion: Mollete/Pan Pizza (2 ingrediente) ($50)"
+        ]
+      ],
+      "esperado": {
+        "mas_barato": {
+          "precio": 30.0,
+          "tiendas": [
+            1,
+            10
+          ],
+          "platillos": [
+            "Mollete Sencillo"
+          ]
+        }
+      },
+      "respuesta": "El mollete más barato está en Cafeteria Educacion por $45.",
+      "error": null,
+      "presupuesto_detectado": null,
+      "ubicacion_usada": null,
+      "docs_contexto": 11,
+      "contexto_resumen": [
+        "PLATILLOS QUE COINCIDEN CON LA PREGUNTA, de menor a mayor precio (el primero es el más bar",
+        "CAFETERÍA: Cafeteria Educacion",
+        "CAFETERÍA: Cafeteria Civil-Minas",
+        "CAFETERÍA: Cafeteria Educacion",
+        "CAFETERÍA: Cafeteria Civil-Minas",
+        "CAFETERÍA: Cafeteria Educacion",
+        "CAFETERÍA: Cafeteria Civil-Minas",
+        "CAFETERÍA: Cafeteria Medicina 2",
+        "CAFETERÍA: Cafeteria Medicina 2",
+        "CAFETERÍA: Cafeteria Medicina 1",
+        "CAFETERÍA: Cafeteria Ingenieria Quimica"
+      ],
+      "segundos": 2.5,
+      "checks": {
+        "precios": {
+          "pass": true,
+          "precios": 1,
+          "inventados": []
+        },
+        "formato": {
+          "pass": true
+        },
+        "mas_barato": {
+          "pass": false,
+          "esperado": {
+            "precio": 30.0,
+            "tiendas": [
+              1,
+              10
+            ],
+            "platillos": [
+              "Mollete Sencillo"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "historial-medicina-30",
+      "tipo": "historial",
+      "pregunta": "¿y algo con 30 pesos?",
+      "historial": [
+        [
+          "estoy en medicina, ¿qué hay de comer?",
+          "Cerca de medicina está Cafeteria Medicina 1:\n• Cafeteria Medicina 1: Sabritas con queso ($30)\n• Cafeteria Medicina 1: Calzonne ($45)\n• Cafeteria Medicina 1: Orange Chicken ($75)"
+        ]
+      ],
+      "esperado": {
+        "origen": [
+          29.081355,
+          -110.968206
+        ],
+        "mas_cercana": {
+          "metros": 91,
+          "tiendas": [
+            8,
+            13
+          ]
+        }
+      },
+      "respuesta": "Aquí tienes opciones con $30 pesos cerca de medicina:\n• Cafeteria Medicina 1: Rebanada de Pizza ($30)\n• Cafeteria Medicina 1: Sabritas con queso ($30)\n• Cafeteria Medicina 2: Sandwich de jamon ($30)\n• Cafeteria Educacion: Tamal con frijoles ($30)",
+      "error": null,
+      "presupuesto_detectado": 30.0,
+      "ubicacion_usada": "MEDICINA",
+      "docs_contexto": 8,
+      "contexto_resumen": [
+        "CAFETERÍA: Cafeteria Medicina 1",
+        "CAFETERÍA: Cafeteria Medicina 1",
+        "CAFETERÍA: Cafeteria Medicina 2",
+        "CAFETERÍA: Cafeteria Medicina 2",
+        "CAFETERÍA: Cafeteria Medicina 2",
+        "CAFETERÍA: Cafeteria Educacion",
+        "CAFETERÍA: Cafeteria Ingenieria Quimica",
+        "CAFETERÍA: Cafeteria Civil-Minas"
+      ],
+      "segundos": 3.7,
+      "checks": {
+        "precios": {
+          "pass": true,
+          "precios": 0,
+          "inventados": []
+        },
+        "formato": {
+          "pass": true
+        },
+        "presupuesto": {
+          "pass": true,
+          "excedidos": []
+        },
+        "cercania": {
+          "pass": true,
+          "esperado": [
+            "Cafeteria Medicina 1",
+            "Cafeteria Medicina 2"
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -33,6 +33,7 @@ CACHE_VERSION = "bedrock-v1"
 EMBED_DIMENSIONS = 512
 MAX_DISTANCE_METERS = 2500
 MAX_DOCS_PER_STORE = 3
+NEAREST_STORES = 3
 
 
 def build_documents(data: Dict) -> Tuple[List[str], List[Dict]]:
@@ -301,17 +302,21 @@ class BuhoRAGBedrock:
                     continue
                 seen_stores[store_id] = seen_stores.get(store_id, 0) + 1
 
-            dist = None
-            lat2, lon2 = meta.get('latitud'), meta.get('longitud')
-            if has_location and lat2 is not None and lon2 is not None:
-                dist = calculate_distance(user_lat, user_lon, lat2, lon2)
-                if dist > MAX_DISTANCE_METERS:
-                    continue
-                lines = doc.split('\n')
-                lines.insert(2, f"DISTANCIA: {dist:.0f} metros")
-                doc = '\n'.join(lines)
-
+            dist, doc = self._with_distance(idx, user_lat, user_lon)
+            if dist is not None and dist > MAX_DISTANCE_METERS:
+                continue
             results.append((dist, doc))
+
+        if has_location:
+            # Las cafeterías más cercanas entran aunque no estén entre las más similares
+            # ("cosas por 50 pesos cerca de economía" dejaba fuera a la de al lado)
+            for store_id in self._nearest_store_ids(user_lat, user_lon):
+                if store_id in seen_stores:
+                    continue
+                seen_stores[store_id] = 1
+                best = max((i for i, m in enumerate(self.doc_metadata) if m.get('id') == store_id),
+                           key=lambda i: scores[i])
+                results.append(self._with_distance(best, user_lat, user_lon))
 
         # Con ubicación, el modelo recibe las cafeterías de la más cercana a la más lejana
         # (sort estable: dentro de la misma cafetería se conserva el orden por relevancia)
@@ -319,6 +324,25 @@ class BuhoRAGBedrock:
             results.sort(key=lambda r: r[0] if r[0] is not None else float('inf'))
 
         return [doc for _, doc in results[:k]]
+
+    def _with_distance(self, idx: int, user_lat, user_lon) -> Tuple[Optional[float], str]:
+        """El documento con su línea de DISTANCIA, si hay ubicación y coordenadas."""
+        doc, meta = self.documents[idx], self.doc_metadata[idx]
+        lat2, lon2 = meta.get('latitud'), meta.get('longitud')
+        if user_lat is None or user_lon is None or lat2 is None or lon2 is None:
+            return None, doc
+        dist = calculate_distance(user_lat, user_lon, lat2, lon2)
+        lines = doc.split('\n')
+        lines.insert(2, f"DISTANCIA: {dist:.0f} metros")
+        return dist, '\n'.join(lines)
+
+    def _nearest_store_ids(self, lat, lon, n: int = NEAREST_STORES) -> List:
+        stores = {}
+        for meta in self.doc_metadata:
+            if meta.get('latitud') is not None and meta.get('longitud') is not None:
+                stores[meta['id']] = calculate_distance(lat, lon, meta['latitud'], meta['longitud'])
+        nearest = sorted((d, sid) for sid, d in stores.items() if d <= MAX_DISTANCE_METERS)
+        return [sid for _, sid in nearest[:n]]
 
     # --- Generación ---
 
@@ -379,7 +403,13 @@ class BuhoRAGBedrock:
         # y después el GPS, solo si está dentro del campus: desde casa, las distancias al
         # GPS descartarían todas las cafeterías.
         target_lat = target_lon = location_name = None
-        places = find_locations(question) or find_locations(search_query)
+        # Solo lo que escribió el usuario: la pregunta reformulada puede traer una cafetería
+        # de las respuestas anteriores del asistente y convertirla en "ubicación".
+        places = find_locations(question)
+        for previous_question, _ in reversed(effective_history[-3:]):
+            if places:
+                break
+            places = find_locations(previous_question)
         location_notes = []
         if places:
             name, target_lat, target_lon = places[0]
