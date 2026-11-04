@@ -119,28 +119,76 @@ textarea:focus-visible {
   animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Estilos oscuros integrados para Leaflet OpenStreetMap */
-.leaflet-dark-tiles .leaflet-tile-pane {
-  filter: brightness(0.68) invert(1) contrast(1.25) hue-rotate(205deg) saturate(0.55);
+/* Mapa (MapLibre): marcador y popup con la paleta UNISON */
+.buho-marcador {
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: var(--color-unison-gold-light);
+  border: 3px solid var(--color-canvas-deep);
+  box-shadow: 0 0 0 2px var(--color-unison-gold-light), 0 6px 14px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  transition: transform 0.15s ease;
 }
 
-.leaflet-popup-content-wrapper {
-  background: #071326 !important;
-  color: #F2F2F0 !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  border-radius: 0.875rem !important;
-  box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.8) !important;
+.buho-marcador:hover,
+.buho-marcador:focus-visible {
+  transform: scale(1.25);
+  outline: none;
 }
 
-.leaflet-popup-tip {
-  background: #071326 !important;
+/* Prefijo .maplibregl-map: el CSS de MapLibre se carga después (carga diferida) y
+   con la misma especificidad nos ganaría */
+.maplibregl-map .maplibregl-popup-content {
+  background: var(--color-canvas-deep);
+  color: var(--color-paper);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.875rem;
+  box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.8);
+  padding: 14px 16px;
 }
 
-.leaflet-container a.leaflet-popup-close-button {
-  color: #a3a3a3 !important;
-  padding: 6px 8px !important;
+.maplibregl-map .maplibregl-popup-anchor-bottom .maplibregl-popup-tip { border-top-color: var(--color-canvas-deep); }
+.maplibregl-map .maplibregl-popup-anchor-top .maplibregl-popup-tip { border-bottom-color: var(--color-canvas-deep); }
+.maplibregl-map .maplibregl-popup-anchor-left .maplibregl-popup-tip { border-right-color: var(--color-canvas-deep); }
+.maplibregl-map .maplibregl-popup-anchor-right .maplibregl-popup-tip { border-left-color: var(--color-canvas-deep); }
+
+.maplibregl-map .maplibregl-popup-close-button {
+  color: #a3a3a3;
+  font-size: 18px;
+  padding: 2px 8px;
 }
 
-.leaflet-container a.leaflet-popup-close-button:hover {
-  color: #ffffff !important;
+.maplibregl-map .maplibregl-popup-close-button:hover {
+  color: #ffffff;
+  background: transparent;
+}
+
+/* Controles de zoom y atribución en oscuro */
+.maplibregl-map .maplibregl-ctrl-group {
+  background: var(--color-canvas-deep);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+
+.maplibregl-map .maplibregl-ctrl-group button + button {
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+
+.maplibregl-map .maplibregl-ctrl-group button .maplibregl-ctrl-icon {
+  filter: invert(1) brightness(0.85);
+}
+
+.maplibregl-map .maplibregl-ctrl-attrib,
+.maplibregl-map .maplibregl-ctrl-attrib.maplibregl-compact {
+  background: rgba(7, 19, 38, 0.85);
+  color: var(--color-silver);
+}
+
+.maplibregl-map .maplibregl-ctrl-attrib a {
+  color: var(--color-silver);
+}
+
+.maplibregl-map .maplibregl-ctrl-attrib-button {
+  filter: invert(1);
 }
