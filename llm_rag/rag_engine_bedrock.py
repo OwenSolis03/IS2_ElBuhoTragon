@@ -17,6 +17,7 @@ import json
 import logging
 import os
 import re
+import unicodedata
 from typing import List, Dict, Optional, Tuple
 
 import boto3
@@ -32,6 +33,9 @@ CACHE_VERSION = "bedrock-v1"
 EMBED_DIMENSIONS = 512
 MAX_DISTANCE_METERS = 2500
 MAX_DOCS_PER_STORE = 3
+NEAREST_STORES = 3
+CONTEXT_DOCS = 10
+CONTEXT_DOCS_WITH_PRICE_LIST = 4
 
 
 def build_documents(data: Dict) -> Tuple[List[str], List[Dict]]:
@@ -107,6 +111,91 @@ def filter_by_budget(docs: List[str], budget: float) -> List[str]:
     return filtered
 
 
+CHEAPEST_INTENT = re.compile(r'm[aá]s\s+(barat|econ[oó]mic|accesible)|menor precio|lo barato', re.IGNORECASE)
+# El prompt pide máximo 3 cafeterías; una lista más larga hacía que el modelo listara todo
+MAX_PRICE_LIST_ITEMS = 6
+MAX_PRICE_LIST_STORES = 3
+
+# Palabras de las preguntas que también aparecen en nombres de platillos y no son un platillo
+DISH_STOPWORDS = {
+    'algo', 'barat', 'cafeteria', 'cerca', 'comer', 'comida', 'cosa', 'donde', 'economic', 'grande',
+    'chica', 'chico', 'mediana', 'orden', 'peso', 'precio', 'quiero', 'sencill', 'tienda', 'venden',
+    # Categorías del menú, no platillos
+    'desayuno', 'bebida', 'postr', 'snack',
+}
+
+
+def _stems(text: str) -> set:
+    """Palabras de 4+ letras sin acentos ni plural: "Molletes" y "mollete" -> "mollet"."""
+    text = unicodedata.normalize('NFD', text.lower())
+    text = ''.join(c for c in text if unicodedata.category(c) != 'Mn')
+    return {re.sub(r'e$', '', re.sub(r's$', '', w)) for w in re.findall(r'[a-zñ]+', text) if len(w) >= 4}
+
+
+def build_menu_items(data: Dict) -> List[Dict]:
+    """Lista plana de platillos con su cafetería, para búsquedas por nombre y precio."""
+    stores = {t.get('id_tiendita'): t for t in data.get('tienditas', [])}
+    items = []
+    for m in data.get('menus', []):
+        store = stores.get(m.get('id_tiendita'))
+        try:
+            price = float(m['precio'])
+        except (TypeError, ValueError, KeyError):
+            continue
+        if not store:
+            continue
+        name = m['nombre'].strip().replace("\n", " ")
+        items.append({
+            'name': name, 'price': price, 'stems': _stems(name),
+            'store': re.sub(r'([a-z])([A-Z])', r'\1 \2', store.get('nombre', 'Desconocida')),
+            'latitud': store.get('latitud'), 'longitud': store.get('longitud'),
+        })
+    return items
+
+
+def find_dish_terms(text: str, items: List[Dict]) -> List[str]:
+    """Raíces de la pregunta que nombran platillos de los datos ("molletes" -> ["mollet"])."""
+    vocabulary = set().union(*(i['stems'] for i in items)) if items else set()
+    return sorted((_stems(text) & vocabulary) - DISH_STOPWORDS)
+
+
+def price_list_doc(items: List[Dict], terms: List[str], cheapest: bool, budget: Optional[float] = None,
+                   origin: Optional[Tuple[float, float]] = None) -> Optional[str]:
+    """
+    Documento con los platillos que coinciden, de menor a mayor precio. La búsqueda por
+    similitud no garantiza traer la opción más barata (los Mollete Sencillo de $30 no
+    salían en "¿dónde venden molletes?"), así que se arma en código desde los datos.
+    """
+    if terms:
+        # Primero los que tienen todas las palabras ("torta de jamón"); si ninguno, cualquiera
+        matches = [i for i in items if set(terms) <= i['stems']] or \
+                  [i for i in items if set(terms) & i['stems']]
+        header = "PLATILLOS QUE COINCIDEN CON LA PREGUNTA, de menor a mayor precio (el primero es el más barato):"
+    elif cheapest:
+        matches = list(items)
+        header = "PLATILLOS MÁS BARATOS DE TODAS LAS CAFETERÍAS, de menor a mayor precio:"
+    else:
+        return None
+
+    if budget:
+        matches = [i for i in matches if i['price'] <= budget]
+    lines, stores = [], set()
+    for i in sorted(matches, key=lambda i: i['price']):
+        if i['store'] not in stores and len(stores) >= MAX_PRICE_LIST_STORES:
+            continue
+        where = i['store']
+        if origin:
+            dist = calculate_distance(origin[0], origin[1], i['latitud'], i['longitud'])
+            if dist > MAX_DISTANCE_METERS:
+                continue
+            where += f", a {dist:.0f} metros"
+        stores.add(i['store'])
+        lines.append(f"- {i['name']} en {where} (${i['price']:.0f} MXN)")
+        if len(lines) >= MAX_PRICE_LIST_ITEMS:
+            break
+    return "\n".join([header] + lines) if lines else None
+
+
 def clean_answer(answer: str) -> str:
     """Normaliza el formato de lista con viñetas que espera el ChatWidget."""
     answer = answer.replace("**", "").replace("__", "")
@@ -130,6 +219,7 @@ class BuhoRAGBedrock:
         self.documents: List[str] = []
         self.doc_metadata: List[Dict] = []
         self.embeddings: Optional[np.ndarray] = None
+        self.menu_items: List[Dict] = []
         self.chat_history: List[Tuple[str, str]] = []
 
         # Nova 2 Lite: en pruebas fue el único modelo económico que no inventó precios
@@ -170,6 +260,7 @@ class BuhoRAGBedrock:
             self.load_data()
 
         self.documents, self.doc_metadata = build_documents(self.data)
+        self.menu_items = build_menu_items(self.data)
 
         # Caché en disco: solo se recalculan los embeddings si cambian los documentos o el modelo
         fingerprint = hashlib.sha256(
@@ -218,17 +309,21 @@ class BuhoRAGBedrock:
                     continue
                 seen_stores[store_id] = seen_stores.get(store_id, 0) + 1
 
-            dist = None
-            lat2, lon2 = meta.get('latitud'), meta.get('longitud')
-            if has_location and lat2 is not None and lon2 is not None:
-                dist = calculate_distance(user_lat, user_lon, lat2, lon2)
-                if dist > MAX_DISTANCE_METERS:
-                    continue
-                lines = doc.split('\n')
-                lines.insert(2, f"DISTANCIA: {dist:.0f} metros")
-                doc = '\n'.join(lines)
-
+            dist, doc = self._with_distance(idx, user_lat, user_lon)
+            if dist is not None and dist > MAX_DISTANCE_METERS:
+                continue
             results.append((dist, doc))
+
+        if has_location:
+            # Las cafeterías más cercanas entran aunque no estén entre las más similares
+            # ("cosas por 50 pesos cerca de economía" dejaba fuera a la de al lado)
+            for store_id in self._nearest_store_ids(user_lat, user_lon):
+                if store_id in seen_stores:
+                    continue
+                seen_stores[store_id] = 1
+                best = max((i for i, m in enumerate(self.doc_metadata) if m.get('id') == store_id),
+                           key=lambda i: scores[i])
+                results.append(self._with_distance(best, user_lat, user_lon))
 
         # Con ubicación, el modelo recibe las cafeterías de la más cercana a la más lejana
         # (sort estable: dentro de la misma cafetería se conserva el orden por relevancia)
@@ -236,6 +331,25 @@ class BuhoRAGBedrock:
             results.sort(key=lambda r: r[0] if r[0] is not None else float('inf'))
 
         return [doc for _, doc in results[:k]]
+
+    def _with_distance(self, idx: int, user_lat, user_lon) -> Tuple[Optional[float], str]:
+        """El documento con su línea de DISTANCIA, si hay ubicación y coordenadas."""
+        doc, meta = self.documents[idx], self.doc_metadata[idx]
+        lat2, lon2 = meta.get('latitud'), meta.get('longitud')
+        if user_lat is None or user_lon is None or lat2 is None or lon2 is None:
+            return None, doc
+        dist = calculate_distance(user_lat, user_lon, lat2, lon2)
+        lines = doc.split('\n')
+        lines.insert(2, f"DISTANCIA: {dist:.0f} metros")
+        return dist, '\n'.join(lines)
+
+    def _nearest_store_ids(self, lat, lon, n: int = NEAREST_STORES) -> List:
+        stores = {}
+        for meta in self.doc_metadata:
+            if meta.get('latitud') is not None and meta.get('longitud') is not None:
+                stores[meta['id']] = calculate_distance(lat, lon, meta['latitud'], meta['longitud'])
+        nearest = sorted((d, sid) for sid, d in stores.items() if d <= MAX_DISTANCE_METERS)
+        return [sid for _, sid in nearest[:n]]
 
     # --- Generación ---
 
@@ -296,7 +410,13 @@ class BuhoRAGBedrock:
         # y después el GPS, solo si está dentro del campus: desde casa, las distancias al
         # GPS descartarían todas las cafeterías.
         target_lat = target_lon = location_name = None
-        places = find_locations(question) or find_locations(search_query)
+        # Solo lo que escribió el usuario: la pregunta reformulada puede traer una cafetería
+        # de las respuestas anteriores del asistente y convertirla en "ubicación".
+        places = find_locations(question)
+        for previous_question, _ in reversed(effective_history[-3:]):
+            if places:
+                break
+            places = find_locations(previous_question)
         location_notes = []
         if places:
             name, target_lat, target_lon = places[0]
@@ -321,10 +441,20 @@ class BuhoRAGBedrock:
             location_notes.append(f"DISTANCIA ENTRE {a.upper()} Y {b.upper()}: {meters:.0f} metros "
                                   f"(unos {max(1, round(meters / 80))} min caminando).")
 
-        # 3. Contexto
-        context_docs = self._retrieve_context(search_query, target_lat, target_lon, k=10)
+        # 3. Contexto. Platillo concreto o "el más barato": lista por precio armada en código,
+        # al principio. Con ella bastan menos documentos por similitud; con 10 el modelo
+        # listaba 6 o 7 cafeterías en vez de 3.
+        dish_terms = find_dish_terms(question, self.menu_items) or find_dish_terms(search_query, self.menu_items)
+        wants_cheapest = bool(CHEAPEST_INTENT.search(question) or CHEAPEST_INTENT.search(search_query))
+        origin = (target_lat, target_lon) if target_lat is not None else None
+        price_doc = price_list_doc(self.menu_items, dish_terms, wants_cheapest, budget_val, origin)
+
+        context_docs = self._retrieve_context(search_query, target_lat, target_lon,
+                                              k=CONTEXT_DOCS_WITH_PRICE_LIST if price_doc else CONTEXT_DOCS)
         if budget_val:
             context_docs = filter_by_budget(context_docs, budget_val)
+        if price_doc:
+            context_docs.insert(0, price_doc)
         context_block = "\n\n".join(context_docs) if context_docs else \
             "No se encontró información relevante en la base de datos para esta consulta."
 
@@ -352,7 +482,7 @@ REGLAS:
 3. Si hay DISTANCIA, menciona los metros y respeta el orden de los DATOS (ya van de más cerca a más lejos)
 4. Máximo 3 cafeterías y 4 platillos por cafetería; elige los más relevantes para la pregunta
 5. Usa los precios EXACTOS de los DATOS; nunca inventes ni redondees un precio
-6. Si preguntan "más barato", busca precios menores
+6. Si los DATOS traen una lista de PLATILLOS de menor a mayor precio, úsala para "el más barato" y para decir dónde venden un platillo
 {f"7. PRESUPUESTO: ${budget_val:.0f} pesos; no sugieras nada más caro" if budget_val else ""}"""
 
         messages = self._history_messages(effective_history[-6:])

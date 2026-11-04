@@ -194,3 +194,116 @@ class UbicacionRAGTests(TestCase):
         from llm_rag.rag_utils import is_on_campus
         self.assertFalse(is_on_campus(29.13, -111.01))     # ~8 km, otra parte de Hermosillo
         self.assertTrue(is_on_campus(29.0846, -110.9625))  # junto a la cafetería de Derecho
+
+
+DATOS_PRUEBA = {
+    'tienditas': [
+        {'id_tiendita': 1, 'nombre': 'Cafeteria Derecho', 'latitud': '29.084596', 'longitud': '-110.962472'},
+        {'id_tiendita': 2, 'nombre': 'Cafeteria Artes', 'latitud': '29.081127', 'longitud': '-110.959141'},
+        {'id_tiendita': 3, 'nombre': 'Cafeteria Medicina', 'latitud': '29.081320', 'longitud': '-110.969137'},
+    ],
+    'menus': [
+        {'nombre': 'Molletes', 'precio': '45.00', 'id_tiendita': 1, 'categoria': 'Comida'},
+        {'nombre': 'Mollete Sencillo', 'precio': '30.00', 'id_tiendita': 2, 'categoria': 'Comida'},
+        {'nombre': 'Torta de jamon', 'precio': '50.00', 'id_tiendita': 1, 'categoria': 'Comida'},
+        {'nombre': 'Paletas', 'precio': '5.00', 'id_tiendita': 3, 'categoria': 'Postres'},
+        {'nombre': 'Chilaquiles', 'precio': '60.00', 'id_tiendita': 3, 'categoria': 'Desayuno'},
+    ],
+}
+
+
+class ListaDePreciosRAGTests(TestCase):
+    """Lista determinista de platillos por precio (sin llamar a AWS)."""
+
+    def setUp(self):
+        from llm_rag.rag_engine_bedrock import build_menu_items
+        self.items = build_menu_items(DATOS_PRUEBA)
+
+    def test_detecta_platillo_en_plural_y_con_acento(self):
+        from llm_rag.rag_engine_bedrock import find_dish_terms
+        self.assertEqual(find_dish_terms("¿dónde venden molletes?", self.items), ["mollet"])
+        self.assertEqual(find_dish_terms("¿cuál es la torta de jamón más barata?", self.items), ["jamon", "torta"])
+
+    def test_no_confunde_palabras_de_la_pregunta_con_platillos(self):
+        from llm_rag.rag_engine_bedrock import find_dish_terms
+        self.assertEqual(find_dish_terms("¿qué puedo comer con 40 pesos?", self.items), [])
+        self.assertEqual(find_dish_terms("¿dónde desayuno?", self.items), [])
+
+    def test_lista_de_platillo_va_del_mas_barato_al_mas_caro(self):
+        from llm_rag.rag_engine_bedrock import price_list_doc
+        doc = price_list_doc(self.items, ["mollet"], cheapest=False)
+        lineas = doc.split("\n")[1:]
+        self.assertEqual(lineas, ["- Mollete Sencillo en Cafeteria Artes ($30 MXN)",
+                                  "- Molletes en Cafeteria Derecho ($45 MXN)"])
+
+    def test_mas_barato_sin_platillo_usa_todo_el_menu(self):
+        from llm_rag.rag_engine_bedrock import CHEAPEST_INTENT, price_list_doc
+        self.assertTrue(CHEAPEST_INTENT.search("¿qué es lo más barato?"))
+        self.assertTrue(CHEAPEST_INTENT.search("la chimichanga más económica"))
+        doc = price_list_doc(self.items, [], cheapest=True)
+        self.assertIn("Paletas en Cafeteria Medicina ($5 MXN)", doc.split("\n")[1])
+
+    def test_sin_platillo_ni_mas_barato_no_agrega_lista(self):
+        from llm_rag.rag_engine_bedrock import price_list_doc
+        self.assertIsNone(price_list_doc(self.items, [], cheapest=False))
+
+    def test_lista_respeta_presupuesto_y_sobrevive_al_filtro(self):
+        from llm_rag.rag_engine_bedrock import filter_by_budget, price_list_doc
+        doc = price_list_doc(self.items, ["mollet"], cheapest=False, budget=40)
+        self.assertNotIn("$45", doc)
+        self.assertEqual(filter_by_budget([doc], 40), [doc])
+
+    def test_lista_incluye_maximo_tres_cafeterias(self):
+        from llm_rag.rag_engine_bedrock import build_menu_items, price_list_doc
+        datos = {'tienditas': [{'id_tiendita': n, 'nombre': f'Cafe {n}'} for n in range(1, 6)],
+                 'menus': [{'nombre': 'Taco', 'precio': str(20 + n), 'id_tiendita': n} for n in range(1, 6)]}
+        doc = price_list_doc(build_menu_items(datos), ["taco"], cheapest=False)
+        self.assertEqual([l.split(" en ")[1] for l in doc.split("\n")[1:]],
+                         ["Cafe 1 ($21 MXN)", "Cafe 2 ($22 MXN)", "Cafe 3 ($23 MXN)"])
+
+    def test_lista_con_ubicacion_muestra_metros(self):
+        from llm_rag.rag_engine_bedrock import price_list_doc
+        doc = price_list_doc(self.items, ["mollet"], cheapest=False, origin=(29.0846, -110.9625))
+        self.assertIn("Molletes en Cafeteria Derecho, a 3 metros ($45 MXN)", doc)
+
+
+class RecuperacionRAGTests(TestCase):
+    """Recuperación y ubicación del motor, con embeddings y modelo falsos (sin AWS)."""
+
+    def setUp(self):
+        import numpy as np
+        from llm_rag.rag_engine_bedrock import BuhoRAGBedrock, build_documents, build_menu_items
+        self.rag = BuhoRAGBedrock(data_path="/no/existe.json")
+        self.rag.data = DATOS_PRUEBA
+        self.rag.documents, self.rag.doc_metadata = build_documents(DATOS_PRUEBA)
+        self.rag.menu_items = build_menu_items(DATOS_PRUEBA)
+        # La pregunta se parece solo a los documentos de Medicina (la más lejana de Derecho)
+        self.rag.embeddings = np.array(
+            [[1.0, 0.0] if m['id'] == 3 else [0.0, 1.0] for m in self.rag.doc_metadata], dtype=np.float32)
+        self.rag._embed = lambda text: np.array([1.0, 0.0], dtype=np.float32)
+        self.prompts = []
+
+        def converse(model_id, system, messages, max_tokens):
+            self.prompts.append((system, messages[-1]["content"][0]["text"]))
+            return "Cafetería Artes"  # la reformulación "copia" una cafetería del historial
+        self.rag._converse = converse
+
+    def test_con_ubicacion_entra_la_cafeteria_mas_cercana(self):
+        docs = self.rag._retrieve_context("algo", 29.0846, -110.9625, k=1)
+        self.assertIn("CAFETERÍA: Cafeteria Derecho", docs[0])
+        self.assertIn("DISTANCIA: 3 metros", docs[0])
+
+    def test_lugar_del_historial_sale_de_lo_que_escribio_el_usuario(self):
+        historial = [("estoy en medicina", "Cerca de Medicina está Cafeteria Medicina")]
+        resultado = self.rag.query("¿y algo con 30 pesos?", history=historial)
+        self.assertEqual(resultado['location_used'], "MEDICINA")
+
+    def test_reformulacion_no_inventa_ubicacion(self):
+        historial = [("¿dónde venden molletes?", "• Cafeteria Artes: Mollete Sencillo ($30)")]
+        resultado = self.rag.query("¿y cuál es el más barato?", history=historial)
+        self.assertIsNone(resultado['location_used'])
+
+    def test_platillo_agrega_lista_de_precios_al_contexto(self):
+        resultado = self.rag.query("¿dónde venden molletes?", history=[])
+        self.assertTrue(resultado['context'][0].startswith("PLATILLOS QUE COINCIDEN"))
+        self.assertIn("Mollete Sencillo en Cafeteria Artes ($30 MXN)", self.prompts[-1][1])
