@@ -1,0 +1,133 @@
+{
+  "fecha": "2026-11-03_213043",
+  "label": "base-reintento",
+  "commit": "10e0358",
+  "modelo": "us.amazon.nova-2-lite-v1:0",
+  "modelo_reformular": "us.amazon.nova-micro-v1:0",
+  "n_preguntas": 2,
+  "tokens": {
+    "us.amazon.nova-micro-v1:0": {
+      "entrada": 152,
+      "salida": 14,
+      "llamadas": 1
+    },
+    "amazon.titan-embed-text-v2:0": {
+      "entrada": 27,
+      "salida": 0,
+      "llamadas": 2
+    },
+    "us.amazon.nova-2-lite-v1:0": {
+      "entrada": 3841,
+      "salida": 59,
+      "llamadas": 2
+    }
+  },
+  "costo_usd": 0.00144,
+  "resumen": {
+    "metricas": {
+      "formato": {
+        "ok": 2,
+        "total": 2,
+        "tasa": 1.0
+      },
+      "mas_barato": {
+        "ok": 0,
+        "total": 1,
+        "tasa": 0.0
+      },
+      "precios": {
+        "ok": 2,
+        "total": 2,
+        "tasa": 1.0
+      },
+      "sin_respuesta": {
+        "ok": 1,
+        "total": 1,
+        "tasa": 1.0
+      }
+    },
+    "precios_citados": 2,
+    "precios_inventados": 0,
+    "preguntas_todo_ok": 1
+  },
+  "resultados": [
+    {
+      "id": "historial-molletes-barato",
+      "tipo": "historial",
+      "pregunta": "¿y cuál es el más barato?",
+      "historial": [
+        [
+          "¿dónde venden molletes?",
+          "Los molletes están en:\n• Cafeteria Civil-Minas: Mollete ($50)\n• Cafeteria Educacion: Mollete/Pan Pizza (1 ingrediente) ($45)\n• Cafeteria Educacion: Mollete/Pan Pizza (2 ingrediente) ($50)"
+        ]
+      ],
+      "esperado": {
+        "mas_barato": {
+          "precio": 30.0,
+          "tiendas": [
+            1,
+            10
+          ],
+          "platillos": [
+            "Mollete Sencillo"
+          ]
+        }
+      },
+      "respuesta": "Los molletes más baratos están en:\n• Cafeteria Educacion: Mollete/Pan Pizza (1 ingrediente) ($45)\n• Cafeteria Psicologia/Comunicacion: Mollete ($50)",
+      "error": null,
+      "presupuesto_detectado": null,
+      "ubicacion_usada": null,
+      "docs_contexto": 10,
+      "segundos": 2.5,
+      "checks": {
+        "precios": {
+          "pass": true,
+          "precios": 2,
+          "inventados": []
+        },
+        "formato": {
+          "pass": true
+        },
+        "mas_barato": {
+          "pass": false,
+          "esperado": {
+            "precio": 30.0,
+            "tiendas": [
+              1,
+              10
+            ],
+            "platillos": [
+              "Mollete Sencillo"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "sin-respuesta-vegano",
+      "tipo": "sin_respuesta",
+      "pregunta": "¿hay comida vegana certificada?",
+      "historial": [],
+      "esperado": {},
+      "respuesta": "No hay información sobre comida vegana certificada en las cafeterías proporcionadas.",
+      "error": null,
+      "presupuesto_detectado": null,
+      "ubicacion_usada": null,
+      "docs_contexto": 10,
+      "segundos": 1.8,
+      "checks": {
+        "precios": {
+          "pass": true,
+          "precios": 0,
+          "inventados": []
+        },
+        "formato": {
+          "pass": true
+        },
+        "sin_respuesta": {
+          "pass": true
+        }
+      }
+    }
+  ]
+}

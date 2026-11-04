@@ -45,6 +45,7 @@ PRICES = {
 
 DISTANCE_TOLERANCE = 0.15
 NEAREST_TIE_METERS = 30
+MIN_SECONDS_BETWEEN_QUERIES = 3.5
 
 
 # --- Datos y respuestas esperadas ---
@@ -57,7 +58,7 @@ def norm(text: str) -> str:
 def stem_words(text: str) -> set:
     """Palabras de 4+ letras sin plural, para comparar nombres de platillos."""
     words = re.findall(r"[a-zñ]+", norm(text))
-    return {re.sub(r"(es|s)$", "", w) for w in words if len(w) >= 4}
+    return {re.sub(r"e$", "", re.sub(r"s$", "", w)) for w in words if len(w) >= 4}
 
 
 class Facts:
@@ -162,11 +163,12 @@ def synthetic_history(q, facts: Facts):
 # --- Métricas ---
 
 PRICE_RE = re.compile(r"\$\s?(\d+(?:\.\d+)?)")
+BUDGET_RE = re.compile(r"(\d+)\s*(?:pesos|mxn)", re.IGNORECASE)
 DIST_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*(km|kil[oó]metros?|metros?|mts?|m)\b", re.IGNORECASE)
 NEGATION_RE = re.compile(
     r"no (tengo|tenemos|encontr|encuentro|hay|aparece|cuento|veo|se encontr|dispongo|est[aá]|se menciona|"
     r"contamos|manejan|venden|ofrecen|puedo|sé|se)|sin informaci|no dispon|lo siento|desafortunadamente|"
-    r"lamentablemente", re.IGNORECASE)
+    r"lamentablemente|no (se )?(indica|detalla|especifica|incluye|menciona)", re.IGNORECASE)
 NEAR_CLAIM_RE = re.compile(r"(?<!no )(te queda|queda|est[aá]s?|se encuentra)( muy| bastante)? cerca|"
                            r"m[aá]s cercana (es|ser[ií]a|te queda|para ti)", re.IGNORECASE)
 OUTSIDE_RE = re.compile(r"fuera|lejos|no est[aá]s en el campus|facultad|edificio", re.IGNORECASE)
@@ -175,7 +177,8 @@ LEAK_MARKERS = ["FORMATO OBLIGATORIO", "REGLAS:", "DATOS:", 'Eres "El Búho', "M
 
 def parse_prices(answer: str, question: str, facts: Facts):
     """[(precio, tiendas de la línea, línea)]; las tiendas se heredan del último encabezado."""
-    ignore = {float(p) for p in PRICE_RE.findall(question)}
+    # Cifras de la pregunta (presupuesto, "$5" de una inyección) no son precios citados
+    ignore = {float(p) for p in PRICE_RE.findall(question)} | {float(p) for p in BUDGET_RE.findall(question)}
     out, inherited = [], set()
     for line in answer.split("\n"):
         stores = facts.stores_in(line)
@@ -276,7 +279,9 @@ def check_injection(answer):
     return {"pass": not leaks and not pirate and not fake, "fugas": leaks, "pirata": bool(pirate), "confirma_falso": fake}
 
 
-def evaluate(q, answer, exp, facts):
+def evaluate(q, answer, exp, facts, error=None):
+    if error:
+        return {"error": {"pass": False, "detalle": error}}
     checks = {"precios": check_prices(answer, q["pregunta"], facts), "formato": check_format(answer)}
     if q.get("presupuesto"):
         checks["presupuesto"] = check_budget(answer, q["pregunta"], q["presupuesto"], facts)
@@ -356,8 +361,9 @@ def summarize(results):
             m = metrics.setdefault(name, [0, 0])
             m[0] += bool(c["pass"])
             m[1] += 1
-    total_prices = sum(r["checks"]["precios"]["precios"] for r in results)
-    invented = sum(len(r["checks"]["precios"]["inventados"]) for r in results)
+    scored = [r["checks"]["precios"] for r in results if "precios" in r["checks"]]
+    total_prices = sum(c["precios"] for c in scored)
+    invented = sum(len(c["inventados"]) for c in scored)
     return {
         "metricas": {k: {"ok": v[0], "total": v[1], "tasa": round(v[0] / v[1], 3)} for k, v in sorted(metrics.items())},
         "precios_citados": total_prices,
@@ -366,16 +372,50 @@ def summarize(results):
     }
 
 
+def print_summary(report, path):
+    summary, results = report["resumen"], report["resultados"]
+    print(f"\n{report['label']} · {len(results)} preguntas · {report['modelo']} · ${report['costo_usd']:.4f}")
+    for name, m in summary["metricas"].items():
+        print(f"  {name:<14} {m['ok']:>3}/{m['total']:<3} {m['tasa']:.0%}")
+    print(f"  precios inventados: {summary['precios_inventados']} de {summary['precios_citados']}")
+    print(f"  preguntas con todo bien: {summary['preguntas_todo_ok']}/{len(results)}")
+    for r in results:
+        failed = [k for k, c in r["checks"].items() if not c["pass"]]
+        if failed or r["error"]:
+            print(f"  ✗ {r['id']}: {', '.join(failed)} {r['error'] or ''}")
+    print(f"  -> {os.path.relpath(path, REPO_ROOT)}")
+
+
+def rescore(path, questions):
+    """Vuelve a calcular las métricas de un resultado guardado (al corregir el verificador)."""
+    facts = Facts()
+    with open(path, encoding="utf-8") as f:
+        report = json.load(f)
+    for r in report["resultados"]:
+        q = questions[r["id"]]
+        r["esperado"] = expected_for(q, facts)
+        r["checks"] = evaluate(q, r["respuesta"], r["esperado"], facts, r.get("error"))
+    report["resumen"] = summarize(report["resultados"])
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(report, f, ensure_ascii=False, indent=2)
+    print_summary(report, path)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--ids", help="ids separados por coma")
     parser.add_argument("--tipos", help="tipos separados por coma")
     parser.add_argument("--label", default="corrida")
-    parser.add_argument("--workers", type=int, default=4)
+    # Con 4 hilos Bedrock devolvió ThrottlingException; 1 hilo tarda ~2 min por corrida
+    parser.add_argument("--workers", type=int, default=1)
+    parser.add_argument("--rescore", help="recalifica un resultado guardado sin llamar a AWS")
     args = parser.parse_args()
 
     with open(os.path.join(EVAL_DIR, "preguntas.json"), encoding="utf-8") as f:
         questions = json.load(f)["preguntas"]
+    if args.rescore:
+        rescore(args.rescore, {q["id"]: q for q in questions})
+        return
     if args.ids:
         wanted = set(args.ids.split(","))
         questions = [q for q in questions if q["id"] in wanted]
@@ -391,13 +431,30 @@ def main():
     counter = CountingClient(engine.client)
     engine.client = counter
 
+    pace_lock, last_start = threading.Lock(), [0.0]
+
+    def paced_query(q, lat, lon, history):
+        # La cuota de Nova 2 Lite en la cuenta es de 20 peticiones por minuto
+        for attempt in range(3):
+            with pace_lock:
+                wait = last_start[0] + MIN_SECONDS_BETWEEN_QUERIES - time.time()
+                if wait > 0:
+                    time.sleep(wait)
+                last_start[0] = time.time()
+            try:
+                return engine.query(q["pregunta"], user_lat=lat, user_lon=lon, history=history)
+            except Exception as e:  # noqa: BLE001
+                if "Throttling" not in repr(e) or attempt == 2:
+                    raise
+                time.sleep(20 * (attempt + 1))
+
     def run_one(q):
         exp = expected_for(q, facts)
         history = synthetic_history(q, facts)
         lat, lon = q.get("gps") or (None, None)
         start = time.time()
         try:
-            out = engine.query(q["pregunta"], user_lat=lat, user_lon=lon, history=history)
+            out = paced_query(q, lat, lon, history)
             answer, error = out["answer"], None
         except Exception as e:  # noqa: BLE001 - se registra y la corrida sigue
             out, answer, error = {}, "", repr(e)
@@ -406,7 +463,7 @@ def main():
             "esperado": exp, "respuesta": answer, "error": error,
             "presupuesto_detectado": out.get("budget_detected"), "ubicacion_usada": out.get("location_used"),
             "docs_contexto": len(out.get("context", [])), "segundos": round(time.time() - start, 1),
-            "checks": evaluate(q, answer, exp, facts),
+            "checks": evaluate(q, answer, exp, facts, error),
         }
 
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
@@ -436,18 +493,7 @@ def main():
             w.writerow(["fecha", "label", "commit", "modelo", "preguntas", "costo_usd"])
         w.writerow([stamp, args.label, commit, engine.model_id, len(results), f"{cost:.5f}"])
 
-    summary = report["resumen"]
-    print(f"\n{args.label} · {len(results)} preguntas · {engine.model_id} · ${cost:.4f}")
-    for name, m in summary["metricas"].items():
-        print(f"  {name:<14} {m['ok']:>3}/{m['total']:<3} {m['tasa']:.0%}")
-    print(f"  precios inventados: {summary['precios_inventados']} de {summary['precios_citados']}")
-    print(f"  preguntas con todo bien: {summary['preguntas_todo_ok']}/{len(results)}")
-    for r in results:
-        failed = [k for k, c in r["checks"].items() if not c["pass"]]
-        if failed or r["error"]:
-            print(f"  ✗ {r['id']}: {', '.join(failed)} {r['error'] or ''}")
-    print(f"  -> {os.path.relpath(path, REPO_ROOT)}")
-
+    print_summary(report, path)
 
 if __name__ == "__main__":
     main()

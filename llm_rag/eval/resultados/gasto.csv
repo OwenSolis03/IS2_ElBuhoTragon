@@ -1,0 +1,4 @@
+fecha,label,commit,modelo,preguntas,costo_usd
+2026-11-03_212828,base-con-throttling,10e0358,us.amazon.nova-2-lite-v1:0,36,0.02752
+2026-11-03_213008,base,10e0358,us.amazon.nova-2-lite-v1:0,36,0.02847
+2026-11-03_213043,base-reintento,10e0358,us.amazon.nova-2-lite-v1:0,2,0.00144
