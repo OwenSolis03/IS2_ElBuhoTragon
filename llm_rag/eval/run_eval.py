@@ -416,12 +416,10 @@ def main():
     if args.rescore:
         rescore(args.rescore, {q["id"]: q for q in questions})
         return
-    if args.ids:
-        wanted = set(args.ids.split(","))
-        questions = [q for q in questions if q["id"] in wanted]
-    if args.tipos:
-        wanted = set(args.tipos.split(","))
-        questions = [q for q in questions if q["tipo"] in wanted]
+    if args.ids or args.tipos:
+        ids = set((args.ids or "").split(","))
+        tipos = set((args.tipos or "").split(","))
+        questions = [q for q in questions if q["id"] in ids or q["tipo"] in tipos]
 
     from llm_rag.rag_engine_bedrock import BuhoRAGBedrock
     facts = Facts()
@@ -462,7 +460,8 @@ def main():
             "id": q["id"], "tipo": q["tipo"], "pregunta": q["pregunta"], "historial": history,
             "esperado": exp, "respuesta": answer, "error": error,
             "presupuesto_detectado": out.get("budget_detected"), "ubicacion_usada": out.get("location_used"),
-            "docs_contexto": len(out.get("context", [])), "segundos": round(time.time() - start, 1),
+            "docs_contexto": len(out.get("context", [])),
+            "contexto_resumen": [doc.split("\n")[0][:90] for doc in out.get("context", [])], "segundos": round(time.time() - start, 1),
             "checks": evaluate(q, answer, exp, facts, error),
         }
 
@@ -488,7 +487,7 @@ def main():
     ledger = os.path.join(RESULTS_DIR, "gasto.csv")
     new = not os.path.exists(ledger)
     with open(ledger, "a", newline="", encoding="utf-8") as f:
-        w = csv.writer(f)
+        w = csv.writer(f, lineterminator="\n")
         if new:
             w.writerow(["fecha", "label", "commit", "modelo", "preguntas", "costo_usd"])
         w.writerow([stamp, args.label, commit, engine.model_id, len(results), f"{cost:.5f}"])

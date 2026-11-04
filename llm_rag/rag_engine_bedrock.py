@@ -17,6 +17,7 @@ import json
 import logging
 import os
 import re
+import unicodedata
 from typing import List, Dict, Optional, Tuple
 
 import boto3
@@ -107,6 +108,86 @@ def filter_by_budget(docs: List[str], budget: float) -> List[str]:
     return filtered
 
 
+CHEAPEST_INTENT = re.compile(r'm[aá]s\s+(barat|econ[oó]mic|accesible)|menor precio|lo barato', re.IGNORECASE)
+MAX_PRICE_LIST_ITEMS = 8
+
+# Palabras de las preguntas que también aparecen en nombres de platillos y no son un platillo
+DISH_STOPWORDS = {
+    'algo', 'barat', 'cafeteria', 'cerca', 'comer', 'comida', 'cosa', 'donde', 'economic', 'grande',
+    'chica', 'chico', 'mediana', 'orden', 'peso', 'precio', 'quiero', 'sencill', 'tienda', 'venden',
+    # Categorías del menú, no platillos
+    'desayuno', 'bebida', 'postr', 'snack',
+}
+
+
+def _stems(text: str) -> set:
+    """Palabras de 4+ letras sin acentos ni plural: "Molletes" y "mollete" -> "mollet"."""
+    text = unicodedata.normalize('NFD', text.lower())
+    text = ''.join(c for c in text if unicodedata.category(c) != 'Mn')
+    return {re.sub(r'e$', '', re.sub(r's$', '', w)) for w in re.findall(r'[a-zñ]+', text) if len(w) >= 4}
+
+
+def build_menu_items(data: Dict) -> List[Dict]:
+    """Lista plana de platillos con su cafetería, para búsquedas por nombre y precio."""
+    stores = {t.get('id_tiendita'): t for t in data.get('tienditas', [])}
+    items = []
+    for m in data.get('menus', []):
+        store = stores.get(m.get('id_tiendita'))
+        try:
+            price = float(m['precio'])
+        except (TypeError, ValueError, KeyError):
+            continue
+        if not store:
+            continue
+        name = m['nombre'].strip().replace("\n", " ")
+        items.append({
+            'name': name, 'price': price, 'stems': _stems(name),
+            'store': re.sub(r'([a-z])([A-Z])', r'\1 \2', store.get('nombre', 'Desconocida')),
+            'latitud': store.get('latitud'), 'longitud': store.get('longitud'),
+        })
+    return items
+
+
+def find_dish_terms(text: str, items: List[Dict]) -> List[str]:
+    """Raíces de la pregunta que nombran platillos de los datos ("molletes" -> ["mollet"])."""
+    vocabulary = set().union(*(i['stems'] for i in items)) if items else set()
+    return sorted((_stems(text) & vocabulary) - DISH_STOPWORDS)
+
+
+def price_list_doc(items: List[Dict], terms: List[str], cheapest: bool, budget: Optional[float] = None,
+                   origin: Optional[Tuple[float, float]] = None) -> Optional[str]:
+    """
+    Documento con los platillos que coinciden, de menor a mayor precio. La búsqueda por
+    similitud no garantiza traer la opción más barata (los Mollete Sencillo de $30 no
+    salían en "¿dónde venden molletes?"), así que se arma en código desde los datos.
+    """
+    if terms:
+        # Primero los que tienen todas las palabras ("torta de jamón"); si ninguno, cualquiera
+        matches = [i for i in items if set(terms) <= i['stems']] or \
+                  [i for i in items if set(terms) & i['stems']]
+        header = "PLATILLOS QUE COINCIDEN CON LA PREGUNTA, de menor a mayor precio (el primero es el más barato):"
+    elif cheapest:
+        matches = list(items)
+        header = "PLATILLOS MÁS BARATOS DE TODAS LAS CAFETERÍAS, de menor a mayor precio:"
+    else:
+        return None
+
+    if budget:
+        matches = [i for i in matches if i['price'] <= budget]
+    lines = []
+    for i in sorted(matches, key=lambda i: i['price']):
+        where = i['store']
+        if origin:
+            dist = calculate_distance(origin[0], origin[1], i['latitud'], i['longitud'])
+            if dist > MAX_DISTANCE_METERS:
+                continue
+            where += f", a {dist:.0f} metros"
+        lines.append(f"- {i['name']} en {where} (${i['price']:.0f} MXN)")
+        if len(lines) >= MAX_PRICE_LIST_ITEMS:
+            break
+    return "\n".join([header] + lines) if lines else None
+
+
 def clean_answer(answer: str) -> str:
     """Normaliza el formato de lista con viñetas que espera el ChatWidget."""
     answer = answer.replace("**", "").replace("__", "")
@@ -130,6 +211,7 @@ class BuhoRAGBedrock:
         self.documents: List[str] = []
         self.doc_metadata: List[Dict] = []
         self.embeddings: Optional[np.ndarray] = None
+        self.menu_items: List[Dict] = []
         self.chat_history: List[Tuple[str, str]] = []
 
         # Nova 2 Lite: en pruebas fue el único modelo económico que no inventó precios
@@ -170,6 +252,7 @@ class BuhoRAGBedrock:
             self.load_data()
 
         self.documents, self.doc_metadata = build_documents(self.data)
+        self.menu_items = build_menu_items(self.data)
 
         # Caché en disco: solo se recalculan los embeddings si cambian los documentos o el modelo
         fingerprint = hashlib.sha256(
@@ -325,6 +408,13 @@ class BuhoRAGBedrock:
         context_docs = self._retrieve_context(search_query, target_lat, target_lon, k=10)
         if budget_val:
             context_docs = filter_by_budget(context_docs, budget_val)
+        # Platillo concreto o "el más barato": lista por precio armada en código, al principio
+        dish_terms = find_dish_terms(question, self.menu_items) or find_dish_terms(search_query, self.menu_items)
+        wants_cheapest = bool(CHEAPEST_INTENT.search(question) or CHEAPEST_INTENT.search(search_query))
+        origin = (target_lat, target_lon) if target_lat is not None else None
+        price_doc = price_list_doc(self.menu_items, dish_terms, wants_cheapest, budget_val, origin)
+        if price_doc:
+            context_docs.insert(0, price_doc)
         context_block = "\n\n".join(context_docs) if context_docs else \
             "No se encontró información relevante en la base de datos para esta consulta."
 
@@ -352,7 +442,7 @@ REGLAS:
 3. Si hay DISTANCIA, menciona los metros y respeta el orden de los DATOS (ya van de más cerca a más lejos)
 4. Máximo 3 cafeterías y 4 platillos por cafetería; elige los más relevantes para la pregunta
 5. Usa los precios EXACTOS de los DATOS; nunca inventes ni redondees un precio
-6. Si preguntan "más barato", busca precios menores
+6. Si los DATOS traen una lista de PLATILLOS de menor a mayor precio, úsala para "el más barato" y para decir dónde venden un platillo
 {f"7. PRESUPUESTO: ${budget_val:.0f} pesos; no sugieras nada más caro" if budget_val else ""}"""
 
         messages = self._history_messages(effective_history[-6:])
