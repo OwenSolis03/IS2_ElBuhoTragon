@@ -1,0 +1,12 @@
+[Unit]
+Description=Respaldo diario de la base de datos de El Buho Tragon
+
+[Timer]
+# 10:00 UTC = 3:00 am en Hermosillo (UTC-7)
+OnCalendar=*-*-* 10:00:00 UTC
+RandomizedDelaySec=15min
+# Si el servidor estaba apagado a esa hora, respaldar al encender
+Persistent=true
+
+[Install]
+WantedBy=timers.target

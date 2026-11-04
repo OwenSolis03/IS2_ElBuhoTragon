@@ -58,8 +58,9 @@ BEDROCK_REGION=us-east-2
 EOF
 fi
 # Valores que dependen del despliegue: se actualizan en cada corrida
-sed -i '/^DJANGO_ALLOWED_HOSTS=/d; /^CORS_ALLOWED_ORIGINS=/d; /^NUM_PROXIES=/d' "$DATA/.env"
+sed -i '/^DJANGO_ALLOWED_HOSTS=/d; /^CORS_ALLOWED_ORIGINS=/d; /^NUM_PROXIES=/d; /^BACKUP_BUCKET=/d' "$DATA/.env"
 echo "DJANGO_ALLOWED_HOSTS=$HOST" >> "$DATA/.env"
+echo "BACKUP_BUCKET=$BUCKET" >> "$DATA/.env"
 # CloudFront + proxy de Amplify + Caddy: la IP del alumno es la 3a desde la derecha
 echo "NUM_PROXIES=3" >> "$DATA/.env"
 [ -n "$CORS_ORIGINS" ] && echo "CORS_ALLOWED_ORIGINS=$CORS_ORIGINS" >> "$DATA/.env"
@@ -85,9 +86,11 @@ echo "== [6/6] Servicios"
 ln -sfn "$release" "$APP/current"
 install -m 644 "$release/deploy/ec2/buho-backend.service" /etc/systemd/system/buho-backend.service
 install -m 644 "$release/deploy/ec2/caddy.service" /etc/systemd/system/caddy.service
+install -m 644 "$release/deploy/ec2/buho-backup.service" /etc/systemd/system/buho-backup.service
+install -m 644 "$release/deploy/ec2/buho-backup.timer" /etc/systemd/system/buho-backup.timer
 sed "s/__HOST__/$HOST/" "$release/deploy/ec2/Caddyfile" > /etc/caddy/Caddyfile
 systemctl daemon-reload
-systemctl enable --now buho-backend caddy
+systemctl enable --now buho-backend caddy buho-backup.timer
 systemctl restart buho-backend
 systemctl reload caddy || systemctl restart caddy
 

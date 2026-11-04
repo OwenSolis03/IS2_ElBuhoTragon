@@ -1,0 +1,14 @@
+[Unit]
+Description=El Buho Tragon - respaldo de la base de datos a S3
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=buho
+Group=buho
+EnvironmentFile=/opt/buho/data/.env
+ExecStart=/opt/buho/current/deploy/ec2/backup-db.sh
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
