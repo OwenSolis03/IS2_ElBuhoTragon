@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "../assets/logo.png";
+import { PASAPORTE_ACTIVO } from "../config";
 import { FiMenu, FiX, FiLogOut, FiUser, FiSettings, FiCompass, FiMap, FiBookOpen, FiMessageSquare } from "react-icons/fi";
 
 const Header = () => {
@@ -124,10 +125,12 @@ const Header = () => {
               <span>Mapa</span>
             </Link>
 
-            <Link to="/cafeterias" className={navLinkClass("/cafeterias")} aria-current={isActive("/cafeterias") ? "page" : undefined}>
-              <FiBookOpen size={16} className={isActive("/cafeterias") ? "text-[#204a8e]" : "text-neutral-400"} />
-              <span>Pasaporte</span>
-            </Link>
+            {PASAPORTE_ACTIVO && (
+              <Link to="/cafeterias" className={navLinkClass("/cafeterias")} aria-current={isActive("/cafeterias") ? "page" : undefined}>
+                <FiBookOpen size={16} className={isActive("/cafeterias") ? "text-[#204a8e]" : "text-neutral-400"} />
+                <span>Pasaporte</span>
+              </Link>
+            )}
 
             {esAdmin && (
               <Link
@@ -244,15 +247,17 @@ const Header = () => {
           >
             Mapa del Campus
           </Link>
-          <Link
-            to="/cafeterias"
-            className={`block px-4 py-3.5 rounded-xl text-base font-medium transition-colors ${
-              isActive("/cafeterias") ? "bg-white/[0.08] text-white font-semibold" : "text-neutral-300 hover:bg-white/[0.04]"
-            }`}
-            onClick={() => setIsMenuOpen(false)}
-          >
-            Pasaporte Tragón
-          </Link>
+          {PASAPORTE_ACTIVO && (
+            <Link
+              to="/cafeterias"
+              className={`block px-4 py-3.5 rounded-xl text-base font-medium transition-colors ${
+                isActive("/cafeterias") ? "bg-white/[0.08] text-white font-semibold" : "text-neutral-300 hover:bg-white/[0.04]"
+              }`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Pasaporte Tragón
+            </Link>
+          )}
 
           <button
             type="button"

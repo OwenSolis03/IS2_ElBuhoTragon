@@ -35,7 +35,7 @@ const Privacidad = () => {
               2. Datos de Cuenta y Autenticación
             </h2>
             <p className="text-neutral-200 leading-relaxed">
-              Al registrarte en el sistema, almacenamos únicamente tu nombre de usuario, correo institucional (@unison.mx) y tu contraseña debidamente hasheada mediante algoritmos criptográficos seguros. Estos datos se emplean estrictamente para la autenticación y el registro de tu Pasaporte Tragón.
+              Al registrarte en el sistema, almacenamos únicamente tu nombre de usuario, correo institucional (@unison.mx) y tu contraseña debidamente hasheada mediante algoritmos criptográficos seguros. Estos datos se emplean estrictamente para la autenticación y para asociar tus reseñas a tu cuenta.
             </p>
           </section>
 

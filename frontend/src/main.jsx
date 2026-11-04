@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { PASAPORTE_ACTIVO } from "./config";
 
 // Páginas Principales
 import Home from "./pages/Home.jsx";
@@ -26,7 +27,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             <Routes>
                 {/* --- RUTAS GENERALES --- */}
                 <Route path="/" element={<Home />} />
-                <Route path="/cafeterias" element={<Cafeterias />} />
+                {/* Pasaporte Tragón: función experimental (ver PASAPORTE_ACTIVO en config.js) */}
+                <Route path="/cafeterias" element={PASAPORTE_ACTIVO ? <Cafeterias /> : <Navigate to="/" replace />} />
                 <Route path="/facultad" element={<Facultad />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/registro" element={<Registro />} />

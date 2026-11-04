@@ -5,7 +5,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ChatWidget from "../components/ChatWidget";
 import { FiAlertCircle, FiLock, FiUser, FiEye, FiEyeOff } from "react-icons/fi";
-import { API_URL } from "../config";
+import { API_URL, PASAPORTE_ACTIVO } from "../config";
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -68,7 +68,7 @@ const Login = () => {
               Iniciar Sesión
             </h1>
             <p className="text-neutral-200 text-base font-light leading-relaxed">
-              Ingresa con tus credenciales para registrar opiniones y consultar tu Pasaporte Tragón.
+              Ingresa con tus credenciales para registrar opiniones{PASAPORTE_ACTIVO ? " y consultar tu Pasaporte Tragón" : ""}.
             </p>
           </div>
 
